@@ -3,7 +3,7 @@
  * Keep the map dominant, use atlas blue #123C52, sand surfaces, copper heritage accents,
  * Noto Kufi Arabic for headings, and IBM Plex Sans Arabic for data/UI.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
@@ -12,6 +12,7 @@ import { filterAtlasSites } from "@shared/atlasFilters";
 import { isFavoriteSiteName } from "@shared/favoriteSites";
 import { FAVORITE_IMAGE, favoriteImageMetadata } from "@shared/favoriteImage";
 import { routeCoordinates } from "@shared/atlasRoute";
+import { buildDensityBins, densityColor } from "@shared/density";
 import L from "leaflet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,12 +21,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import {
-  ArrowLeft, ChevronDown, Database, ExternalLink, Eye, EyeOff, Flag, ImagePlus, Layers3,
-  MapPinned, MapPinPlus, Menu, Route, Search, ShieldCheck, SlidersHorizontal, Sparkles, X, ZoomIn
+  Activity, ArrowLeft, Building2, ChevronDown, Database, ExternalLink, Eye, EyeOff, Flag, Hotel, ImagePlus, Landmark, Layers3,
+  MapPinned, MapPinPlus, Menu, Mountain, Route, Search, ShieldCheck, SlidersHorizontal, Sparkles, Star, Trees, TrendingUp, Utensils, Waves, X, ZoomIn
 } from "lucide-react";
 
 type Site = { id: string; name: string; description: string; lat: number; lng: number; properties: Record<string, string>; layerId: string; imageUrl?: string | null };
-type LayerConfig = { id: string; name: string; short: string; color: string; icon: string; url: string; kind: "kml" | "geojson"; description: string; featured?: boolean };
+type LayerConfig = { id: string; name: string; short: string; color: string; icon: ReactNode; url: string; kind: "kml" | "geojson"; description: string; featured?: boolean };
 
 const DATA = {
   projectLogo: "/manus-storage/atlas-tourism-project_c75dcab1.png",
@@ -40,15 +41,16 @@ const DATA = {
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
 
 const layers: LayerConfig[] = [
-  { id: "heritage", name: "التراث العالمي", short: "مواقع أثرية وتاريخية", color: "#B96D3B", icon: "◈", url: "/manus-storage/world-heritage_ae1639b4.kml", kind: "kml", description: "مواقع التراث العالمي والمكونات التابعة لها", featured: true },
-  { id: "natural", name: "الموارد الطبيعية", short: "مشاهد وجغرافيا طبيعية", color: "#287A70", icon: "⌁", url: "/manus-storage/natural-atlas-with-media_5ccb1fb0.geojson", kind: "geojson", description: "سجل أطلس الموارد الطبيعية الليبية" },
-  { id: "akakus", name: "تادرارت أكاكوس", short: "الفن الصخري والصحراء", color: "#A76027", icon: "◇", url: "/manus-storage/akakus_60c47b41.kml", kind: "kml", description: "الفن الصخري والمشهد الصحراوي" },
-  { id: "old-tripoli", name: "المدينة القديمة طرابلس", short: "معالم تاريخية", color: "#3E7183", icon: "⌂", url: "/manus-storage/old-tripoli_5c62867b.kml", kind: "kml", description: "مبانٍ ومعالم المدينة القديمة" },
-  { id: "hotels", name: "الفنادق والإيواء", short: "خدمات الضيافة", color: "#B34B42", icon: "▣", url: "/manus-storage/hotels_b9547235.kml", kind: "kml", description: "الفنادق ومنشآت الإيواء" },
-  { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: "≈", url: "/manus-storage/resorts_e4a8f065.kml", kind: "kml", description: "القرى والمنتجعات والشاليهات" },
-  { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: "↗", url: "/manus-storage/investment_de22d4a0.kml", kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
-  { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: "•", url: "/manus-storage/restaurants_0642e048.kml", kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
-  { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: "★", url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
+  { id: "heritage", name: "التراث العالمي", short: "مواقع أثرية وتاريخية", color: "#B96D3B", icon: <Landmark size={19} strokeWidth={1.8} />, url: "/manus-storage/world-heritage_ae1639b4.kml", kind: "kml", description: "مواقع التراث العالمي والمكونات التابعة لها", featured: true },
+  { id: "natural", name: "الموارد الطبيعية", short: "مشاهد وجغرافيا طبيعية", color: "#287A70", icon: <Trees size={19} strokeWidth={1.8} />, url: "/manus-storage/natural-atlas-with-media_5ccb1fb0.geojson", kind: "geojson", description: "سجل أطلس الموارد الطبيعية الليبية" },
+  { id: "akakus", name: "تادرارت أكاكوس", short: "الفن الصخري والصحراء", color: "#A76027", icon: <Mountain size={19} strokeWidth={1.8} />, url: "/manus-storage/akakus_60c47b41.kml", kind: "kml", description: "الفن الصخري والمشهد الصحراوي" },
+  { id: "old-tripoli", name: "المدينة القديمة طرابلس", short: "معالم تاريخية", color: "#3E7183", icon: <Building2 size={19} strokeWidth={1.8} />, url: "/manus-storage/old-tripoli_5c62867b.kml", kind: "kml", description: "مبانٍ ومعالم المدينة القديمة" },
+  { id: "hotels", name: "الفنادق والإيواء", short: "خدمات الضيافة", color: "#B34B42", icon: <Hotel size={19} strokeWidth={1.8} />, url: "/manus-storage/hotels_b9547235.kml", kind: "kml", description: "الفنادق ومنشآت الإيواء" },
+  { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: <Waves size={19} strokeWidth={1.8} />, url: "/manus-storage/resorts_e4a8f065.kml", kind: "kml", description: "القرى والمنتجعات والشاليهات" },
+  { id: "density", name: "كثافة التجمعات السياحية", short: "فنادق وقرى ومنتجعات", color: "#D04C45", icon: <Activity size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "توزيع مكاني محسوب من سجلات الفنادق والقرى والمنتجعات" },
+  { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: <TrendingUp size={19} strokeWidth={1.8} />, url: "/manus-storage/investment_de22d4a0.kml", kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
+  { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: <Utensils size={19} strokeWidth={1.8} />, url: "/manus-storage/restaurants_0642e048.kml", kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
+  { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: <Star size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
 ];
 
 function isFavoriteSite(site: Site) {
@@ -197,17 +199,44 @@ export default function Home() {
   const renderMarkers = useCallback((config: LayerConfig, sites: Site[]) => {
     if (!map) return;
     clearMarkers(config.id);
-    markers.current[config.id] = sites.map((site) => {
-      const marker = L.circleMarker([site.lat, site.lng], { radius: 7, color: "#fff", weight: 2, fillColor: config.color, fillOpacity: 1 });
+    markers.current[config.id] = sites.flatMap((site) => {
+      const radius = config.id === "hotels" ? 9 : config.id === "resorts" ? 8 : config.id === "natural" ? 7 : 6.5;
+      const halo = L.circleMarker([site.lat, site.lng], { radius: radius + 5, color: config.color, weight: 1, fillColor: config.color, fillOpacity: 0.12, opacity: 0.35, interactive: false });
+      halo.addTo(map);
+      const marker = L.circleMarker([site.lat, site.lng], { radius, color: "#fff", weight: 2, fillColor: config.color, fillOpacity: 0.92, opacity: 0.98 });
       marker.addTo(map);
       marker.bindTooltip(site.name, { direction: "top", offset: [0, -7], opacity: 0.95 });
       marker.on("click", () => { setSelected(site); setMobileOpen(false); });
-      return marker;
+      return [halo, marker];
+    });
+  }, [clearMarkers, map]);
+
+  const renderDensity = useCallback((sites: Site[]) => {
+    if (!map) return;
+    clearMarkers("density");
+    const bins = buildDensityBins(sites);
+    const maxCount = Math.max(1, ...bins.map((bin) => bin.count));
+    markers.current.density = bins.map((bin) => {
+      const color = densityColor(bin.count, maxCount);
+      const circle = L.circle([bin.lat, bin.lng], { radius: 6500 + bin.count * 2800, color, fillColor: color, fillOpacity: 0.2 + (bin.count / maxCount) * 0.3, weight: 1.5 });
+      circle.addTo(map);
+      circle.bindTooltip(`تجمع سياحي · ${bin.count.toLocaleString("ar-LY")} سجلًا`, { direction: "top", opacity: 0.95 });
+      return circle;
     });
   }, [clearMarkers, map]);
 
   useEffect(() => {
     if (!map) return;
+    if (activeLayers.includes("density") && !markers.current.density?.length) {
+      Promise.all(["hotels", "resorts"].map(async (id) => {
+        if (loaded[id]) return loaded[id];
+        const source = layers.find((item) => item.id === id);
+        if (!source) return [];
+        const sites = await loadLayer(source);
+        setLoaded((current) => ({ ...current, [id]: sites }));
+        return sites;
+      })).then((groups) => renderDensity(groups.flat())).catch(() => toast.error("تعذر حساب كثافة التجمعات السياحية"));
+    }
     if (activeLayers.includes("favorites") && !loaded.favorites) {
       const sourceIds = ["heritage", "natural", "akakus", "old-tripoli"];
       Promise.all(sourceIds.map(async (id) => {
@@ -216,7 +245,7 @@ export default function Home() {
         return source ? loadLayer(source) : [];
       })).then((groups) => setLoaded((current) => ({ ...current, favorites: buildFavoriteSites(groups.flat()) }))).catch(() => toast.error("تعذر تحميل المواقع المفضلة"));
     }
-    activeLayers.forEach(async (id) => {
+    activeLayers.filter((id) => id !== "density").forEach(async (id) => {
       const config = layers.find((item) => item.id === id);
       if (!config || loaded[id]) { if (config && loaded[id]) renderMarkers(config, loaded[id]); return; }
       try {
@@ -228,7 +257,7 @@ export default function Home() {
       }
     });
     Object.keys(markers.current).filter((id) => id !== "managed" && !activeLayers.includes(id)).forEach(clearMarkers);
-  }, [activeLayers, map, loaded, renderMarkers, clearMarkers]);
+  }, [activeLayers, map, loaded, renderMarkers, renderDensity, clearMarkers]);
 
   useEffect(() => {
     if (!map || !pickMode) return;
@@ -275,8 +304,8 @@ export default function Home() {
   return (
     <main dir="rtl" className="atlas-shell">
       <header className="topbar">
-        <div className="brand-lockup"><div className="project-mark"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /></div><div className="brand-title"><span className="eyebrow">مركز المعلومات والتوثيق السياحي</span><h1>أطلس ليبيا <em>السياحي</em></h1></div><div className="official-logos" aria-label="الجهات الرسمية المشرفة على المشروع"><div className="official-logo-cell"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><span>وزارة السياحة والصناعات التقليدية</span></div><span className="logo-divider" /><div className="official-logo-cell"><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /><span>مركز المعلومات والتوثيق</span></div></div></div>
-        <div className="topbar-actions"><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span><Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
+        <div className="brand-lockup"><div className="project-mark"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /></div><div className="brand-title"><span className="eyebrow">مشروع وطني للتوثيق والاستكشاف</span><h1>أطلس ليبيا <em>السياحي</em></h1><small>ليبيا.. ملتقى الحضارات، ومهد الأصالة</small></div><div className="official-logos" aria-label="الجهات الرسمية المشرفة على المشروع"><div className="official-logo-cell"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><span>وزارة السياحة<br />والصناعات التقليدية</span></div><span className="logo-divider" /><div className="official-logo-cell"><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /><span>مركز المعلومات<br />والتوثيق السياحي</span></div></div></div>
+        <div className="topbar-actions"><div className="header-gis-badge"><Layers3 size={14} /><span>GIS</span><small>خريطة وطنية</small></div><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span><Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
       </header>
 
       <section className="atlas-cover" aria-label="الغلاف الافتتاحي لأطلس ليبيا السياحي">
@@ -299,7 +328,7 @@ export default function Home() {
           <div className="panel-foot"><div><Database size={15} /><span>السجلات المعروضة</span><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong></div><button onClick={focusLibya}><ZoomIn size={14} /> إعادة تمركز الخريطة</button></div>
         </aside>
 
-        <section className="map-stage"><div className="map-overlay-title"><span>المشهد الجغرافي الوطني</span><strong>استكشف ليبيا طبقةً بعد طبقة</strong></div><MapView className="atlas-map" initialCenter={INITIAL_CENTER} initialZoom={5} onMapReady={handleMapReady} /><div className="map-legend"><span><i style={{ background: "#B96D3B" }} /> مواقع موثقة</span><span><i style={{ background: "#AF7A24" }} /> فرص وتنمية</span><span><i style={{ background: "#287A70" }} /> موارد طبيعية</span></div><div className="map-count"><MapPinned size={15} /><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong><span>موقع ظاهر</span></div></section>
+        <section className="map-stage"><div className="map-overlay-title"><span>المشهد الجغرافي الوطني</span><strong>استكشف ليبيا طبقةً بعد طبقة</strong></div><MapView className="atlas-map" initialCenter={INITIAL_CENTER} initialZoom={5} onMapReady={handleMapReady} /><div className="map-legend"><span><i style={{ background: "#B96D3B" }} /> مواقع موثقة</span><span><i style={{ background: "#AF7A24" }} /> فرص وتنمية</span><span><i style={{ background: "#287A70" }} /> موارد طبيعية</span>{activeLayers.includes("density") && <span className="density-legend"><i style={{ background: "#2FBEF0" }} /> تركّز منخفض <i style={{ background: "#D94B45" }} /> تركّز مرتفع</span>}</div><div className="map-count"><MapPinned size={15} /><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong><span>موقع ظاهر</span></div></section>
       </section>
 
       <section className="story-strip"><div className="story-image" style={{ backgroundImage: `url(${DATA.heritage})` }} /><div className="story-copy"><span className="section-eyebrow">ذاكرة المكان</span><h2>الموقع ليس نقطة على الخريطة؛ إنه <i>قصة كاملة.</i></h2><p>نحوّل السجلات والطبقات والصور إلى معرفة مكانية تساعد على الحصر والتوثيق والتخطيط السياحي.</p><button onClick={() => { setActiveLayers(["heritage"]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>ابدأ من التراث العالمي <ArrowLeft size={16} /></button></div><div className="story-stat"><strong>10</strong><span>مسارات بيانات<br />قابلة للاستكشاف</span></div></section>
