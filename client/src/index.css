@@ -49,7 +49,7 @@ button { cursor:pointer; }
 .panel-foot div strong { grid-column:2; color:var(--atlas-blue); font-family:'Noto Kufi Arabic',sans-serif; font-size:16px; line-height:1; }
 .panel-foot div svg { grid-row:span 2; color:var(--atlas-copper); }
 .panel-foot button { border:0; background:none; color:var(--atlas-teal); font-size:10px; display:flex; align-items:center; gap:4px; }
-.map-stage { direction:rtl; min-width:0; position:relative; background-color:#d7dcdb; background-image:radial-gradient(ellipse at 24% 70%,transparent 0 28%,#123c5211 28.3%,transparent 28.8%),radial-gradient(ellipse at 67% 35%,transparent 0 22%,#123c5210 22.3%,transparent 22.8%),repeating-linear-gradient(12deg,transparent 0 48px,#123c5208 49px,#123c5208 50px,transparent 51px 100px); overflow:hidden; }
+.map-stage { position:relative; z-index:1; direction:rtl; min-width:0; position:relative; background-color:#d7dcdb; background-image:radial-gradient(ellipse at 24% 70%,transparent 0 28%,#123c5211 28.3%,transparent 28.8%),radial-gradient(ellipse at 67% 35%,transparent 0 22%,#123c5210 22.3%,transparent 22.8%),repeating-linear-gradient(12deg,transparent 0 48px,#123c5208 49px,#123c5208 50px,transparent 51px 100px); overflow:hidden; }
 .map-stage:before { content:""; position:absolute; inset:0; pointer-events:none; z-index:1; background:linear-gradient(90deg,transparent 0%,transparent 64%,#123c5212 100%),radial-gradient(#123c5220 .8px,transparent .8px); background-size:100% 100%,18px 18px; mix-blend-mode:multiply; }.map-stage:after { content:""; position:absolute; z-index:1; top:18%; left:14%; width:35%; height:25%; border:1px dashed #B96D3B45; border-radius:46% 54% 38% 62%; transform:rotate(-10deg); pointer-events:none; }
 .atlas-map { width:100%; height:calc(100vh - 78px) !important; min-height:620px; }
 .map-overlay-title { position:absolute; z-index:2; border-left:1px dashed #B96D3B80; top:25px; right:30px; border-right:2px solid var(--atlas-copper); padding:6px 12px; background:#fbfaf7e8; box-shadow:0 10px 22px #0b243012; }
@@ -72,7 +72,7 @@ button { cursor:pointer; }
 .story-stat { display:flex; flex-direction:column; justify-content:center; padding:30px; border-right:1px solid #ffffff20; }
 .story-stat strong { color:#D7B66D; font-family:'Noto Kufi Arabic',sans-serif; font-size:60px; line-height:1; }
 .story-stat span { color:#C3D2D0; font-size:12px; line-height:1.7; }
-.detail-sheet { background:var(--atlas-paper); border-color:var(--atlas-line); }
+.detail-sheet { background:var(--atlas-paper); border-color:var(--atlas-line); z-index:80 !important; }.mobile-layers-sheet { max-height:min(82svh,720px) !important; overflow-y:auto !important; overscroll-behavior:contain; padding:22px 22px max(28px,env(safe-area-inset-bottom)) !important; box-shadow:0 -18px 50px #07192335; }.mobile-layers-sheet [data-slot="sheet-header"] { position:sticky; top:0; z-index:2; padding-bottom:12px; background:var(--atlas-paper); }.mobile-layers-sheet .mobile-layers { max-height:none; overflow:visible; }
 .detail-top { display:flex; align-items:center; justify-content:space-between; color:var(--atlas-teal); }
 .detail-top .badge { color:white; border-radius:2px; font-size:10px; }
 .detail-sheet h2 { font-family:'Noto Kufi Arabic',sans-serif; color:var(--atlas-blue); line-height:1.6; }
