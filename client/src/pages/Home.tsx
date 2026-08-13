@@ -84,7 +84,8 @@ function parseKml(text: string, layerId: string): Site[] {
   const xml = new DOMParser().parseFromString(text, "text/xml");
   return Array.from(xml.querySelectorAll("Placemark")).map((node, index) => {
     const name = node.querySelector("name")?.textContent?.trim() || `موقع ${index + 1}`;
-    const description = (node.querySelector("description")?.textContent || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    const rawDescription = node.querySelector("description")?.textContent || "";
+    const description = rawDescription.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
     const coordinateText = node.querySelector("Point coordinates, coordinates")?.textContent?.trim() || node.querySelector("coordinates")?.textContent?.trim() || "";
     const [lng, lat] = coordinateText.split(",").map(Number);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
@@ -93,7 +94,7 @@ function parseKml(text: string, layerId: string): Site[] {
       const key = item.getAttribute("name");
       if (key) properties[key] = item.querySelector("value")?.textContent?.trim() || "";
     });
-    const imageSource = extractKmlImageUrl(description, properties);
+    const imageSource = extractKmlImageUrl(rawDescription, properties);
     const imageUrl = toDisplayImageUrl(imageSource);
     if (imageSource) properties.image_source = imageSource;
     if (imageUrl) properties.image_url = imageUrl;
@@ -122,7 +123,10 @@ async function loadLayer(config: LayerConfig): Promise<Site[]> {
     const point = geometry?.type === "Point" ? geometry.coordinates : geometry?.coordinates?.[0]?.[0];
     if (!point || !Number.isFinite(point[0]) || !Number.isFinite(point[1])) return [];
     const properties = feature.properties || {};
-    const imageUrl = String(properties.image_url || properties.imageUrl || properties.image || "") || undefined;
+    const imageSource = String(properties.image_source || properties.imageUrl || properties.image || properties.photo || properties.photo_URL || "").trim() || undefined;
+    const imageUrl = toDisplayImageUrl(imageSource);
+    if (imageSource) properties.image_source = imageSource;
+    if (imageUrl) properties.image_url = imageUrl;
     properties.source_layer = config.id;
     properties.source_format = "GeoJSON";
     return [{ id: `${config.id}-${index}`, name: propertyName(properties), description: String(properties.description_ar || properties.description || ""), lat: point[1], lng: point[0], imageUrl, properties, layerId: config.id }];
