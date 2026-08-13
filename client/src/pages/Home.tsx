@@ -36,7 +36,7 @@ const DATA = {
   desert: "/manus-storage/libya-atlas-desert_8d3e876d.jpg",
   heritage: "/manus-storage/libya-atlas-heritage_baefbb7e.jpg",
   cover: "/manus-storage/libya-atlas-cover-gis-landscape_22a918d0.png",
-  intro: "/manus-storage/libya-atlas-intro-poster-final_5371be70.jpg",
+  intro: "/manus-storage/IMG_6898_91929b39.PNG",
 };
 
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
@@ -304,7 +304,7 @@ export default function Home() {
   };
 
   if (!hasEnteredAtlas) {
-    return <main dir="rtl" className="intro-screen"><div className="intro-art"><img src={DATA.intro} alt="غلاف مشروع أطلس ليبيا السياحي" /><div className="intro-sheen" /></div><div className="intro-content"><div className="intro-brand"><img src={DATA.projectLogo} alt="شعار أطلس ليبيا السياحي" /><span>وزارة السياحة والصناعات التقليدية<br />مركز المعلومات والتوثيق السياحي</span></div><span className="intro-kicker">منصة الذاكرة الوطنية</span><h1>أطلس ليبيا <em>السياحي</em></h1><p>استكشف المقومات السياحية والتاريخية والطبيعية في ليبيا عبر خريطة جغرافية تفاعلية.</p><Button className="intro-enter" onClick={() => setHasEnteredAtlas(true)}>دخول إلى الأطلس <ArrowLeft size={17} /></Button><small className="intro-note"><Layers3 size={14} /> اختر الطبقة التي تريد استكشافها بعد الدخول</small></div></main>;
+    return <main dir="rtl" className="intro-screen"><div className="intro-full-art"><img src={DATA.intro} alt="غلاف مشروع أطلس ليبيا السياحي" /><div className="intro-sheen" /><Button className="intro-enter-overlay" onClick={() => setHasEnteredAtlas(true)}>دخول إلى الأطلس <ArrowLeft size={17} /></Button></div></main>;
   }
 
   return (
@@ -314,11 +314,6 @@ export default function Home() {
         <div className="topbar-actions"><div className="header-gis-badge"><Layers3 size={14} /><span>GIS</span><small>خريطة وطنية</small></div><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span><Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
       </header>
 
-      <section className="atlas-cover" aria-label="الغلاف الافتتاحي لأطلس ليبيا السياحي">
-        <div className="atlas-cover-frame">
-          <img src={DATA.cover} alt="غلاف مشروع أطلس ليبيا السياحي بهوية نظم المعلومات الجغرافية" />
-        </div>
-      </section>
 
       <section className="atlas-main">
         <aside className="control-panel">
