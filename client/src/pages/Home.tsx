@@ -30,6 +30,7 @@ const DATA = {
   hero: "/manus-storage/libya-atlas-hero_ebb8b2b9.jpg",
   desert: "/manus-storage/libya-atlas-desert_8d3e876d.jpg",
   heritage: "/manus-storage/libya-atlas-heritage_baefbb7e.jpg",
+  cover: "/manus-storage/libya-atlas-cover-gis-landscape_22a918d0.png",
 };
 
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
@@ -192,6 +193,12 @@ export default function Home() {
         <div className="brand-lockup"><div className="project-mark"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /></div><div className="brand-title"><span className="eyebrow">مركز المعلومات والتوثيق السياحي</span><h1>أطلس ليبيا <em>السياحي</em></h1></div><div className="official-logos" aria-label="الجهات الرسمية المشرفة على المشروع"><div className="official-logo-cell"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><span>وزارة السياحة والصناعات التقليدية</span></div><span className="logo-divider" /><div className="official-logo-cell"><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /><span>مركز المعلومات والتوثيق</span></div></div></div>
         <div className="topbar-actions"><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span><Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
       </header>
+
+      <section className="atlas-cover" aria-label="الغلاف الافتتاحي لأطلس ليبيا السياحي">
+        <div className="atlas-cover-frame">
+          <img src={DATA.cover} alt="غلاف مشروع أطلس ليبيا السياحي بهوية نظم المعلومات الجغرافية" />
+        </div>
+      </section>
 
       <section className="atlas-main">
         <aside className="control-panel">
