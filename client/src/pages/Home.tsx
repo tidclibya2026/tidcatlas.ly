@@ -92,6 +92,8 @@ function parseKml(text: string, layerId: string): Site[] {
     const imageMatch = description.match(/https?:\/\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/i);
     const imageUrl = properties.image_url || properties.imageUrl || imageMatch?.[0];
     if (imageUrl) properties.image_url = imageUrl;
+    properties.source_layer = layerId;
+    properties.source_format = "KML";
     return { id: `${layerId}-${index}`, name, description, lat, lng, imageUrl, properties, layerId };
   }).filter(Boolean) as Site[];
 }
@@ -116,6 +118,8 @@ async function loadLayer(config: LayerConfig): Promise<Site[]> {
     if (!point || !Number.isFinite(point[0]) || !Number.isFinite(point[1])) return [];
     const properties = feature.properties || {};
     const imageUrl = String(properties.image_url || properties.imageUrl || properties.image || "") || undefined;
+    properties.source_layer = config.id;
+    properties.source_format = "GeoJSON";
     return [{ id: `${config.id}-${index}`, name: propertyName(properties), description: String(properties.description_ar || properties.description || ""), lat: point[1], lng: point[0], imageUrl, properties, layerId: config.id }];
   });
 }
