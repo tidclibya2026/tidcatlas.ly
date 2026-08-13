@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><name>مسرح لبدة التجريبي</name><description><![CDATA[<div><img src="https://example.org/images/leptis.jpg" /></div>]]></description><ExtendedData><Data name="image_author"><value>TIDC</value></Data><Data name="image_license"><value>CC BY-SA 4.0</value></Data></ExtendedData><Point><coordinates>14.293,32.638,0</coordinates></Point></Placemark></Document></kml>

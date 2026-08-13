@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Noto+Kufi+Arabic:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f0f4f8}.slide-container{width:1280px;min-height:720px;padding:62px 76px 0;background:#f0f4f8;color:#102a43;font-family:'IBM Plex Sans Arabic',sans-serif;position:relative;overflow:hidden}.slide-container:before{content:'';position:absolute;left:0;top:0;width:420px;min-height:720px;background:linear-gradient(135deg,#dce9e8aa,#f0f4f800);pointer-events:none}.kicker{position:relative;color:#d97706;font-size:13px;font-weight:700}.title{position:relative;margin-top:12px;font:800 34px/1.4 'Noto Kufi Arabic',sans-serif}.sub{position:relative;margin-top:10px;color:#526b7d;font-size:15px}.body{position:relative;display:grid;grid-template-columns:1fr 1px 1fr;gap:38px;margin-top:55px;direction:ltr}.column{direction:rtl}.divider{background:#9fb3bf;min-height:365px}.column h2{margin:0 0 20px;color:#102a43;font-size:22px}.flow{display:grid;grid-template-columns:130px 24px 130px;align-items:center;gap:12px;margin-top:34px;direction:ltr}.flow-box{min-height:80px;border-top:3px solid #287a70;background:#e2eeec;padding:15px 10px;text-align:center;direction:rtl}.flow-box strong{display:block;font-size:14px}.flow-box small{display:block;margin-top:7px;color:#526b7d;font-size:10px;line-height:1.6}.arrow{color:#d97706;font-size:22px;text-align:center}.note{margin-top:32px;padding-top:14px;border-top:1px solid #9fb3bf;color:#526b7d;font-size:12px;line-height:1.8}.rights{border-top:1px solid #9fb3bf}.row{display:grid;grid-template-columns:165px 1fr;gap:20px;min-height:62px;padding-top:14px;border-bottom:1px solid #c5d1d6}.row strong{color:#102a43;font-size:13px}.row span{color:#526b7d;font-size:12px;line-height:1.7}.warning{margin-top:28px;color:#9a5c00;font-size:12px;line-height:1.8;border-right:3px solid #d97706;padding-right:14px}.footer{position:absolute;right:76px;bottom:38px;color:#687f8e;font-size:12px}.footer strong{color:#287a70}
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="kicker">07 · الاستدامة والامتثال</div>
+<div class="title">التخزين الدائم وحقوق الملكية</div>
+<div class="sub">الصورة لا تصبح جاهزة للنشر إلا عندما يكون ملفها ومصدرها وحق استخدامها قابلين للتتبع.</div>
+<div class="body">
+<section class="column">
+<h2>مسار التخزين</h2>
+<div class="flow"><div class="flow-box"><strong>storagePut</strong><small>حفظ bytes في التخزين الدائم</small></div><div class="arrow">←</div><div class="flow-box"><strong>قاعدة البيانات</strong><small>حفظ key وURL مع سجل الموقع</small></div></div>
+<div class="note">في مشروع الأطلس، الخادم هو نقطة الرفع. الواجهة لا تحمل مفاتيح التخزين، ولا تعتمد على مسار محلي بعد النشر.</div>
+</section>
+<div class="divider"></div>
+<section class="column">
+<h2>سجل الحقوق</h2>
+<div class="rights"><div class="row"><strong>image_source</strong><span>الرابط الأصلي القابل للتدقيق</span></div><div class="row"><strong>image_author</strong><span>المصور أو الجهة المالكة</span></div><div class="row"><strong>image_license</strong><span>نوع الترخيص وشروط الاستخدام</span></div><div class="row"><strong>image_license_note</strong><span>نص الإسناد الذي يظهر بجانب الصورة</span></div></div>
+<div class="warning">لا تُنشر مفاتيح سرية أو روابط موقعة طويلة داخل المستودع، ولا تُستخدم صورة لموقع آخر كبديل مضلل.</div>
+</section>
+</div>
+<div class="footer">المعيار المؤسسي: <strong>تخزين مستقر · مصدر ظاهر · ترخيص محفوظ</strong></div>
+</div>
+</body>
+</html>

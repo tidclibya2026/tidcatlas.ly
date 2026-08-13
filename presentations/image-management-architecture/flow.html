@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Noto+Kufi+Arabic:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f0f4f8}.slide-container{width:1280px;min-height:720px;padding:62px 76px 0;background:#f0f4f8;color:#102a43;font-family:'IBM Plex Sans Arabic',sans-serif;position:relative;overflow:hidden}.slide-container:before{content:'';position:absolute;right:-160px;top:120px;width:560px;min-height:560px;border:1px solid #2f6f7e22;border-radius:50%;transform:rotate(-18deg)}.kicker{color:#d97706;font-size:13px;font-weight:700}.title{margin-top:12px;font:800 34px/1.4 'Noto Kufi Arabic',sans-serif}.sub{margin-top:12px;color:#526b7d;font-size:15px}.flow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:70px;direction:rtl}.flow:before{content:'';position:absolute;right:8%;left:8%;top:42px;border-top:1px dashed #2f6f7e88}.node{position:relative;min-height:220px;padding-top:0;text-align:center;background:#f0f4f8}.symbol{width:84px;height:84px;margin:0 auto 20px;display:grid;place-items:center;border:1px solid #2f6f7e88;background:#e5edf0;color:#102a43;font:700 16px 'Noto Kufi Arabic',sans-serif;position:relative;z-index:2}.node:nth-child(2) .symbol{border-color:#d97706;background:#fff1dc}.node:nth-child(3) .symbol{border-color:#287a70;background:#e2f0ec}.node:nth-child(4) .symbol{border-color:#102a43;background:#dce8ed}.node h3{margin:0 0 10px;font-size:18px;color:#102a43}.node p{margin:0 auto;color:#526b7d;font-size:12px;line-height:1.9;max-width:220px}.tag{display:inline-block;margin-top:14px;color:#687f8e;font-size:10px;border-top:1px solid #a9bac3;padding-top:8px}.result{position:absolute;right:76px;left:76px;bottom:44px;display:grid;grid-template-columns:1fr 1fr;gap:28px;border-top:1px solid #9fb3bf;padding-top:14px;color:#526b7d;font-size:12px;line-height:1.8}.result strong{color:#102a43;font-size:13px}.result span{color:#d97706;font-weight:700}
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="kicker">03 · التدفق التشغيلي</div>
+<div class="title">تدفق الصورة من المصدر إلى الواجهة</div>
+<div class="sub">كل محطة تنتج مخرجات قابلة للفحص قبل أن تصل الصورة إلى المستخدم.</div>
+<div class="flow">
+<div class="node"><div class="symbol">KML<br>GeoJSON</div><h3>المصدر</h3><p>ملف رسمي أو رفع موثق يحتوي الوصف، الإحداثيات، ورابط الصورة.</p><div class="tag">مدخلات خام</div></div>
+<div class="node"><div class="symbol">PY</div><h3>المستورد وmanifest</h3><p>استخراج الرابط، فك HTML، حفظ الحقوق، وتسجيل الحالة والخطأ.</p><div class="tag">سجل موحد</div></div>
+<div class="node"><div class="symbol">S3</div><h3>التخزين الدائم</h3><p>حفظ bytes باسم ثابت، ثم ربط المفتاح بالموقع في قاعدة البيانات.</p><div class="tag">نسخة مستقرة</div></div>
+<div class="node"><div class="symbol">GIS</div><h3>نافذة التفاصيل</h3><p>عرض الصورة مع المصدر والمؤلف والترخيص، أو placeholder واضح عند الفشل.</p><div class="tag">مخرجات موثقة</div></div>
+</div>
+<div class="result"><div><strong>نقطة التحقق:</strong> <span>لا تنتقل الصورة</span> إلى التخزين قبل معرفة مصدرها وحالتها.</div><div><strong>نقطة العرض:</strong> الأولوية للصورة المستقرة، مع رابط المصدر الأصلي ظاهرًا للمراجعة.</div></div>
+</div>
+</body>
+</html>
