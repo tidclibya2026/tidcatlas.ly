@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractKmlImageUrl } from "./kmlImage";
+import { extractKmlImageUrl, toDisplayImageUrl } from "./kmlImage";
 
 describe("extractKmlImageUrl", () => {
   it("extracts image URLs from KML img markup", () => {
@@ -8,5 +8,11 @@ describe("extractKmlImageUrl", () => {
 
   it("prefers image properties when KML provides a direct photo field", () => {
     expect(extractKmlImageUrl("photo_URL: https://example.com/fallback.jpg", { photo_URL: "https://example.com/leptis.jpg" })).toBe("https://example.com/leptis.jpg");
+  });
+
+  it("creates a browser-display URL while retaining the original source separately", () => {
+    const source = "https://mymaps.usercontent.google.com/hostedimage/leptis.png?authuser=1";
+    expect(toDisplayImageUrl(source)).toContain("https://images.weserv.nl/?url=");
+    expect(decodeURIComponent(toDisplayImageUrl(source)!.split("?url=")[1].split("&w=")[0])).toBe(source);
   });
 });

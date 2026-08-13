@@ -11,3 +11,9 @@ export function extractKmlImageUrl(description: string, properties: Record<strin
 function decodeKmlUrl(value: string) {
   return value.replace(/&amp;/g, "&").replace(/\\u0026/g, "&").trim();
 }
+
+export function toDisplayImageUrl(sourceUrl?: string) {
+  if (!sourceUrl) return undefined;
+  if (!/^https?:\/\//i.test(sourceUrl)) return sourceUrl;
+  return `https://images.weserv.nl/?url=${encodeURIComponent(sourceUrl)}&w=1200&q=82&output=webp`;
+}

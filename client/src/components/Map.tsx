@@ -11,7 +11,8 @@ export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom =
   const mapRef = useRef<L.Map | null>(null);
   useEffect(() => {
     if (!container.current || mapRef.current) return;
-    const map = L.map(container.current, { zoomControl: false, minZoom: 4, maxZoom: 18, attributionControl: true }).setView(initialCenter, initialZoom);
+    const libyaBounds = L.latLngBounds([18.8, 8.2], [34.2, 25.6]);
+    const map = L.map(container.current, { zoomControl: false, minZoom: 5, maxZoom: 18, maxBounds: libyaBounds, maxBoundsViscosity: 0.92, worldCopyJump: false, attributionControl: true }).setView(initialCenter, initialZoom);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(map);
     mapRef.current = map;
