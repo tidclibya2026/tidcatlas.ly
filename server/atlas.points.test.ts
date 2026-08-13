@@ -22,4 +22,14 @@ describe("atlas points", () => {
     const caller = appRouter.createCaller(context(null));
     await expect(caller.atlas.mine()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
   });
+
+  it("requires at least one verified record for smart search", async () => {
+    const caller = appRouter.createCaller(context(null));
+    await expect(caller.atlas.smartSearch({ question: "ما المواقع؟", mode: "visitor", sites: [] })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("requires at least two verified records for route planning", async () => {
+    const caller = appRouter.createCaller(context(null));
+    await expect(caller.atlas.routePlan({ mode: "tourist", durationHours: 8, interests: ["تراث"], sites: [{ id: "one", name: "موقع واحد", description: "", latitude: 32, longitude: 13, layerId: "heritage" }] })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
 });
