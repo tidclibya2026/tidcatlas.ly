@@ -46,7 +46,55 @@ const layers: LayerConfig[] = [
   { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: "≈", url: "/manus-storage/resorts_e4a8f065.kml", kind: "kml", description: "القرى والمنتجعات والشاليهات" },
   { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: "↗", url: "/manus-storage/investment_de22d4a0.kml", kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
   { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: "•", url: "/manus-storage/restaurants_0642e048.kml", kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
+  { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: "★", url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
 ];
+
+const FAVORITE_IMAGE = {
+  url: "/manus-storage/waw-an-namus-wikimedia_5cabbb3f.jpg",
+  sourceUrl: "https://commons.wikimedia.org/wiki/File:Wau-en-Namus-2.jpg",
+  author: "Rolfcosar",
+  license: "CC BY-SA 3.0",
+};
+
+const explicitFavoriteNames = [
+  "موقع لبدة الأثري (لبتس ماغنا) (لبدة الكبرى)", "مدينة لبدة الاثرية الكبرى", "موقع صبراتة الأثري", "اثار صبراتة",
+  "موقع شحات (قورينة) الأثري", "مدينة غدامس القديمة", "غدامس", "مواقع تادرارت أكاكوس الصخرية", "جبال أكاكوس", "المدينة القديمة غات",
+  "شلال بالفو", "شلال رأس الهلال بافلو", "عين الفرس", "كهف هوا فطيح", "متحف غدامس", "وادي لبدة",
+];
+
+function normalizeFavoriteName(value: string) {
+  return value.toLocaleLowerCase().replace(/[\u200e\u200f\u00a0]/g, "").replace(/[ًٌٍَُِّْـ]/g, "").replace(/[^\u0600-\u06ff\w]/g, "");
+}
+
+const explicitFavoriteKeys = new Set(explicitFavoriteNames.map(normalizeFavoriteName));
+
+function isFavoriteSite(site: Site) {
+  return explicitFavoriteKeys.has(normalizeFavoriteName(site.name));
+}
+
+function buildFavoriteSites(sites: Site[]) {
+  const seen = new Set<string>();
+  return sites.filter(isFavoriteSite).filter((site) => {
+    const key = `${site.name.trim().toLocaleLowerCase()}-${site.lat.toFixed(4)}-${site.lng.toFixed(4)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).map((site) => {
+    const imageUrl = site.imageUrl || FAVORITE_IMAGE.url;
+    return {
+      ...site,
+      imageUrl,
+      layerId: "favorites",
+      properties: {
+        ...site.properties,
+        image_source: site.imageUrl ? (site.properties.image_source || "مصدر الصورة من ملف KML") : FAVORITE_IMAGE.sourceUrl,
+        image_author: site.imageUrl ? (site.properties.image_author || "موجود في بيانات KML") : FAVORITE_IMAGE.author,
+        image_license: site.imageUrl ? (site.properties.image_license || "يرجى مراجعة ترخيص KML") : FAVORITE_IMAGE.license,
+        image_license_note: site.imageUrl ? "صورة مرتبطة ببيانات KML" : "صورة بيئية عامة للعرض المؤقت وليست صورة موضعية مؤكدة؛ تعتمد وفق شروط CC BY-SA 3.0.",
+      },
+    };
+  });
+}
 
 function parseKml(text: string, layerId: string): Site[] {
   const xml = new DOMParser().parseFromString(text, "text/xml");
@@ -61,7 +109,10 @@ function parseKml(text: string, layerId: string): Site[] {
       const key = item.getAttribute("name");
       if (key) properties[key] = item.querySelector("value")?.textContent?.trim() || "";
     });
-    return { id: `${layerId}-${index}`, name, description, lat, lng, properties, layerId };
+    const imageMatch = description.match(/https?:\/\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/i);
+    const imageUrl = properties.image_url || properties.imageUrl || imageMatch?.[0];
+    if (imageUrl) properties.image_url = imageUrl;
+    return { id: `${layerId}-${index}`, name, description, lat, lng, imageUrl, properties, layerId };
   }).filter(Boolean) as Site[];
 }
 
@@ -83,7 +134,9 @@ async function loadLayer(config: LayerConfig): Promise<Site[]> {
     const geometry = feature.geometry;
     const point = geometry?.type === "Point" ? geometry.coordinates : geometry?.coordinates?.[0]?.[0];
     if (!point || !Number.isFinite(point[0]) || !Number.isFinite(point[1])) return [];
-    return [{ id: `${config.id}-${index}`, name: propertyName(feature.properties || {}), description: String(feature.properties?.description_ar || feature.properties?.description || ""), lat: point[1], lng: point[0], properties: feature.properties || {}, layerId: config.id }];
+    const properties = feature.properties || {};
+    const imageUrl = String(properties.image_url || properties.imageUrl || properties.image || "") || undefined;
+    return [{ id: `${config.id}-${index}`, name: propertyName(properties), description: String(properties.description_ar || properties.description || ""), lat: point[1], lng: point[0], imageUrl, properties, layerId: config.id }];
   });
 }
 
@@ -171,6 +224,14 @@ export default function Home() {
 
   useEffect(() => {
     if (!map) return;
+    if (activeLayers.includes("favorites") && !loaded.favorites) {
+      const sourceIds = ["heritage", "natural", "akakus", "old-tripoli"];
+      Promise.all(sourceIds.map(async (id) => {
+        if (loaded[id]) return loaded[id];
+        const source = layers.find((item) => item.id === id);
+        return source ? loadLayer(source) : [];
+      })).then((groups) => setLoaded((current) => ({ ...current, favorites: buildFavoriteSites(groups.flat()) }))).catch(() => toast.error("تعذر تحميل المواقع المفضلة"));
+    }
     activeLayers.forEach(async (id) => {
       const config = layers.find((item) => item.id === id);
       if (!config || loaded[id]) { if (config && loaded[id]) renderMarkers(config, loaded[id]); return; }
@@ -260,7 +321,7 @@ export default function Home() {
       <section className="story-strip"><div className="story-image" style={{ backgroundImage: `url(${DATA.heritage})` }} /><div className="story-copy"><span className="section-eyebrow">ذاكرة المكان</span><h2>الموقع ليس نقطة على الخريطة؛ إنه <i>قصة كاملة.</i></h2><p>نحوّل السجلات والطبقات والصور إلى معرفة مكانية تساعد على الحصر والتوثيق والتخطيط السياحي.</p><button onClick={() => { setActiveLayers(["heritage"]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>ابدأ من التراث العالمي <ArrowLeft size={16} /></button></div><div className="story-stat"><strong>10</strong><span>مسارات بيانات<br />قابلة للاستكشاف</span></div></section>
 
       <Sheet open={editorOpen} onOpenChange={setEditorOpen}><SheetContent side="left" className="detail-sheet point-editor" dir="rtl"><SheetHeader><div className="detail-top"><Badge>سجل جديد</Badge><ImagePlus size={18} /></div><SheetTitle>إضافة نقطة سياحية</SheetTitle></SheetHeader><div className="point-form"><p className="form-hint">اختر الطبقة، ثم استخدم زر تحديد الموقع للانتقال إلى الخريطة، أو أدخل الإحداثيات يدويًا.</p><Button type="button" variant="outline" className="pick-location-button" onClick={() => { setEditorOpen(false); setPickMode(true); }}><MapPinPlus size={15} /> تحديد الموقع من الخريطة</Button><label>الطبقة<select value={draftPoint.layerId} onChange={(event) => updateDraft("layerId", event.target.value)}>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label><label>اسم الموقع<Input value={draftPoint.name} onChange={(event) => updateDraft("name", event.target.value)} placeholder="مثال: واحة غدامس" /></label><label>الوصف<textarea value={draftPoint.description} onChange={(event) => updateDraft("description", event.target.value)} placeholder="وصف موجز للموقع وقيمته السياحية..." /></label><div className="form-grid"><label>البلدية<Input value={draftPoint.municipality} onChange={(event) => updateDraft("municipality", event.target.value)} /></label><label>التصنيف<Input value={draftPoint.category} onChange={(event) => updateDraft("category", event.target.value)} /></label></div><div className="form-grid"><label>خط العرض<Input value={draftPoint.latitude} onChange={(event) => updateDraft("latitude", event.target.value)} inputMode="decimal" /></label><label>خط الطول<Input value={draftPoint.longitude} onChange={(event) => updateDraft("longitude", event.target.value)} inputMode="decimal" /></label></div><label>مصدر البيانات<Input value={draftPoint.source} onChange={(event) => updateDraft("source", event.target.value)} placeholder="جهة الحصر أو المرجع" /></label><label>البيانات الوصفية<textarea value={draftPoint.metadata} onChange={(event) => updateDraft("metadata", event.target.value)} placeholder={'سنة التوثيق: 2026\nحالة الوصول: متاح'} /></label><label className="file-picker"><span><ImagePlus size={16} /> صورة الموقع</span><input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => updateDraft("imageDataUrl", String(reader.result)); reader.readAsDataURL(file); updateDraft("imageFileName", file.name); updateDraft("imageContentType", file.type); }} /></label><Button className="detail-action" disabled={createPoint.isPending || !draftPoint.name || !draftPoint.latitude || !draftPoint.longitude} onClick={submitPoint}>{createPoint.isPending ? "جارٍ الحفظ..." : "حفظ النقطة للمراجعة"}</Button></div></SheetContent></Sheet>
-      <Sheet open={mobileOpen || Boolean(selected)} onOpenChange={(open) => { if (!open) { setMobileOpen(false); setSelected(null); } }}><SheetContent side={selected ? "left" : "bottom"} className="detail-sheet" dir="rtl">{selected ? <><SheetHeader><div className="detail-top"><Badge style={{ background: layers.find((l) => l.id === selected.layerId)?.color }}>{layers.find((l) => l.id === selected.layerId)?.name}</Badge><ShieldCheck size={18} /></div><SheetTitle>{selected.name}</SheetTitle></SheetHeader><div className="detail-body">{selected.imageUrl && <img className="detail-image" src={selected.imageUrl} alt={`صورة ${selected.name}`} />}<p>{selected.description || "لا يوجد وصف منشور لهذا الموقع بعد."}</p><div className="detail-grid"><div><span>الإحداثيات</span><strong>{selected.lat.toFixed(4)}°N · {selected.lng.toFixed(4)}°E</strong></div><div><span>حالة السجل</span><strong>موقع موثق</strong></div></div><Button className="detail-action" onClick={() => { map?.panTo([selected.lat, selected.lng]); map?.setZoom(13); }}><MapPinned size={16} /> ركّز على الموقع</Button></div></> : <><SheetHeader><SheetTitle>طبقات الأطلس</SheetTitle></SheetHeader><div className="mobile-filter-panel"><div className="filter-heading"><span><SlidersHorizontal size={14} /> تصفية السجلات</span><button onClick={() => { setSelectedCategory("all"); setSelectedMunicipality("all"); setSelectedLayer("all"); setSelectedStatus("all"); }} type="button">إعادة ضبط</button></div><div className="filter-grid"><label>الطبقة<select value={selectedLayer} onChange={(event) => setSelectedLayer(event.target.value)}><option value="all">كل الطبقات</option>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label><label>التصنيف<select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}><option value="all">كل الأنواع</option>{filterOptions.categories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label><label>البلدية<select value={selectedMunicipality} onChange={(event) => setSelectedMunicipality(event.target.value)}><option value="all">كل البلديات</option>{filterOptions.municipalities.map((municipality) => <option key={municipality} value={municipality}>{municipality}</option>)}</select></label><label>الحالة<select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}><option value="all">كل الحالات</option>{filterOptions.statuses.map((status) => <option key={status} value={status}>{status}</option>)}</select></label></div></div><div className="mobile-layers">{layers.map((layer) => <label key={layer.id}><span><i style={{ color: layer.color }}>{layer.icon}</i>{layer.name}</span><Switch checked={activeLayers.includes(layer.id)} onCheckedChange={(checked) => toggleLayer(layer.id, checked)} /></label>)}</div></>}</SheetContent></Sheet>
+      <Sheet open={mobileOpen || Boolean(selected)} onOpenChange={(open) => { if (!open) { setMobileOpen(false); setSelected(null); } }}><SheetContent side={selected ? "left" : "bottom"} className="detail-sheet" dir="rtl">{selected ? <><SheetHeader><div className="detail-top"><Badge style={{ background: layers.find((l) => l.id === selected.layerId)?.color }}>{layers.find((l) => l.id === selected.layerId)?.name}</Badge><ShieldCheck size={18} /></div><SheetTitle>{selected.name}</SheetTitle></SheetHeader><div className="detail-body">{selected.imageUrl && <img className="detail-image" src={selected.imageUrl} alt={`صورة ${selected.name}`} />}<p>{selected.description || "لا يوجد وصف منشور لهذا الموقع بعد."}</p><div className="detail-grid"><div><span>الإحداثيات</span><strong>{selected.lat.toFixed(4)}°N · {selected.lng.toFixed(4)}°E</strong></div><div><span>حالة السجل</span><strong>موقع موثق</strong></div></div>{selected.properties.image_source && <small className="image-source-note">مصدر الصورة: <a href={selected.properties.image_source} target="_blank" rel="noreferrer">{selected.properties.image_source}</a>{selected.properties.image_author && <> · المؤلف: {selected.properties.image_author}</>}{selected.properties.image_license && <> · الترخيص: {selected.properties.image_license}</>}{selected.properties.image_license_note && <> · {selected.properties.image_license_note}</>}</small>}<Button className="detail-action" onClick={() => { map?.panTo([selected.lat, selected.lng]); map?.setZoom(13); }}><MapPinned size={16} /> ركّز على الموقع</Button></div></> : <><SheetHeader><SheetTitle>طبقات الأطلس</SheetTitle></SheetHeader><div className="mobile-filter-panel"><div className="filter-heading"><span><SlidersHorizontal size={14} /> تصفية السجلات</span><button onClick={() => { setSelectedCategory("all"); setSelectedMunicipality("all"); setSelectedLayer("all"); setSelectedStatus("all"); }} type="button">إعادة ضبط</button></div><div className="filter-grid"><label>الطبقة<select value={selectedLayer} onChange={(event) => setSelectedLayer(event.target.value)}><option value="all">كل الطبقات</option>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label><label>التصنيف<select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}><option value="all">كل الأنواع</option>{filterOptions.categories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label><label>البلدية<select value={selectedMunicipality} onChange={(event) => setSelectedMunicipality(event.target.value)}><option value="all">كل البلديات</option>{filterOptions.municipalities.map((municipality) => <option key={municipality} value={municipality}>{municipality}</option>)}</select></label><label>الحالة<select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}><option value="all">كل الحالات</option>{filterOptions.statuses.map((status) => <option key={status} value={status}>{status}</option>)}</select></label></div></div><div className="mobile-layers">{layers.map((layer) => <label key={layer.id}><span><i style={{ color: layer.color }}>{layer.icon}</i>{layer.name}</span><Switch checked={activeLayers.includes(layer.id)} onCheckedChange={(checked) => toggleLayer(layer.id, checked)} /></label>)}</div></>}</SheetContent></Sheet>
     </main>
   );
 }
