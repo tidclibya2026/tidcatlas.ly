@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterAtlasSites } from "./atlasFilters";
+import { atlasCategoryFamilies, filterAtlasSites, inferAtlasCategory } from "./atlasFilters";
 
 const sites = [
   { id: "a", name: "مدينة غدامس القديمة", description: "تراث معماري", layerId: "heritage", lat: 30.13, lng: 9.5, properties: { category: "تراث", municipality: "غدامس", status: "منشور" } },
@@ -14,5 +14,22 @@ describe("filterAtlasSites", () => {
 
   it("returns an empty result when no verified record matches", () => {
     expect(filterAtlasSites(sites, { query: "سرت", status: "منشور" })).toHaveLength(0);
+  });
+});
+
+
+describe("tourism category families", () => {
+  it("infers historical, natural, and service categories", () => {
+    expect(inferAtlasCategory({ id: "1", name: "قلعة السرايا", description: "معلم تاريخي", layerId: "heritage", properties: {} })).toBe("تاريخية");
+    expect(inferAtlasCategory({ id: "2", name: "وادي الحياة", description: "مشهد طبيعي", layerId: "natural", properties: {} })).toBe("طبيعية");
+    expect(inferAtlasCategory({ id: "3", name: "فندق الساحل", description: "إيواء", layerId: "hotels", properties: {} })).toBe("خدمية");
+  });
+
+  it("exposes canonical category labels and filters by them", () => {
+    expect(atlasCategoryFamilies()).toEqual(expect.arrayContaining(["تاريخية", "طبيعية", "خدمية"]));
+    expect(filterAtlasSites([
+      { id: "historic", name: "قلعة", description: "موقع تاريخي", layerId: "heritage", properties: {} },
+      { id: "nature", name: "وادي", description: "موقع طبيعي", layerId: "natural", properties: {} },
+    ], { category: "طبيعية" }).map((site) => site.id)).toEqual(["nature"]);
   });
 });

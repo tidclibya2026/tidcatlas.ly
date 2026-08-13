@@ -8,7 +8,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
 import { MapView } from "@/components/Map";
-import { filterAtlasSites } from "@shared/atlasFilters";
+import { atlasCategoryFamilies, filterAtlasSites, inferAtlasCategory } from "@shared/atlasFilters";
 import { isFavoriteSiteName } from "@shared/favoriteSites";
 import { FAVORITE_IMAGE, favoriteImageMetadata } from "@shared/favoriteImage";
 import { routeCoordinates } from "@shared/atlasRoute";
@@ -159,6 +159,8 @@ export default function Home() {
   const [imageDisplayUrl, setImageDisplayUrl] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [map, setMap] = useState<L.Map | null>(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [loadingLayers, setLoadingLayers] = useState<string[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
   const [pickMode, setPickMode] = useState(false);
   const [draftPoint, setDraftPoint] = useState({ layerId: "heritage", name: "", description: "", municipality: "", category: "", source: "", latitude: "", longitude: "", metadata: "", imageDataUrl: "", imageFileName: "", imageContentType: "" });
@@ -167,7 +169,7 @@ export default function Home() {
   const publishedPoints = trpc.atlas.published.useQuery({});
   const adminPoints = trpc.atlas.mine.useQuery(undefined, { enabled: Boolean(isAuthenticated && user?.role === "admin") });
   const trpcUtils = trpc.useUtils();
-  const handleMapReady = useCallback((instance: L.Map) => setMap(instance), []);
+  const handleMapReady = useCallback((instance: L.Map) => { setMap(instance); setMapReady(true); }, []);
   const smartSearch = trpc.atlas.smartSearch.useMutation();
   const routePlan = trpc.atlas.routePlan.useMutation();
   const createPoint = trpc.atlas.create.useMutation({
@@ -190,17 +192,19 @@ export default function Home() {
     const municipalities = new Set<string>();
     const statuses = new Set<string>();
     activeSites.forEach((site) => {
-      const category = siteValue(site, ["category", "type", "classification", "التصنيف"]);
+      const category = inferAtlasCategory(site);
       const municipality = siteValue(site, ["municipality", "municipality_name", "بلدية", "البلدية", "city"]);
       const status = siteValue(site, ["status", "حالة السجل", "الحالة"]) || "منشور";
       if (category) categories.add(category);
       if (municipality) municipalities.add(municipality);
       statuses.add(status);
     });
-    return { categories: Array.from(categories).sort((a, b) => a.localeCompare(b, "ar")), municipalities: Array.from(municipalities).sort((a, b) => a.localeCompare(b, "ar")), statuses: Array.from(statuses).sort((a, b) => a.localeCompare(b, "ar")) };
+    return { categories: Array.from(new Set(atlasCategoryFamilies().concat(Array.from(categories)))).sort((a, b) => a.localeCompare(b, "ar")), municipalities: Array.from(municipalities).sort((a, b) => a.localeCompare(b, "ar")), statuses: Array.from(statuses).sort((a, b) => a.localeCompare(b, "ar")) };
   }, [activeSites]);
   const assistantSites = useMemo(() => activeSites.slice(0, 120).map((site) => ({ id: site.id, name: site.name, description: site.description, latitude: site.lat, longitude: site.lng, layerId: site.layerId, category: siteValue(site, ["category", "type", "classification", "التصنيف"]), municipality: siteValue(site, ["municipality", "municipality_name", "بلدية", "البلدية", "city"]), source: siteValue(site, ["source", "المصدر"]) || "سجلات أطلس ليبيا السياحي" })), [activeSites]);
   const visibleSites = useMemo(() => filterAtlasSites(activeSites, { query, category: selectedCategory, municipality: selectedMunicipality, layerId: selectedLayer, status: selectedStatus }), [activeSites, query, selectedCategory, selectedMunicipality, selectedLayer, selectedStatus]);
+  const dataPending = activeLayers.some((id) => id !== "density" && id !== "favorites" && !loaded[id]) || (activeLayers.includes("density") && (!loaded.hotels || !loaded.resorts)) || (activeLayers.includes("favorites") && !loaded.favorites);
+  const isAtlasLoading = !mapReady || dataPending || loadingLayers.length > 0;
 
   const clearMarkers = useCallback((id: string) => {
     markers.current[id]?.forEach((marker) => marker.remove());
@@ -238,6 +242,10 @@ export default function Home() {
 
   useEffect(() => {
     if (!map) return;
+    const pendingIds = activeLayers.filter((id) => id !== "density" && id !== "favorites" && !loaded[id]);
+    if (activeLayers.includes("density") && (!loaded.hotels || !loaded.resorts)) pendingIds.push("density");
+    if (activeLayers.includes("favorites") && !loaded.favorites) pendingIds.push("favorites");
+    setLoadingLayers(Array.from(new Set(pendingIds)));
     if (activeLayers.includes("density") && !markers.current.density?.length) {
       Promise.all(["hotels", "resorts"].map(async (id) => {
         if (loaded[id]) return loaded[id];
@@ -265,6 +273,8 @@ export default function Home() {
         renderMarkers(config, sites);
       } catch (error) {
         toast.error(`تعذر تحميل طبقة ${config.name}`);
+      } finally {
+        setLoadingLayers((current) => current.filter((item) => item !== id));
       }
     });
     Object.keys(markers.current).filter((id) => id !== "managed" && !activeLayers.includes(id)).forEach(clearMarkers);
@@ -342,7 +352,7 @@ export default function Home() {
           <div className="panel-intro"><div className="intro-kicker"><Sparkles size={14} /> من المعلومة إلى القرار</div><h2>ليبيا، كما تُروى عبر المكان.</h2><p>منصة جغرافية لتوثيق المقومات السياحية والتاريخية والطبيعية والخدمية، وربطها بمشهد واحد قابل للاستكشاف.</p></div>
           <div className="search-box"><Search size={18} /><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ابحث باسم موقع أو مدينة…" aria-label="البحث داخل المواقع" />{query && <button onClick={() => setQuery("")} aria-label="مسح البحث"><X size={15} /></button>}</div>
           {(query || selectedCategory !== "all" || selectedMunicipality !== "all" || selectedLayer !== "all" || selectedStatus !== "all") && <div className="search-results" aria-live="polite"><div className="search-results-heading"><span>نتائج البحث</span><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong></div>{visibleSites.length === 0 ? <p className="search-empty">لا توجد سجلات مطابقة ضمن الطبقات النشطة.</p> : <div className="search-result-list">{visibleSites.slice(0, 8).map((site) => <button type="button" key={site.id} onClick={() => { setSelected(site); map?.panTo([site.lat, site.lng]); map?.setZoom(12); }}><span>{site.name}</span><small>{siteValue(site, ["municipality", "municipality_name", "بلدية", "البلدية", "city"]) || "موقع موثق"}</small></button>)}</div>}</div>}
-          <div className="filter-panel" aria-label="الفلاتر المتقدمة"><div className="filter-heading"><span><SlidersHorizontal size={14} /> تصفية السجلات</span><button onClick={() => { setSelectedCategory("all"); setSelectedMunicipality("all"); setSelectedLayer("all"); setSelectedStatus("all"); }} type="button">إعادة ضبط</button></div><div className="filter-grid"><label>الطبقة<select value={selectedLayer} onChange={(event) => setSelectedLayer(event.target.value)}><option value="all">كل الطبقات</option>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label><label>التصنيف<select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}><option value="all">كل الأنواع</option>{filterOptions.categories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label><label>البلدية<select value={selectedMunicipality} onChange={(event) => setSelectedMunicipality(event.target.value)}><option value="all">كل البلديات</option>{filterOptions.municipalities.map((municipality) => <option key={municipality} value={municipality}>{municipality}</option>)}</select></label><label>الحالة<select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}><option value="all">كل الحالات</option>{filterOptions.statuses.map((status) => <option key={status} value={status}>{status}</option>)}</select></label></div></div>
+          <div className="filter-panel" aria-label="الفلاتر المتقدمة"><div className="filter-heading"><span><SlidersHorizontal size={14} /> تصفية السجلات</span><button onClick={() => { setSelectedCategory("all"); setSelectedMunicipality("all"); setSelectedLayer("all"); setSelectedStatus("all"); }} type="button">إعادة ضبط</button></div><div className="category-filter-chips" aria-label="تصفية سريعة حسب الفئة"><button type="button" className={selectedCategory === "all" ? "is-selected" : ""} aria-pressed={selectedCategory === "all"} onClick={() => setSelectedCategory("all")}>الكل</button>{filterOptions.categories.map((category) => <button type="button" key={category} className={selectedCategory === category ? "is-selected" : ""} aria-pressed={selectedCategory === category} onClick={() => setSelectedCategory(category)}>{category}</button>)}</div><div className="filter-grid"><label>الطبقة<select value={selectedLayer} onChange={(event) => setSelectedLayer(event.target.value)}><option value="all">كل الطبقات</option>{layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label><label>التصنيف<select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}><option value="all">كل الأنواع</option>{filterOptions.categories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label><label>البلدية<select value={selectedMunicipality} onChange={(event) => setSelectedMunicipality(event.target.value)}><option value="all">كل البلديات</option>{filterOptions.municipalities.map((municipality) => <option key={municipality} value={municipality}>{municipality}</option>)}</select></label><label>الحالة<select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}><option value="all">كل الحالات</option>{filterOptions.statuses.map((status) => <option key={status} value={status}>{status}</option>)}</select></label></div></div>
           <div className="ai-panel"><div className="ai-panel-heading"><span><Sparkles size={14} /> البحث الذكي الموثق</span><select value={assistantMode} onChange={(event) => setAssistantMode(event.target.value as typeof assistantMode)}><option value="visitor">زائر</option><option value="tourist">سائح</option><option value="researcher">باحث</option></select></div><p>اسأل عن المواقع الظاهرة؛ الإجابة تعتمد على السجلات الموثقة المتاحة فقط.</p><div className="ai-question"><Input value={assistantQuestion} onChange={(event) => setAssistantQuestion(event.target.value)} placeholder="مثال: ما المواقع الأثرية المناسبة لزيارة قصيرة؟" aria-label="سؤال البحث الذكي" /><Button size="sm" disabled={!assistantQuestion.trim() || smartSearch.isPending} onClick={() => smartSearch.mutate({ question: assistantQuestion, mode: assistantMode })}>{smartSearch.isPending ? "يبحث..." : "اسأل"}</Button></div>{smartSearch.error && <div className="ai-answer"><strong>تعذر إكمال البحث الذكي حاليًا.</strong><small>يمكنك تضييق الفلاتر أو المحاولة مرة أخرى. لا يتم عرض معلومات غير موثقة.</small></div>}{smartSearch.data && <div className="ai-answer"><strong>{smartSearch.data.answer}</strong>{smartSearch.data.matchedIds.length > 0 && <small>السجلات المطابقة: {smartSearch.data.matchedIds.map((id) => activeSites.find((site) => site.id === id)?.name).filter(Boolean).join("، ")}</small>}{smartSearch.data.sources.length > 0 && <small>المصادر: {smartSearch.data.sources.join("، ")}</small>}{smartSearch.data.limitation && <small>{smartSearch.data.limitation}</small>}</div>}</div>
           <div className="route-panel"><div className="ai-panel-heading"><span><Route size={14} /> مسار مقترح</span><span className="route-note">بيانات موثقة</span></div><div className="route-controls"><label>المدة بالساعات<input value={routeHours} onChange={(event) => setRouteHours(event.target.value)} inputMode="numeric" /></label><label>الاهتمامات<input value={routeInterests} onChange={(event) => setRouteInterests(event.target.value)} placeholder="تراث، طبيعة" /></label></div><Button className="route-button" size="sm" disabled={routePlan.isPending || assistantSites.length < 2} onClick={() => routePlan.mutate({ mode: assistantMode, durationHours: Number(routeHours) || 8, interests: routeInterests.split("،").map((item) => item.trim()).filter(Boolean) })}>{routePlan.isPending ? "يبني المسار..." : "اقترح مسارًا"}</Button>{routePlan.error && <div className="route-result"><strong>تعذر بناء المسار حاليًا.</strong><small>تأكد من تفعيل طبقتين أو أكثر تحتويان على مواقع موثقة.</small></div>}{routePlan.data && <div className="route-result"><strong>{routePlan.data.title}</strong><p>{routePlan.data.rationale}</p><small>المحطات: {routePlan.data.orderedIds.map((id) => activeSites.find((site) => site.id === id)?.name).filter(Boolean).join(" ← ") || "لم يتم العثور على محطات كافية"}</small>{routePlan.data.warnings.map((warning) => <small key={warning}>{warning}</small>)}</div>}</div>
           {!isAuthenticated && <Button className="add-point-button" onClick={startLogin}><MapPinPlus size={16} /> دخول فريق التوثيق</Button>}{isAuthenticated && user?.role === "admin" && <Button className="add-point-button" onClick={() => setEditorOpen(true)}><MapPinPlus size={16} /> إضافة نقطة إلى الأطلس</Button>}
@@ -351,7 +361,7 @@ export default function Home() {
           <div className="panel-foot"><div><Database size={15} /><span>السجلات المعروضة</span><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong></div><button onClick={focusLibya}><ZoomIn size={14} /> إعادة تمركز الخريطة</button></div>
         </aside>
 
-        <section className="map-stage"><div className="map-overlay-title"><span>المشهد الجغرافي الوطني</span><strong>استكشف ليبيا طبقةً بعد طبقة</strong></div><MapView className="atlas-map" initialCenter={INITIAL_CENTER} initialZoom={5} onMapReady={handleMapReady} /><div className="map-legend"><span><i style={{ background: "#B96D3B" }} /> مواقع موثقة</span><span><i style={{ background: "#AF7A24" }} /> فرص وتنمية</span><span><i style={{ background: "#287A70" }} /> موارد طبيعية</span>{activeLayers.includes("density") && <span className="density-legend"><i style={{ background: "#2FBEF0" }} /> تركّز منخفض <i style={{ background: "#D94B45" }} /> تركّز مرتفع</span>}</div><div className="map-count"><MapPinned size={15} /><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong><span>موقع ظاهر</span></div></section>
+        <section className="map-stage"><div className={`map-loading-overlay ${isAtlasLoading ? "is-visible" : ""}`} aria-live="polite" aria-busy={isAtlasLoading}><div className="loading-orbit"><span /><span /><span /></div><strong>{!mapReady ? "جارٍ تهيئة الخريطة" : "جارٍ تحميل الطبقات"}</strong><small>{loadingLayers.length ? `يتم تجهيز ${loadingLayers.length.toLocaleString("ar-LY")} طبقة` : "لحظات ونبدأ الاستكشاف"}</small></div><div className="map-overlay-title"><span>المشهد الجغرافي الوطني</span><strong>استكشف ليبيا طبقةً بعد طبقة</strong></div><MapView className="atlas-map" initialCenter={INITIAL_CENTER} initialZoom={5} onMapReady={handleMapReady} /><div className="map-legend"><span><i style={{ background: "#B96D3B" }} /> مواقع موثقة</span><span><i style={{ background: "#AF7A24" }} /> فرص وتنمية</span><span><i style={{ background: "#287A70" }} /> موارد طبيعية</span>{activeLayers.includes("density") && <span className="density-legend"><i style={{ background: "#2FBEF0" }} /> تركّز منخفض <i style={{ background: "#D94B45" }} /> تركّز مرتفع</span>}</div><div className="map-count"><MapPinned size={15} /><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong><span>موقع ظاهر</span></div></section>
       </section>
 
       <section className="story-strip"><div className="story-image" style={{ backgroundImage: `url(${DATA.heritage})` }} /><div className="story-copy"><span className="section-eyebrow">ذاكرة المكان</span><h2>الموقع ليس نقطة على الخريطة؛ إنه <i>قصة كاملة.</i></h2><p>نحوّل السجلات والطبقات والصور إلى معرفة مكانية تساعد على الحصر والتوثيق والتخطيط السياحي.</p><button onClick={() => { setActiveLayers(["heritage"]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>ابدأ من التراث العالمي <ArrowLeft size={16} /></button></div><div className="story-stat"><strong>10</strong><span>مسارات بيانات<br />قابلة للاستكشاف</span></div></section>
