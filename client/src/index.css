@@ -107,3 +107,12 @@ button { cursor:pointer; }
 @keyframes loading-spin { to { transform:rotate(360deg); } }
 @keyframes layer-row-enter { from { opacity:.55; transform:translateX(6px); } to { opacity:1; transform:translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .category-filter-chips button,.layer-row,.layer-row .layer-mark,.layer-row:before,.map-loading-overlay { transition:none; animation:none; } .loading-orbit { animation:none; } }
+
+/* Explicit Leaflet zoom controls */
+.atlas-main .leaflet-control-zoom { margin:18px 18px 0 0; border:1px solid #123C5266; border-radius:4px; overflow:hidden; box-shadow:0 8px 18px #123C5230; z-index:8; }
+.atlas-main .leaflet-control-zoom a { width:42px; height:42px; line-height:40px; display:block; background:#FBFAF7; color:#123C52; border-bottom:1px solid #D9D8D1; font-size:25px; font-weight:700; text-align:center; text-decoration:none; }
+.atlas-main .leaflet-control-zoom a:last-child { border-bottom:0; }
+.atlas-main .leaflet-control-zoom a:hover { background:#F2E5CC; color:#B96D3B; }
+.atlas-main .leaflet-control-zoom a:focus-visible { outline:3px solid #D7B66D; outline-offset:-3px; }
+.atlas-main .leaflet-control-zoom a:active { background:#D7B66D; color:#123C52; }
+@media (max-width:640px) { .atlas-main .leaflet-control-zoom { margin:12px 12px 0 0; } .atlas-main .leaflet-control-zoom a { width:46px; height:46px; line-height:44px; font-size:28px; } }
