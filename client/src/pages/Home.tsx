@@ -21,7 +21,9 @@ type Site = { id: string; name: string; description: string; lat: number; lng: n
 type LayerConfig = { id: string; name: string; short: string; color: string; icon: string; url: string; kind: "kml" | "geojson"; description: string; featured?: boolean };
 
 const DATA = {
-  logo: "/manus-storage/libya-atlas-logo_2439d52e.png",
+  projectLogo: "/manus-storage/atlas-tourism-project_c75dcab1.png",
+  ministryLogo: "/manus-storage/ministry-tourism_feb6f439.png",
+  centerLogo: "/manus-storage/tourism-documentation-center_0d098924.png",
   hero: "/manus-storage/libya-atlas-hero_ebb8b2b9.jpg",
   desert: "/manus-storage/libya-atlas-desert_8d3e876d.jpg",
   heritage: "/manus-storage/libya-atlas-heritage_baefbb7e.jpg",
@@ -136,7 +138,7 @@ export default function Home() {
   return (
     <main dir="rtl" className="atlas-shell">
       <header className="topbar">
-        <div className="brand-lockup"><img src={DATA.logo} alt="رمز أطلس ليبيا السياحي" /><div><span className="eyebrow">مركز المعلومات والتوثيق السياحي</span><h1>أطلس ليبيا <em>السياحي</em></h1></div></div>
+        <div className="brand-lockup"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /><div><span className="eyebrow">مركز المعلومات والتوثيق السياحي</span><h1>أطلس ليبيا <em>السياحي</em></h1></div><div className="official-logos"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /></div></div>
         <div className="topbar-actions"><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span><Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
       </header>
 
