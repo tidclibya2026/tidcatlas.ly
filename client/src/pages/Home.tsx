@@ -9,6 +9,8 @@ import { trpc } from "@/lib/trpc";
 import { startLogin } from "@/const";
 import { MapView } from "@/components/Map";
 import { filterAtlasSites } from "@shared/atlasFilters";
+import { isFavoriteSiteName } from "@shared/favoriteSites";
+import { FAVORITE_IMAGE, favoriteImageMetadata } from "@shared/favoriteImage";
 import { routeCoordinates } from "@shared/atlasRoute";
 import L from "leaflet";
 import { Badge } from "@/components/ui/badge";
@@ -49,27 +51,8 @@ const layers: LayerConfig[] = [
   { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: "★", url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
 ];
 
-const FAVORITE_IMAGE = {
-  url: "/manus-storage/waw-an-namus-wikimedia_5cabbb3f.jpg",
-  sourceUrl: "https://commons.wikimedia.org/wiki/File:Wau-en-Namus-2.jpg",
-  author: "Rolfcosar",
-  license: "CC BY-SA 3.0",
-};
-
-const explicitFavoriteNames = [
-  "موقع لبدة الأثري (لبتس ماغنا) (لبدة الكبرى)", "مدينة لبدة الاثرية الكبرى", "موقع صبراتة الأثري", "اثار صبراتة",
-  "موقع شحات (قورينة) الأثري", "مدينة غدامس القديمة", "غدامس", "مواقع تادرارت أكاكوس الصخرية", "جبال أكاكوس", "المدينة القديمة غات",
-  "شلال بالفو", "شلال رأس الهلال بافلو", "عين الفرس", "كهف هوا فطيح", "متحف غدامس", "وادي لبدة",
-];
-
-function normalizeFavoriteName(value: string) {
-  return value.toLocaleLowerCase().replace(/[\u200e\u200f\u00a0]/g, "").replace(/[ًٌٍَُِّْـ]/g, "").replace(/[^\u0600-\u06ff\w]/g, "");
-}
-
-const explicitFavoriteKeys = new Set(explicitFavoriteNames.map(normalizeFavoriteName));
-
 function isFavoriteSite(site: Site) {
-  return explicitFavoriteKeys.has(normalizeFavoriteName(site.name));
+  return isFavoriteSiteName(site.name);
 }
 
 function buildFavoriteSites(sites: Site[]) {
@@ -87,10 +70,7 @@ function buildFavoriteSites(sites: Site[]) {
       layerId: "favorites",
       properties: {
         ...site.properties,
-        image_source: site.imageUrl ? (site.properties.image_source || "مصدر الصورة من ملف KML") : FAVORITE_IMAGE.sourceUrl,
-        image_author: site.imageUrl ? (site.properties.image_author || "موجود في بيانات KML") : FAVORITE_IMAGE.author,
-        image_license: site.imageUrl ? (site.properties.image_license || "يرجى مراجعة ترخيص KML") : FAVORITE_IMAGE.license,
-        image_license_note: site.imageUrl ? "صورة مرتبطة ببيانات KML" : "صورة بيئية عامة للعرض المؤقت وليست صورة موضعية مؤكدة؛ تعتمد وفق شروط CC BY-SA 3.0.",
+        ...favoriteImageMetadata(Boolean(site.imageUrl), site.properties),
       },
     };
   });
