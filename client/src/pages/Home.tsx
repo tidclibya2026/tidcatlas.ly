@@ -36,6 +36,7 @@ const DATA = {
   desert: "/manus-storage/libya-atlas-desert_8d3e876d.jpg",
   heritage: "/manus-storage/libya-atlas-heritage_baefbb7e.jpg",
   cover: "/manus-storage/libya-atlas-cover-gis-landscape_22a918d0.png",
+  intro: "/manus-storage/libya-atlas-intro-poster-final_5371be70.jpg",
 };
 
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
@@ -134,7 +135,8 @@ export default function Home() {
   // nonce cookie and must run only at the moment of navigation.
   let { user, loading, error, isAuthenticated, logout } = useAuth();
 
-  const [activeLayers, setActiveLayers] = useState<string[]>(["heritage"]);
+  const [hasEnteredAtlas, setHasEnteredAtlas] = useState(false);
+  const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const [loaded, setLoaded] = useState<Record<string, Site[]>>({});
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -300,6 +302,10 @@ export default function Home() {
     draftPoint.metadata.split("\n").map((line) => line.split(":")).filter(([key, value]) => key?.trim() && value?.trim()).forEach(([key, value]) => { metadata[key.trim()] = value.trim(); });
     createPoint.mutate({ ...draftPoint, latitude: Number(draftPoint.latitude), longitude: Number(draftPoint.longitude), metadata, imageDataUrl: draftPoint.imageDataUrl || undefined, imageFileName: draftPoint.imageFileName || undefined, imageContentType: draftPoint.imageContentType || undefined });
   };
+
+  if (!hasEnteredAtlas) {
+    return <main dir="rtl" className="intro-screen"><div className="intro-art"><img src={DATA.intro} alt="غلاف مشروع أطلس ليبيا السياحي" /><div className="intro-sheen" /></div><div className="intro-content"><div className="intro-brand"><img src={DATA.projectLogo} alt="شعار أطلس ليبيا السياحي" /><span>وزارة السياحة والصناعات التقليدية<br />مركز المعلومات والتوثيق السياحي</span></div><span className="intro-kicker">منصة الذاكرة الوطنية</span><h1>أطلس ليبيا <em>السياحي</em></h1><p>استكشف المقومات السياحية والتاريخية والطبيعية في ليبيا عبر خريطة جغرافية تفاعلية.</p><Button className="intro-enter" onClick={() => setHasEnteredAtlas(true)}>دخول إلى الأطلس <ArrowLeft size={17} /></Button><small className="intro-note"><Layers3 size={14} /> اختر الطبقة التي تريد استكشافها بعد الدخول</small></div></main>;
+  }
 
   return (
     <main dir="rtl" className="atlas-shell">
