@@ -6,6 +6,10 @@ describe("extractKmlImageUrl", () => {
     expect(extractKmlImageUrl('<img src="https://mymaps.usercontent.google.com/hostedimage/theatre.png?x=1&amp;y=2" />')).toBe("https://mymaps.usercontent.google.com/hostedimage/theatre.png?x=1&y=2");
   });
 
+  it("extracts an image from HTML-escaped KML descriptions", () => {
+    expect(extractKmlImageUrl("&lt;img src=\"https://example.com/leptis.jpg?x=1&amp;y=2\" /&gt;")).toBe("https://example.com/leptis.jpg?x=1&y=2");
+  });
+
   it("prefers image properties when KML provides a direct photo field", () => {
     expect(extractKmlImageUrl("photo_URL: https://example.com/fallback.jpg", { photo_URL: "https://example.com/leptis.jpg" })).toBe("https://example.com/leptis.jpg");
   });
