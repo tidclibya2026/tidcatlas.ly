@@ -1,6 +1,8 @@
 export function extractKmlImageUrl(description: string, properties: Record<string, string> = {}) {
   const decodedDescription = decodeKmlHtml(description);
-  const fromProperties = properties.image_url || properties.imageUrl || properties.photo_URL || properties.photoUrl || properties.photo;
+  const propertyEntries = Object.entries(properties).map(([key, value]) => [key.toLowerCase().replace(/[^a-z0-9]/g, ""), value] as const);
+  const propertyMap = new Map(propertyEntries);
+  const fromProperties = ["imageurl", "image", "photourl", "photourl", "photo", "pictureurl", "picture", "mediaurl"].map((key) => propertyMap.get(key)).find(Boolean);
   const decodedProperty = fromProperties ? decodeKmlUrl(fromProperties) : undefined;
   if (decodedProperty?.startsWith("http")) return decodedProperty;
 
