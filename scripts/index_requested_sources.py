@@ -23,7 +23,12 @@ def safe_name(name): return re.sub(r'[^\w\u0600-\u06ff.-]+', '_', name)
 
 def kml_stats(path):
     try: root = ET.fromstring(path.read_text(encoding='utf-8', errors='replace'))
-    except ET.ParseError: return {'records': 0, 'coordinates': 0, 'imageReferences': 0, 'parseError': True}
+    except ET.ParseError:
+        text = path.read_text(encoding='utf-8', errors='replace')
+        placemarks = re.findall(r'<Placemark(?:\s[^>]*)?>([\s\S]*?)</Placemark>', text, re.I)
+        coordinates = sum(1 for block in placemarks if re.search(r'<coordinates(?:\s[^>]*)?>[\s\S]*?</coordinates>', block, re.I))
+        images = sum(len(re.findall(r"(?:https?://|data:image/)[^\s\"'<>]+", block, re.I)) for block in placemarks)
+        return {'records': len(placemarks), 'coordinates': coordinates, 'imageReferences': images, 'parseError': True, 'parseMode': 'regex-fallback'}
     records = coordinates = images = 0
     for pm in root.iter():
         if pm.tag.rsplit('}', 1)[-1] != 'Placemark': continue
