@@ -13,6 +13,9 @@ vi.mock("./db", async () => {
     createAuditLog: auditLog,
     getAtlasPoint: vi.fn(async (id: number) => ({ id })),
     listAtlasImages: vi.fn(async () => []),
+    listTeamMembers: vi.fn(async () => [{ id: 31, displayName: "مراجع تجريبي", email: "reviewer@example.com", teamRole: "reviewer", status: "pending" }]),
+    createTeamMember: vi.fn(async (member: unknown) => ({ id: 31, ...(member as object) })),
+    updateTeamMember: vi.fn(async (id: number, patch: unknown) => ({ id, ...(patch as object) })),
   };
 });
 
@@ -51,6 +54,15 @@ describe("atlas documentation success flows", () => {
 
   it("refuses commit when the import job has no stored file", async () => {
     await expect(appRouter.createCaller(ctx()).atlas.commitImport({ jobId: 9999, sourceKind: "kml", fileName: "missing.kml", layerId: "heritage" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("creates a documentation team member and records administration", async () => {
+    const result = await appRouter.createCaller(ctx()).atlas.createTeamMember({ displayName: "مراجع تجريبي", email: "reviewer@example.com", teamRole: "reviewer", notes: "فريق التوثيق" });
+    expect(result).toMatchObject({ id: 31, status: "pending", teamRole: "reviewer" });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_team_member", action: "create", actorId: 7 }));
+    const updated = await appRouter.createCaller(ctx()).atlas.updateTeamMember({ id: 31, patch: { status: "suspended" } });
+    expect(updated).toMatchObject({ id: 31, status: "suspended" });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_team_member", action: "update", actorId: 7 }));
   });
 
   it("adds and reviews an externally sourced image with rights metadata", async () => {

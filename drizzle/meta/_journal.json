@@ -15,6 +15,13 @@
       "when": 1786704844757,
       "tag": "0001_milky_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1786706833918,
+      "tag": "0002_whole_princess_powerful",
+      "breakpoints": true
     }
   ]
 }

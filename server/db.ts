@@ -5,10 +5,12 @@ import {
   atlasImages,
   atlasImportJobs,
   atlasPoints,
+  atlasTeamMembers,
   InsertAtlasImage,
   InsertAtlasImportJob,
   InsertAtlasPoint,
   InsertAtlasAuditLog,
+  InsertAtlasTeamMember,
   InsertUser,
   users,
 } from "../drizzle/schema";
@@ -184,6 +186,28 @@ export async function updateImportJob(id: number, patch: Partial<InsertAtlasImpo
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
   await db.update(atlasImportJobs).set(patch).where(eq(atlasImportJobs.id, id));
   const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function listTeamMembers() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasTeamMembers).orderBy(desc(atlasTeamMembers.createdAt));
+}
+
+export async function createTeamMember(member: InsertAtlasTeamMember) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const result = await db.insert(atlasTeamMembers).values(member);
+  const rows = await db.select().from(atlasTeamMembers).where(eq(atlasTeamMembers.id, Number(result[0].insertId))).limit(1);
+  return rows[0];
+}
+
+export async function updateTeamMember(id: number, patch: Partial<InsertAtlasTeamMember>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasTeamMembers).set(patch).where(eq(atlasTeamMembers.id, id));
+  const rows = await db.select().from(atlasTeamMembers).where(eq(atlasTeamMembers.id, id)).limit(1);
   return rows[0];
 }
 

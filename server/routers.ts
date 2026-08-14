@@ -4,7 +4,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, getImportJob, listAtlasImages, listAtlasPoints, listImportJobs, listReviewQueue, mergeAtlasPoints, updateAtlasImage, updateAtlasPoint, updateImportJob } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, getImportJob, listAtlasImages, listAtlasPoints, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createTeamMember, updateTeamMember, updateAtlasImage, updateAtlasPoint, updateImportJob } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -162,6 +162,17 @@ export const appRouter = router({
       return image;
     }),
     importJobs: adminProcedure.query(({ ctx }) => listImportJobs(ctx.user.id)),
+    teamMembers: adminProcedure.query(() => listTeamMembers()),
+    createTeamMember: adminProcedure.input(z.object({ displayName: z.string().min(2).max(255), email: z.string().email().max(320), teamRole: z.enum(["reviewer", "editor", "import_manager"]), notes: z.string().max(4000).optional() })).mutation(async ({ input, ctx }) => {
+      const member = await createTeamMember({ ...input, status: "pending", createdBy: ctx.user.id });
+      await createAuditLog({ entityType: "atlas_team_member", entityId: member.id, action: "create", details: JSON.stringify({ email: input.email, teamRole: input.teamRole }), actorId: ctx.user.id });
+      return member;
+    }),
+    updateTeamMember: adminProcedure.input(z.object({ id: z.number().int().positive(), patch: z.object({ displayName: z.string().min(2).max(255).optional(), teamRole: z.enum(["reviewer", "editor", "import_manager"]).optional(), status: z.enum(["active", "suspended", "pending"]).optional(), notes: z.string().max(4000).optional() }) })).mutation(async ({ input, ctx }) => {
+      const member = await updateTeamMember(input.id, input.patch);
+      await createAuditLog({ entityType: "atlas_team_member", entityId: input.id, action: "update", details: JSON.stringify(input.patch), actorId: ctx.user.id });
+      return member;
+    }),
     previewImport: adminProcedure.input(z.object({ sourceKind: z.enum(["kml", "excel"]), fileName: z.string().min(1).max(255), fileDataBase64: z.string().min(10).max(30_000_000), layerId: z.string().max(80).optional() })).mutation(async ({ input }) => {
       const parsed = input.sourceKind === "kml" ? parseKml(Buffer.from(input.fileDataBase64, "base64"), { layerId: input.layerId, source: input.fileName }) : parseExcel(Buffer.from(input.fileDataBase64, "base64"), { layerId: input.layerId, source: input.fileName });
       return { fileName: input.fileName, sourceKind: input.sourceKind, ...parsed, rows: parsed.rows.slice(0, 500) };

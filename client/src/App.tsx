@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import DocumentationTeam from "./pages/DocumentationTeam";
+import SystemAdmin from "./pages/SystemAdmin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -15,6 +16,8 @@ function Router() {
       <Route path={"/tidcatlas.ly/"} component={Home} />
       <Route path={"/documentation-team"} component={DocumentationTeam} />
       <Route path={"/tidcatlas.ly/documentation-team"} component={DocumentationTeam} />
+      <Route path={"/system-admin"} component={SystemAdmin} />
+      <Route path={"/tidcatlas.ly/system-admin"} component={SystemAdmin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

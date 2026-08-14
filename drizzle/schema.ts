@@ -108,3 +108,19 @@ export const atlasAuditLogs = mysqlTable("atlas_audit_logs", {
 
 export type AtlasAuditLog = typeof atlasAuditLogs.$inferSelect;
 export type InsertAtlasAuditLog = typeof atlasAuditLogs.$inferInsert;
+
+export const atlasTeamMembers = mysqlTable("atlas_team_members", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  displayName: varchar("displayName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  teamRole: mysqlEnum("teamRole", ["reviewer", "editor", "import_manager"]).default("reviewer").notNull(),
+  status: mysqlEnum("status", ["active", "suspended", "pending"]).default("pending").notNull(),
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_team_members_status_idx").on(table.status), roleIdx: index("atlas_team_members_role_idx").on(table.teamRole) }));
+
+export type AtlasTeamMember = typeof atlasTeamMembers.$inferSelect;
+export type InsertAtlasTeamMember = typeof atlasTeamMembers.$inferInsert;
