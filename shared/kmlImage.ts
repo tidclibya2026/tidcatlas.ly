@@ -1,15 +1,20 @@
-export function extractKmlImageUrl(description: string, properties: Record<string, string> = {}) {
+export function extractKmlImageUrls(description: string, properties: Record<string, string> = {}) {
   const decodedDescription = decodeKmlHtml(description);
   const propertyEntries = Object.entries(properties).map(([key, value]) => [key.toLowerCase().replace(/[^a-z0-9]/g, ""), value] as const);
   const propertyMap = new Map(propertyEntries);
-  const fromProperties = ["imageurl", "image", "imagehref", "photourl", "photo", "pictureurl", "picture", "thumbnailurl", "mediaurl"].map((key) => propertyMap.get(key)).find(Boolean);
-  const decodedProperty = fromProperties ? decodeKmlUrl(fromProperties) : undefined;
-  if (decodedProperty?.startsWith("http")) return decodedProperty;
+  const fromProperties = ["imageurl", "image", "imagehref", "photourl", "photo", "pictureurl", "picture", "thumbnailurl", "mediaurl"]
+    .map((key) => propertyMap.get(key)).filter(Boolean).map((value) => decodeKmlUrl(value!));
 
-  const imageTag = decodedDescription.match(/<(?:img|image)[^>]+(?:src|href)=["']([^"']+)["']/i);
-  const plainUrl = decodedDescription.match(/https?:\/\/[^\s"'<>]+/i)?.[0];
-  const candidate = imageTag?.[1] || plainUrl;
-  return candidate ? decodeKmlUrl(candidate) : undefined;
+  const candidates = [
+    ...fromProperties,
+    ...Array.from(decodedDescription.matchAll(/<(?:img|image)[^>]+(?:src|href)=["']([^"']+)["']/gi), (match) => match[1]),
+    ...Array.from(decodedDescription.matchAll(/https?:\/\/[^\s"'<>]+/gi), (match) => match[0]),
+  ].map((value) => decodeKmlUrl(value).replace(/[),.;]+$/, "")).filter((value) => /^https?:\/\//i.test(value));
+  return Array.from(new Set(candidates));
+}
+
+export function extractKmlImageUrl(description: string, properties: Record<string, string> = {}) {
+  return extractKmlImageUrls(description, properties)[0];
 }
 
 function decodeKmlHtml(value: string) {
@@ -23,6 +28,16 @@ function decodeKmlHtml(value: string) {
 
 function decodeKmlUrl(value: string) {
   return value.replace(/&amp;/g, "&").replace(/\\u0026/g, "&").trim();
+}
+
+export function normalizeKmlImageRights(properties: Record<string, string>) {
+  const entries = Object.entries(properties).map(([key, value]) => [key.toLowerCase().replace(/[^a-z0-9]/g, ""), value.trim()] as const);
+  const find = (keys: string[]) => entries.find(([key, value]) => keys.includes(key) && value)?.[1];
+  return {
+    author: find(["author", "creator", "photographer", "imageauthor", "photoauthor"]),
+    license: find(["license", "licence", "imagelicense", "photolicense"]),
+    note: find(["licensenote", "imagelicensenote", "photolicensenote"]),
+  };
 }
 
 export function toDisplayImageUrl(sourceUrl?: string) {

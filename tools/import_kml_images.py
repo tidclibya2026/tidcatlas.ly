@@ -112,7 +112,15 @@ def parse_coordinate(node: ET.Element) -> tuple[float | None, float | None]:
 
 
 def parse_kml(path: Path, base_url: str | None = None) -> list[ImageRecord]:
-    root = ET.parse(path).getroot()
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError:
+        try:
+            from lxml import etree  # type: ignore
+        except ImportError as exc:
+            raise ValueError(f"Malformed KML and lxml is unavailable: {path}") from exc
+        parser = etree.XMLParser(recover=True, huge_tree=True)
+        root = etree.fromstring(path.read_bytes(), parser=parser)
     records: list[ImageRecord] = []
     for index, node in enumerate(root.findall(".//{*}Placemark")):
         name = clean(node.findtext("{*}name")) or f"موقع {index + 1}"
