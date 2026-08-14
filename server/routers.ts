@@ -247,6 +247,7 @@ export const appRouter = router({
         imageUrl,
         imageKey,
         status: "draft",
+        recordStatus: "draft",
         createdBy: ctx.user.id,
       });
     }),
