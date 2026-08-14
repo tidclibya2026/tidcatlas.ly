@@ -1,5 +1,7 @@
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
@@ -114,6 +116,15 @@ export const appRouter = router({
     mine: protectedProcedure.query(({ ctx }) => listAtlasPoints(undefined, undefined, ctx.user.id)),
     myTeamAccess: protectedProcedure.query(async ({ ctx }) => ({ isAdmin: ctx.user.role === "admin", member: ctx.user.role === "admin" ? null : await getActiveTeamMemberForUser(ctx.user) })),
     reviewQueue: documentationProcedure.input(z.object({ recordStatus: z.enum(["draft", "pending_review", "approved", "published", "rejected", "archived"]).optional(), search: z.string().max(255).optional(), layerId: z.string().max(80).optional(), municipality: z.string().max(160).optional(), category: z.string().max(120).optional(), sort: z.enum(["newest", "oldest", "name"]).optional() }).optional()).query(({ input }) => listReviewQueue(input?.recordStatus, input)),
+    sourceReconciliation: adminProcedure.query(async () => {
+      const root = process.cwd();
+      const [summaryText, manifestText, reportText] = await Promise.all([
+        readFile(resolve(root, "docs/normalized-attached-sources-2026-08-14.jsonl.summary.json"), "utf8"),
+        readFile(resolve(root, "docs/import-job-attached-sources-2026-08-14.json"), "utf8"),
+        readFile(resolve(root, "docs/attached-source-reconciliation-2026-08-14.md"), "utf8"),
+      ]);
+      return { summary: JSON.parse(summaryText), manifest: JSON.parse(manifestText), report: reportText };
+    }),
     pointDetails: documentationProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input, ctx }) => ({ point: await getAtlasPoint(input.id), images: await listAtlasImages(input.id), comments: await listAtlasComments(input.id, ctx.user.role === "admin"), rating: await getAtlasRatingSummary(input.id, ctx.user.id) })),
     addComment: protectedProcedure.input(z.object({ pointId: z.number().int().positive(), body: z.string().trim().min(3).max(4000) })).mutation(async ({ input, ctx }) => {
       const point = await getAtlasPoint(input.pointId);
