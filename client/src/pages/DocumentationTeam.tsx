@@ -34,7 +34,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function DocumentationTeam() {
-  const { user, loading } = useAuth();
+  const { user, loading, error: authError, refresh: refreshAuth } = useAuth();
   const [status, setStatus] = useState<"draft" | "pending_review" | "approved" | "published" | "rejected" | "archived">("pending_review");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -108,7 +108,8 @@ export default function DocumentationTeam() {
     else createPoint.mutate(payload);
   };
 
-  if (loading) return <main className="min-h-screen grid place-items-center bg-[#f4efe5] text-[#123c52]">جارٍ التحقق من صلاحية فريق التوثيق…</main>;
+  if (loading) return <main dir="rtl" className="min-h-screen grid place-items-center bg-[#f4efe5] text-[#123c52]"><section className="text-center"><p>جارٍ التحقق من صلاحية فريق التوثيق…</p><small className="mt-2 block text-slate-500">يرجى الانتظار لحظات</small></section></main>;
+  if (authError) return <main dir="rtl" className="min-h-screen grid place-items-center bg-[#f4efe5] p-6 text-[#123c52]"><section className="max-w-lg text-center border border-[#d7c9b5] bg-white/80 p-8"><p className="text-sm font-bold tracking-[0.16em] text-[#b86f3c]">تعذر التحقق من الدخول</p><h1 className="mt-3 text-2xl font-black">لم يتم فتح بوابة فريق التوثيق</h1><p className="mt-4 text-slate-600">قد تكون جلسة الدخول منتهية أو أن نطاق هذه المعاينة غير متصل بخدمة الدخول. أعد المحاولة أو افتح البوابة من رابط الخادم الكامل.</p><div className="mt-6 flex justify-center gap-3"><Button className="bg-[#123c52]" onClick={() => refreshAuth()}>إعادة المحاولة</Button><Link href="/"><Button variant="outline">العودة إلى الأطلس</Button></Link></div></section></main>;
   if (!isAdmin) return <main dir="rtl" className="min-h-screen grid place-items-center bg-[#f4efe5] p-6 text-[#123c52]"><section className="max-w-lg text-center"><p className="text-sm uppercase tracking-[0.2em] text-[#b86f3c]">نظام التوثيق الداخلي</p><h1 className="mt-3 text-3xl font-bold">هذه الصفحة مخصصة لفريق التوثيق</h1><p className="mt-4 text-slate-600">يلزم تسجيل الدخول بحساب إداري لإضافة النقاط ومراجعتها ونشرها.</p><Link href="/"><Button className="mt-6 bg-[#123c52]">العودة إلى الأطلس</Button></Link></section></main>;
 
   return <main dir="rtl" className="min-h-screen bg-[#f4efe5] text-[#123c52] p-4 md:p-8">
