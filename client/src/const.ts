@@ -12,7 +12,18 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 // call would desync it from an in-flight login and the callback would reject it
 // with "invalid oauth state". It returns void by design, so there is no URL to
 // stash across renders.
+export const isGitHubPagesHost = (hostname: string) => hostname.endsWith("github.io");
+
 export const startLogin = () => {
+  if (typeof window !== "undefined" && isGitHubPagesHost(window.location.hostname)) {
+    const adminUrl = import.meta.env.VITE_ADMIN_APP_URL as string | undefined;
+    if (adminUrl) {
+      window.location.href = adminUrl;
+      return;
+    }
+    window.alert("تسجيل الدخول الإداري يعمل من نطاق الخادم الكامل فقط، وليس من نسخة GitHub Pages العامة. افتح رابط الإدارة المؤسسي.");
+    return;
+  }
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
   const appId = import.meta.env.VITE_APP_ID;
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
