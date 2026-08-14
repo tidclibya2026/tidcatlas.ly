@@ -15,6 +15,21 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+export const atlasLayers = mysqlTable("atlas_layers", {
+  id: varchar("id", { length: 80 }).primaryKey(),
+  label: varchar("label", { length: 160 }).notNull(),
+  description: text("description"),
+  color: varchar("color", { length: 20 }).default("#287a70").notNull(),
+  icon: varchar("icon", { length: 80 }).default("map-pin").notNull(),
+  status: mysqlEnum("status", ["active", "archived"]).default("active").notNull(),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_layers_status_idx").on(table.status) }));
+
+export type AtlasLayer = typeof atlasLayers.$inferSelect;
+export type InsertAtlasLayer = typeof atlasLayers.$inferInsert;
+
 export const atlasPoints = mysqlTable("atlas_points", {
   id: int("id").autoincrement().primaryKey(),
   layerId: varchar("layerId", { length: 80 }).notNull(),

@@ -5,11 +5,13 @@ import {
   atlasBackups,
   atlasImages,
   atlasImportJobs,
+  atlasLayers,
   atlasPoints,
   atlasTeamMembers,
   InsertAtlasBackup,
   InsertAtlasImage,
   InsertAtlasImportJob,
+  InsertAtlasLayer,
   InsertAtlasPoint,
   InsertAtlasAuditLog,
   InsertAtlasTeamMember,
@@ -58,6 +60,28 @@ export async function getUserByOpenId(openId: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result[0];
+}
+
+export async function listAtlasLayers(includeArchived = false) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasLayers).where(includeArchived ? undefined : eq(atlasLayers.status, "active")).orderBy(atlasLayers.label);
+}
+
+export async function createAtlasLayer(layer: InsertAtlasLayer) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.insert(atlasLayers).values(layer);
+  const rows = await db.select().from(atlasLayers).where(eq(atlasLayers.id, layer.id)).limit(1);
+  return rows[0];
+}
+
+export async function updateAtlasLayer(id: string, patch: Partial<InsertAtlasLayer>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasLayers).set(patch).where(eq(atlasLayers.id, id));
+  const rows = await db.select().from(atlasLayers).where(eq(atlasLayers.id, id)).limit(1);
+  return rows[0];
 }
 
 export async function listAtlasPoints(layerId?: string, status?: "draft" | "published" | "archived", createdBy?: number) {
@@ -230,6 +254,15 @@ export async function listTeamMembers() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(atlasTeamMembers).orderBy(desc(atlasTeamMembers.createdAt));
+}
+
+export async function getActiveTeamMemberForUser(user: { id: number; email: string | null }) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const conditions = [eq(atlasTeamMembers.status, "active")];
+  const identity = user.email ? or(eq(atlasTeamMembers.userId, user.id), eq(atlasTeamMembers.email, user.email)) : eq(atlasTeamMembers.userId, user.id);
+  const rows = await db.select().from(atlasTeamMembers).where(and(...conditions, identity)).limit(1);
+  return rows[0];
 }
 
 export async function createTeamMember(member: InsertAtlasTeamMember) {

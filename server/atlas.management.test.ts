@@ -39,4 +39,12 @@ describe("atlas documentation team", () => {
   it("requires a rights note when reviewing an image", async () => {
     await expect(appRouter.createCaller(context("admin")).atlas.reviewImage({ id: 4, reviewStatus: "approved", rightsNote: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
+
+  it("rejects layer identifiers outside the safe slug format", async () => {
+    await expect(appRouter.createCaller(context("admin")).atlas.createLayer({ id: "طبقة جديدة", label: "طبقة جديدة", color: "#287a70", icon: "map-pin" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("does not allow normal users to manage layers", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.manageLayers()).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
 });
