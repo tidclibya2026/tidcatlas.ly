@@ -127,9 +127,9 @@ export const appRouter = router({
       ]);
       return { summary: JSON.parse(summaryText), manifest: JSON.parse(manifestText), report: reportText, userManifest: JSON.parse(userManifestText), userReconciliation: JSON.parse(userReconciliationText) };
     }),
-    top150ReviewQueue: adminProcedure.input(z.object({ status: z.enum(["pending_review", "approved", "rejected"]).default("pending_review"), matchFilter: z.enum(["all", "confirmed", "manual_review"]).default("all"), search: z.string().max(255).optional() }).optional()).query(async ({ input }) => {
+    top150ReviewQueue: adminProcedure.input(z.object({ status: z.enum(["pending_review", "approved", "rejected"]).default("pending_review"), matchFilter: z.enum(["all", "confirmed", "manual_review"]).default("all"), search: z.string().max(255).optional(), region: z.string().max(120).optional(), category: z.string().max(120).optional() }).optional()).query(async ({ input }) => {
       const queueVersion = "2026-08-14";
-      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; status: string; confirmedName: string | null; matchScore: number; reviewStatus: string; sourceReport: string }> };
+      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; category?: string; status: string; confirmedName: string | null; matchScore: number; reviewStatus: string; sourceReport: string }> };
       const [decisions, points, sourceMatchText, requestedReconciliationText] = await Promise.all([listTop150ReviewDecisions(queueVersion), listAtlasPoints(), readFile(resolve(process.cwd(), "docs/top-150-source-match-candidates-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ rows: [] })), readFile(resolve(process.cwd(), "docs/reconciliation-requested-sources-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ top150SourceMatches: [] }))]);
       const decisionByRank = new Map(decisions.map((decision) => [decision.rank, decision]));
       const oldSourceMatches = (JSON.parse(sourceMatchText) as { rows: Array<{ rank: number; matches: Array<{ source: string; name: string; lat: number; lon: number; overlap: number }> }> }).rows;
@@ -140,8 +140,18 @@ export const appRouter = router({
         const decision = decisionByRank.get(row.rank);
         const confirmedName = row.confirmedName;
         const matchedPoint = confirmedName ? points.find((point) => point.name === confirmedName || point.name.includes(confirmedName) || confirmedName.includes(point.name)) : undefined;
-        return { ...row, reviewStatus: decision?.status || row.reviewStatus, decisionId: decision?.id || null, matchedPointId: matchedPoint?.id || null, matchedPointName: matchedPoint?.name || null, reviewNote: decision?.reviewNote || null, sourceMatches: sourceMatchByRank.get(row.rank)?.matches || [] };
-      }).filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!search || `${row.candidate} ${row.region} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
+        return { ...row, reviewStatus: decision?.status || row.reviewStatus, decisionId: decision?.id || null, matchedPointId: matchedPoint?.id || null, matchedPointName: matchedPoint?.name || null, category: matchedPoint?.category || row.category || "غير مصنف", reviewNote: decision?.reviewNote || null, sourceMatches: sourceMatchByRank.get(row.rank)?.matches || [] };
+      }).filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!input?.region || row.region.toLocaleLowerCase("ar").includes(input.region.toLocaleLowerCase("ar"))) && (!input?.category || row.category.toLocaleLowerCase("ar").includes(input.category.toLocaleLowerCase("ar"))) && (!search || `${row.candidate} ${row.region} ${row.category} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
+    }),
+    top150PendingMarkers: publicProcedure.query(async () => {
+      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; reviewStatus: string }> };
+      const sourceReport = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-source-match-candidates-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ rows: [] }))) as { rows: Array<{ rank: number; matches: Array<{ lat: number; lon: number; source: string; name: string }> }> };
+      const matches = new Map(sourceReport.rows.map((row) => [row.rank, row.matches?.[0]]));
+      return queue.rows.filter((row) => row.reviewStatus === "pending_review").flatMap((row) => {
+        const match = matches.get(row.rank);
+        if (!match || !Number.isFinite(match.lat) || !Number.isFinite(match.lon)) return [];
+        return [{ rank: row.rank, name: row.candidate, region: row.region, lat: match.lat, lng: match.lon, source: match.source }];
+      });
     }),
     reviewTop150: adminProcedure.input(z.object({ rank: z.number().int().min(1).max(150), status: z.enum(["approved", "rejected"]), pointId: z.number().int().positive().optional(), reviewNote: z.string().trim().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
       const queueVersion = "2026-08-14";

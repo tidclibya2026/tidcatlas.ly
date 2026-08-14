@@ -237,6 +237,7 @@ export default function Home() {
   const markers = useRef<Record<string, L.Layer[]>>({});
   const routeLine = useRef<L.Polyline | null>(null);
   const publishedPoints = trpc.atlas.published.useQuery({});
+  const pendingTop150 = trpc.atlas.top150PendingMarkers.useQuery();
   const adminPoints = trpc.atlas.mine.useQuery(undefined, { enabled: Boolean(isAuthenticated && user?.role === "admin") });
   const trpcUtils = trpc.useUtils();
   const handleMapReady = useCallback((instance: L.Map) => { setMap(instance); setMapReady(true); }, []);
@@ -372,6 +373,18 @@ export default function Home() {
     });
     Object.keys(markers.current).filter((id) => id !== "managed" && !activeLayers.includes(id)).forEach(clearMarkers);
   }, [activeLayers, map, loaded, renderMarkers, renderDensity, clearMarkers]);
+
+  useEffect(() => {
+    if (!map) return;
+    clearMarkers("pendingTop150");
+    markers.current.pendingTop150 = (pendingTop150.data ?? []).map((item) => {
+      const marker = L.marker([item.lat, item.lng], { icon: L.divIcon({ className: "atlas-pending-marker", html: '<span style="display:grid;place-items:center;width:28px;height:28px;border:2px solid #fff;border-radius:999px;background:#b34b42;color:#fff;font-size:16px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.28)">!</span>', iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map);
+      marker.bindTooltip(`بانتظار الاعتماد اليدوي · ${item.name} · ${item.region}`, { direction: "top", opacity: 0.96 });
+      marker.on("click", () => toast.info(`هذا الموقع بانتظار مراجعة فريق التوثيق: ${item.name}`));
+      return marker;
+    });
+    return () => clearMarkers("pendingTop150");
+  }, [map, pendingTop150.data, clearMarkers]);
 
   useEffect(() => {
     if (!map || !pickMode) return;
