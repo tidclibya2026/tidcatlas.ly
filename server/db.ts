@@ -172,6 +172,26 @@ export async function updateAtlasImage(id: number, patch: Partial<InsertAtlasIma
   return rows[0];
 }
 
+export async function listAtlasImageReviewQueue() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ image: atlasImages, pointName: atlasPoints.name, pointLayerId: atlasPoints.layerId, pointLatitude: atlasPoints.latitude, pointLongitude: atlasPoints.longitude })
+    .from(atlasImages)
+    .leftJoin(atlasPoints, eq(atlasImages.pointId, atlasPoints.id))
+    .where(eq(atlasImages.reviewStatus, "pending"))
+    .orderBy(desc(atlasImages.createdAt));
+}
+
+export async function reassignAtlasImage(imageId: number, pointId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const point = await getAtlasPoint(pointId);
+  if (!point) throw new Error("النقطة المستهدفة غير موجودة");
+  await db.update(atlasImages).set({ pointId, reviewStatus: "pending", reviewedBy: null, reviewedAt: null, rightsWarning: true }).where(eq(atlasImages.id, imageId));
+  const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, imageId)).limit(1);
+  return rows[0];
+}
+
 export async function archiveAtlasImage(id: number, rightsNote: string) {
   return updateAtlasImage(id, { reviewStatus: "rejected", rightsWarning: true, rightsNote });
 }

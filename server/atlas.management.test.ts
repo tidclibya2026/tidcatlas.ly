@@ -36,6 +36,15 @@ describe("atlas documentation team", () => {
     await expect(appRouter.createCaller(context("admin")).atlas.addImage({ pointId: 8, sourceKind: "facebook", rightsNote: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
+  it("allows flexible image source kinds through validation", async () => {
+    await expect(appRouter.createCaller(context("admin")).atlas.addImage({ pointId: 8, sourceKind: "wikimedia", rightsNote: "مصدر مفتوح" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("protects the image review queue and reassignment from normal users", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.imageReviewQueue()).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(appRouter.createCaller(context("user")).atlas.reassignImage({ imageId: 1, pointId: 8, reason: "اختبار" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
   it("requires a rights note when reviewing an image", async () => {
     await expect(appRouter.createCaller(context("admin")).atlas.reviewImage({ id: 4, reviewStatus: "approved", rightsNote: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });

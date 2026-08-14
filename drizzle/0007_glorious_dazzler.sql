@@ -1,0 +1,1 @@
+ALTER TABLE `atlas_points` MODIFY COLUMN `sourceKind` enum('kml','excel','agency','photographer','web_page','facebook','wikimedia','custom','other') NOT NULL DEFAULT 'other';

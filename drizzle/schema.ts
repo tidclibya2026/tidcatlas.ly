@@ -41,7 +41,7 @@ export const atlasPoints = mysqlTable("atlas_points", {
   municipality: varchar("municipality", { length: 160 }),
   category: varchar("category", { length: 120 }),
   source: varchar("source", { length: 255 }),
-  sourceKind: mysqlEnum("sourceKind", ["kml", "excel", "agency", "web_page", "facebook", "other"]).default("other").notNull(),
+  sourceKind: mysqlEnum("sourceKind", ["kml", "excel", "agency", "photographer", "web_page", "facebook", "wikimedia", "custom", "other"]).default("other").notNull(),
   sourceRecordId: varchar("sourceRecordId", { length: 255 }),
   metadata: text("metadata"),
   imageUrl: text("imageUrl"),
@@ -98,7 +98,11 @@ export const atlasImages = mysqlTable("atlas_images", {
   storageKey: text("storageKey"),
   imageUrl: text("imageUrl").notNull(),
   sourceUrl: text("sourceUrl"),
-  sourceKind: mysqlEnum("sourceKind", ["agency", "photographer", "web_page", "facebook", "kml", "other"]).default("other").notNull(),
+  sourceKind: mysqlEnum("sourceKind", ["agency", "photographer", "web_page", "facebook", "wikimedia", "kml", "excel", "custom", "other"]).default("other").notNull(),
+  sourceRecordId: varchar("sourceRecordId", { length: 255 }),
+  sourceFileName: varchar("sourceFileName", { length: 255 }),
+  assetHash: varchar("assetHash", { length: 128 }),
+  importJobId: int("importJobId"),
   ownerName: varchar("ownerName", { length: 255 }),
   photographerName: varchar("photographerName", { length: 255 }),
   license: varchar("license", { length: 255 }),
@@ -114,6 +118,8 @@ export const atlasImages = mysqlTable("atlas_images", {
 }, (table) => ({
   pointIdx: index("atlas_images_point_idx").on(table.pointId),
   reviewIdx: index("atlas_images_review_idx").on(table.reviewStatus),
+  pointSourceIdx: index("atlas_images_point_source_idx").on(table.pointId, table.sourceKind),
+  assetHashIdx: index("atlas_images_asset_hash_idx").on(table.assetHash),
 }));
 
 export type AtlasImage = typeof atlasImages.$inferSelect;
