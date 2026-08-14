@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { auditLog } = vi.hoisted(() => ({ auditLog: vi.fn() }));
+const { auditLog, backupRecord } = vi.hoisted(() => ({ auditLog: vi.fn(), backupRecord: vi.fn() }));
+vi.mock("./storage", () => ({ storagePut: vi.fn(async () => ({ key: "atlas-backups/test/backup.json.gz", url: "/manus-storage/atlas-backups/test/backup.json.gz" })), storageGetSignedUrl: vi.fn() }));
 vi.mock("./db", async () => {
   const actual = await vi.importActual<typeof import("./db")>("./db");
   return {
@@ -16,6 +17,10 @@ vi.mock("./db", async () => {
     listTeamMembers: vi.fn(async () => [{ id: 31, displayName: "مراجع تجريبي", email: "reviewer@example.com", teamRole: "reviewer", status: "pending" }]),
     createTeamMember: vi.fn(async (member: unknown) => ({ id: 31, ...(member as object) })),
     updateTeamMember: vi.fn(async (id: number, patch: unknown) => ({ id, ...(patch as object) })),
+    createBackupRecord: vi.fn(async (record: unknown) => { const result = { id: 41, ...(record as object) }; backupRecord.mockReturnValue(result); return result; }),
+    updateBackupRecord: vi.fn(async (id: number, patch: unknown) => ({ id, ...(patch as object) })),
+    listBackups: vi.fn(async () => []),
+    getAtlasDataSnapshot: vi.fn(async () => ({ exportedAt: "test", points: [], images: [], imports: [], teamMembers: [], audits: [] })),
   };
 });
 
@@ -54,6 +59,12 @@ describe("atlas documentation success flows", () => {
 
   it("refuses commit when the import job has no stored file", async () => {
     await expect(appRouter.createCaller(ctx()).atlas.commitImport({ jobId: 9999, sourceKind: "kml", fileName: "missing.kml", layerId: "heritage" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("creates a compressed backup and records administration", async () => {
+    const result = await appRouter.createCaller(ctx()).atlas.createBackup();
+    expect(result).toMatchObject({ id: 41, status: "completed", storageKey: "atlas-backups/test/backup.json.gz" });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_backup", action: "create", actorId: 7 }));
   });
 
   it("creates a documentation team member and records administration", async () => {

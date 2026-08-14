@@ -2,10 +2,12 @@ import { and, desc, eq, gt, lt, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   atlasAuditLogs,
+  atlasBackups,
   atlasImages,
   atlasImportJobs,
   atlasPoints,
   atlasTeamMembers,
+  InsertAtlasBackup,
   InsertAtlasImage,
   InsertAtlasImportJob,
   InsertAtlasPoint,
@@ -187,6 +189,41 @@ export async function updateImportJob(id: number, patch: Partial<InsertAtlasImpo
   await db.update(atlasImportJobs).set(patch).where(eq(atlasImportJobs.id, id));
   const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, id)).limit(1);
   return rows[0];
+}
+
+export async function getAtlasDataSnapshot() {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const [points, images, imports, teamMembers, audits] = await Promise.all([
+    db.select().from(atlasPoints),
+    db.select().from(atlasImages),
+    db.select().from(atlasImportJobs),
+    db.select().from(atlasTeamMembers),
+    db.select().from(atlasAuditLogs),
+  ]);
+  return { exportedAt: new Date().toISOString(), schemaVersion: 1, points, images, imports, teamMembers, audits };
+}
+
+export async function createBackupRecord(record: InsertAtlasBackup) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const result = await db.insert(atlasBackups).values(record);
+  const rows = await db.select().from(atlasBackups).where(eq(atlasBackups.id, Number(result[0].insertId))).limit(1);
+  return rows[0];
+}
+
+export async function updateBackupRecord(id: number, patch: Partial<InsertAtlasBackup>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasBackups).set(patch).where(eq(atlasBackups.id, id));
+  const rows = await db.select().from(atlasBackups).where(eq(atlasBackups.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function listBackups() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasBackups).orderBy(desc(atlasBackups.createdAt));
 }
 
 export async function listTeamMembers() {

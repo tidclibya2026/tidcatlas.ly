@@ -124,3 +124,17 @@ export const atlasTeamMembers = mysqlTable("atlas_team_members", {
 
 export type AtlasTeamMember = typeof atlasTeamMembers.$inferSelect;
 export type InsertAtlasTeamMember = typeof atlasTeamMembers.$inferInsert;
+
+export const atlasBackups = mysqlTable("atlas_backups", {
+  id: int("id").autoincrement().primaryKey(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  storageKey: varchar("storageKey", { length: 700 }),
+  status: mysqlEnum("status", ["creating", "completed", "failed"]).default("creating").notNull(),
+  sizeBytes: int("sizeBytes"),
+  errorSummary: text("errorSummary"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_backups_status_idx").on(table.status), createdAtIdx: index("atlas_backups_created_at_idx").on(table.createdAt) }));
+
+export type AtlasBackup = typeof atlasBackups.$inferSelect;
+export type InsertAtlasBackup = typeof atlasBackups.$inferInsert;

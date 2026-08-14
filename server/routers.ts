@@ -1,10 +1,12 @@
+import { gzip } from "node:zlib";
+import { promisify } from "node:util";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, getImportJob, listAtlasImages, listAtlasPoints, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createTeamMember, updateTeamMember, updateAtlasImage, updateAtlasPoint, updateImportJob } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, getImportJob, listAtlasImages, getAtlasDataSnapshot, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasPoint, updateImportJob } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -163,6 +165,21 @@ export const appRouter = router({
     }),
     importJobs: adminProcedure.query(({ ctx }) => listImportJobs(ctx.user.id)),
     teamMembers: adminProcedure.query(() => listTeamMembers()),
+    backups: adminProcedure.query(() => listBackups()),
+    createBackup: adminProcedure.mutation(async ({ ctx }) => {
+      const record = await createBackupRecord({ fileName: `libya-tourism-atlas-backup-${new Date().toISOString().replace(/[:.]/g, "-")}.json.gz`, status: "creating", createdBy: ctx.user.id });
+      try {
+        const snapshot = await getAtlasDataSnapshot();
+        const compressed = await promisify(gzip)(Buffer.from(JSON.stringify(snapshot), "utf8"));
+        const uploaded = await storagePut(`atlas-backups/${ctx.user.id}/${record.fileName}`, compressed, "application/gzip");
+        const completed = await updateBackupRecord(record.id, { storageKey: uploaded.key, status: "completed", sizeBytes: compressed.byteLength });
+        await createAuditLog({ entityType: "atlas_backup", entityId: record.id, action: "create", details: JSON.stringify({ sizeBytes: compressed.byteLength, storageKey: uploaded.key }), actorId: ctx.user.id });
+        return completed;
+      } catch (error) {
+        await updateBackupRecord(record.id, { status: "failed", errorSummary: error instanceof Error ? error.message : "فشل إنشاء النسخة الاحتياطية" });
+        throw error;
+      }
+    }),
     createTeamMember: adminProcedure.input(z.object({ displayName: z.string().min(2).max(255), email: z.string().email().max(320), teamRole: z.enum(["reviewer", "editor", "import_manager"]), notes: z.string().max(4000).optional() })).mutation(async ({ input, ctx }) => {
       const member = await createTeamMember({ ...input, status: "pending", createdBy: ctx.user.id });
       await createAuditLog({ entityType: "atlas_team_member", entityId: member.id, action: "create", details: JSON.stringify({ email: input.email, teamRole: input.teamRole }), actorId: ctx.user.id });
