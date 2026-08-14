@@ -1,0 +1,3154 @@
+{
+  "queueVersion": "2026-08-14",
+  "sourceRecords": 2759,
+  "matchedCandidates": 94,
+  "rows": [
+    {
+      "rank": 1,
+      "candidate": "مدينة لبدة الكبرى (لبتس ماغنا)",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "موقع لبدة الأثري (لبتس ماغنا) (لبدة الكبرى)",
+          "lat": 32.6389502,
+          "lon": 14.2883012,
+          "overlap": 4
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "candidate": "مدينة صبراتة الأثرية",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "اثار صبراته‎‎‎‎",
+          "lat": 32.781682,
+          "lon": 12.447698,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "candidate": "مدينة شحات (قورينا) الأثرية",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "موقع شحات (قورينة) الأثري",
+          "lat": 32.8125333,
+          "lon": 21.8532586,
+          "overlap": 4
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "موقع رأس العوير الأثري",
+          "lat": 31.986636,
+          "lon": 24.883652,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "موقع رأس العوير الأثري",
+          "lat": 31.986636,
+          "lon": 24.883652,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مسرح شحات الاثري‎‎‎‎‎‎‎‏ /المسرح الأوديون",
+          "lat": 32.818439,
+          "lon": 21.857726,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "موقع صبراتة الأثري",
+          "lat": 32.805035,
+          "lon": 12.484983,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "candidate": "المدينة القديمة غدامس",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة البركت ( اغرم )",
+          "lat": 24.89624,
+          "lon": 10.1792,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة غات",
+          "lat": 24.96555,
+          "lon": 10.17951,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "المركز الصحي المدينة القديمة ‎‎‎‎",
+          "lat": 32.8991758301819,
+          "lon": 13.1720155021698,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "جهاز ادارة المدينة القديمة طرابلس‎‎",
+          "lat": 32.8986647,
+          "lon": 13.1740097,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "مسجد الهدار - المدينة القديمة‎‎‎‎‎",
+          "lat": 32.8972753,
+          "lon": 13.1724371,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "candidate": "مواقع فنون الصخور في تادرارت أكاكوس",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مواقع تادرارت أكاكوس الصخرية",
+          "lat": 24.812882,
+          "lon": 10.568242,
+          "overlap": 3
+        },
+        {
+          "source": "akakus.kml",
+          "name": "جبال أكاكوس",
+          "lat": 24.863085,
+          "lon": 10.33775,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "جبال أكاكوس‎‎",
+          "lat": 24.863085,
+          "lon": 10.337754,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "جبال تادرارت أكوكاس",
+          "lat": 25.0239375,
+          "lon": 10.512191,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "candidate": "مدينة يوسبريدس / برنيق القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "candidate": "مدينة إيراسا القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "candidate": "مدينة أويا القديمة وميناء طرابلس التاريخي",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "جهاز ادارة المدينة القديمة طرابلس‎‎",
+          "lat": 32.8986647,
+          "lon": 13.1740097,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "candidate": "مدينة زويلة القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "candidate": "مدينة كاباو القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "candidate": "مدينة يفرن القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "candidate": "مدينة نالوت القديمة ومخازنها",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "candidate": "مدينة غات القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة البركت ( اغرم )",
+          "lat": 24.89624,
+          "lon": 10.1792,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة غات",
+          "lat": 24.96555,
+          "lon": 10.17951,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "candidate": "السرايا الحمراء وقلعة طرابلس",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "بحيرة السرايا الحمراء‎",
+          "lat": 32.897264,
+          "lon": 13.181027,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "حصن القديس يعقوب (السرايا الحمراء)\n ‎‎",
+          "lat": 32.8962,
+          "lon": 13.179828,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "قلعة السرايا الحمراء",
+          "lat": 32.8960003,
+          "lon": 13.1805473,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "متحف السرايا الحمراء \n ‎‎",
+          "lat": 32.8958861,
+          "lon": 13.1807868,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "candidate": "قوس ماركوس أوريليوس",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "قوس ماركوس اوريليوس",
+          "lat": 32.9000001,
+          "lon": 13.1759973,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "candidate": "جامع أحمد باشا القرمانلي",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "جامع أحمد باشا القرمانللي‎",
+          "lat": 32.895306,
+          "lon": 13.17953,
+          "overlap": 3
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "مسجد أحمد باشا",
+          "lat": 32.895444,
+          "lon": 13.179519,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "candidate": "جامع الناقة",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "جامع الناقة",
+          "lat": 32.895453,
+          "lon": 13.178846,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "جامع الناقة ‎",
+          "lat": 32.895372,
+          "lon": 13.17883,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "candidate": "جامع قرجي",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "جامع قرجي",
+          "lat": 32.8996,
+          "lon": 13.175248,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "جامع قرجي \n ‎‎‎‎‎",
+          "lat": 32.899525,
+          "lon": 13.175434,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 26,
+      "candidate": "المدينة القديمة في طرابلس",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "جهاز ادارة المدينة القديمة طرابلس‎‎",
+          "lat": 32.8986647,
+          "lon": 13.1740097,
+          "overlap": 3
+        },
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة البركت ( اغرم )",
+          "lat": 24.89624,
+          "lon": 10.1792,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة غات",
+          "lat": 24.96555,
+          "lon": 10.17951,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "المركز الصحي المدينة القديمة ‎‎‎‎",
+          "lat": 32.8991758301819,
+          "lon": 13.1720155021698,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "فندق إستراحة طرابلس المدينة‎‎‎",
+          "lat": 32.8984188,
+          "lon": 13.1779621,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 27,
+      "candidate": "سوق المشير",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "سوق المشير \n ‎‎‎",
+          "lat": 32.895264,
+          "lon": 13.179941,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "candidate": "سوق الترك",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "سوق الترك ‎",
+          "lat": 32.8967727,
+          "lon": 13.1783933,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 30,
+      "candidate": "متحف السرايا الحمراء",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "متحف السرايا الحمراء \n ‎‎",
+          "lat": 32.8958861,
+          "lon": 13.1807868,
+          "overlap": 3
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "بحيرة السرايا الحمراء‎",
+          "lat": 32.897264,
+          "lon": 13.181027,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "حصن القديس يعقوب (السرايا الحمراء)\n ‎‎",
+          "lat": 32.8962,
+          "lon": 13.179828,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "قلعة السرايا الحمراء",
+          "lat": 32.8960003,
+          "lon": 13.1805473,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 35,
+      "candidate": "مدينة زليتن القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "candidate": "مغارة وادي كعام",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي كعام",
+          "lat": 32.410219,
+          "lon": 14.3412352,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مصب وادي كعام",
+          "lat": 32.5274209,
+          "lon": 14.4466782,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سد وادي كعام",
+          "lat": 32.410219,
+          "lon": 14.3412352,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مصب وادي كعام",
+          "lat": 32.5274209,
+          "lon": 14.4466782,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 43,
+      "candidate": "مدينة تاورغاء القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 49,
+      "candidate": "محمية وادي كعام",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "تفرع طريق محمية وادي الأثل",
+          "lat": 32.1583931,
+          "lon": 12.4833012,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي كعام",
+          "lat": 32.410219,
+          "lon": 14.3412352,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "محمية وادي الأثل",
+          "lat": 32.3091666666667,
+          "lon": 12.3869444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مصب وادي كعام",
+          "lat": 32.5274209,
+          "lon": 14.4466782,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "تفرع طريق محمية وادي الأثل",
+          "lat": 32.1583931,
+          "lon": 12.4833012,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 51,
+      "candidate": "شلال بالفو / شلال رأس الهلال",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "شلال بالفو‎‎‎‎‎",
+          "lat": 32.8660232,
+          "lon": 22.1789563,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "شلال رأس الهلال بافلو‎‎",
+          "lat": 32.8592767,
+          "lon": 22.1776082,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 52,
+      "candidate": "وادي مرقس / وادي مرقص",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي مرقس",
+          "lat": 32.8472222,
+          "lon": 22.2072581,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي مرقس أو وادي الشواعر",
+          "lat": 32.860026,
+          "lon": 22.228278,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي مرقس",
+          "lat": 32.8472222,
+          "lon": 22.2072581,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 54,
+      "candidate": "وادي الكوف",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "استراحة منتزه وادي الكوف",
+          "lat": 32.7017888888889,
+          "lon": 21.5634833333334,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف",
+          "lat": 32.6969085,
+          "lon": 21.5651463,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف القديم",
+          "lat": 32.6985923,
+          "lon": 21.5745439,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتجع وادي الكوف",
+          "lat": 32.70194,
+          "lon": 21.562313,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتجع وادي الكوف",
+          "lat": 32.702,
+          "lon": 21.563798,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 55,
+      "candidate": "غابة وادي الكوف",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "استراحة منتزه وادي الكوف",
+          "lat": 32.7017888888889,
+          "lon": 21.5634833333334,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف",
+          "lat": 32.6969085,
+          "lon": 21.5651463,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف القديم",
+          "lat": 32.6985923,
+          "lon": 21.5745439,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتجع وادي الكوف",
+          "lat": 32.70194,
+          "lon": 21.562313,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتجع وادي الكوف",
+          "lat": 32.702,
+          "lon": 21.563798,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 56,
+      "candidate": "عين الفرس",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الفرس",
+          "lat": 30.1338226,
+          "lon": 9.4960901,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "عين الفرس",
+          "lat": 30.1338226,
+          "lon": 9.4960901,
+          "overlap": 1
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "عين الفرس‎",
+          "lat": 30.133823,
+          "lon": 9.49609,
+          "overlap": 1
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "فندق عين الفرس‎‎‎‎‎‎‎‎‎",
+          "lat": 30.1334857,
+          "lon": 9.494715,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 57,
+      "candidate": "كهف هوا فطيح",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "كهف هوا فطيح.‎‎‎‎‎‎‎‎‎‎",
+          "lat": 32.9001692,
+          "lon": 22.0516121,
+          "overlap": 1
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.881262,
+          "lon": 10.616836,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.88126,
+          "lon": 10.61683,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.85884,
+          "lon": 10.5759,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 60,
+      "candidate": "جامع العتيق في درنة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "جامع أغرم العتيق",
+          "lat": 25.7794,
+          "lon": 10.56635,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "جامع أغرم العتيق",
+          "lat": 25.7794,
+          "lon": 10.56635,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "جامع العتيق",
+          "lat": 30.1340358,
+          "lon": 9.4972801,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 61,
+      "candidate": "قلعة السرايا الحمراء في درنة",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "قلعة السرايا الحمراء",
+          "lat": 32.8960003,
+          "lon": 13.1805473,
+          "overlap": 3
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "بحيرة السرايا الحمراء‎",
+          "lat": 32.897264,
+          "lon": 13.181027,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "حصن القديس يعقوب (السرايا الحمراء)\n ‎‎",
+          "lat": 32.8962,
+          "lon": 13.179828,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "متحف السرايا الحمراء \n ‎‎",
+          "lat": 32.8958861,
+          "lon": 13.1807868,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 63,
+      "candidate": "وادي درنة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي درنة",
+          "lat": 32.6594444444444,
+          "lon": 22.5769444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي درنة",
+          "lat": 32.7505211,
+          "lon": 22.6304847,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي درنة",
+          "lat": 32.7646686,
+          "lon": 22.6438737,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سد وادي درنة",
+          "lat": 32.6594444444444,
+          "lon": 22.5769444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي درنة",
+          "lat": 32.7505211,
+          "lon": 22.6304847,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 64,
+      "candidate": "مدينة البيضاء القديمة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.896048,
+          "lon": 10.179331,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة بركت القديمة",
+          "lat": 24.89604,
+          "lon": 10.17933,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.965854,
+          "lon": 10.179683,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "مدينة غات القديمة",
+          "lat": 24.96585,
+          "lon": 10.17968,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مدينة غدامس القديمة",
+          "lat": 30.133674,
+          "lon": 9.496486,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 70,
+      "candidate": "كهف عين الغزالة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الغزالة",
+          "lat": 32.1856375,
+          "lon": 23.3061218,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "عين الغزالة",
+          "lat": 32.1856375,
+          "lon": 23.3061218,
+          "overlap": 1
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.881262,
+          "lon": 10.616836,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.88126,
+          "lon": 10.61683,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.85884,
+          "lon": 10.5759,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 72,
+      "candidate": "المدينة القديمة في بنغازي",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة البركت ( اغرم )",
+          "lat": 24.89624,
+          "lon": 10.1792,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة غات",
+          "lat": 24.96555,
+          "lon": 10.17951,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "المركز الصحي المدينة القديمة ‎‎‎‎",
+          "lat": 32.8991758301819,
+          "lon": 13.1720155021698,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "جهاز ادارة المدينة القديمة طرابلس‎‎",
+          "lat": 32.8986647,
+          "lon": 13.1740097,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "مسجد الهدار - المدينة القديمة‎‎‎‎‎",
+          "lat": 32.8972753,
+          "lon": 13.1724371,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 73,
+      "candidate": "سوق الحوت",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "سوق الحوت \n ‎‎",
+          "lat": 32.893444,
+          "lon": 13.176242,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 74,
+      "candidate": "مسجد العتيق في بنغازي",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مسجد العتيق",
+          "lat": 24.965453,
+          "lon": 10.1795,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مسجد الحمامة العتيق",
+          "lat": 32.9216666666667,
+          "lon": 21.6344444444444,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مسجد وادي الحسون العتيق",
+          "lat": 32.6748412,
+          "lon": 13.9938527,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مسجد الحمامة العتيق",
+          "lat": 32.9216666666667,
+          "lon": 21.6344444444444,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مسجد وادي الحسون العتيق",
+          "lat": 32.6748412,
+          "lon": 13.9938527,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 76,
+      "candidate": "قصر ليبيا ومتحف الفسيفساء",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "متحف الفسيفساء‎",
+          "lat": 32.63455,
+          "lon": 14.289361,
+          "overlap": 1
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "متحف الفسيفساء‎‎",
+          "lat": 32.63455,
+          "lon": 14.289361,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 80,
+      "candidate": "مسجد أجدابيا العتيق",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مسجد العتيق",
+          "lat": 24.965453,
+          "lon": 10.1795,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مسجد الحمامة العتيق",
+          "lat": 32.9216666666667,
+          "lon": 21.6344444444444,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مسجد وادي الحسون العتيق",
+          "lat": 32.6748412,
+          "lon": 13.9938527,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مسجد الحمامة العتيق",
+          "lat": 32.9216666666667,
+          "lon": 21.6344444444444,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مسجد وادي الحسون العتيق",
+          "lat": 32.6748412,
+          "lon": 13.9938527,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 81,
+      "candidate": "واو الناموس",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "واو الناموس",
+          "lat": 24.9171684,
+          "lon": 17.7652358,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "واو الناموس",
+          "lat": 24.9171684,
+          "lon": 17.7652358,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 83,
+      "candidate": "بحيرة أم الماء",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.7104619,
+          "lon": 13.334806,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.71046,
+          "lon": 13.3348,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.7104619,
+          "lon": 13.334806,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.71046,
+          "lon": 13.3348,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 84,
+      "candidate": "بحيرة قبر عون",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة قبر عون",
+          "lat": 26.8037138,
+          "lon": 13.5379457,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة قبر عون",
+          "lat": 26.8037138,
+          "lon": 13.5379457,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 85,
+      "candidate": "بحيرة أم الحسن",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 90,
+      "candidate": "واحة غات",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "غات",
+          "lat": 24.9623,
+          "lon": 10.18016,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "غات‎‎‎",
+          "lat": 24.962304,
+          "lon": 10.180169,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 91,
+      "candidate": "جبال أكاكوس",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "جبال أكاكوس",
+          "lat": 24.863085,
+          "lon": 10.33775,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "جبال أكاكوس‎‎",
+          "lat": 24.863085,
+          "lon": 10.337754,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 95,
+      "candidate": "مسجد العتيق في أوجلة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "مسجد العتيق",
+          "lat": 24.965453,
+          "lon": 10.1795,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مسجد الحمامة العتيق",
+          "lat": 32.9216666666667,
+          "lon": 21.6344444444444,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مسجد وادي الحسون العتيق",
+          "lat": 32.6748412,
+          "lon": 13.9938527,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مسجد الحمامة العتيق",
+          "lat": 32.9216666666667,
+          "lon": 21.6344444444444,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "مسجد وادي الحسون العتيق",
+          "lat": 32.6748412,
+          "lon": 13.9938527,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 96,
+      "candidate": "المدينة القديمة في أوجلة",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة البركت ( اغرم )",
+          "lat": 24.89624,
+          "lon": 10.1792,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "المدينة القديمة غات",
+          "lat": 24.96555,
+          "lon": 10.17951,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "المركز الصحي المدينة القديمة ‎‎‎‎",
+          "lat": 32.8991758301819,
+          "lon": 13.1720155021698,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "جهاز ادارة المدينة القديمة طرابلس‎‎",
+          "lat": 32.8986647,
+          "lon": 13.1740097,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "مسجد الهدار - المدينة القديمة‎‎‎‎‎",
+          "lat": 32.8972753,
+          "lon": 13.1724371,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 98,
+      "candidate": "مقام سيدي عبد الوهاب القيسي",
+      "matches": [
+        {
+          "source": "old-tripoli.kml",
+          "name": "مسجد عبد الوهاب القيسي‎‎‎",
+          "lat": 32.9002274,
+          "lon": 13.176524,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 100,
+      "candidate": "متحف غدامس",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "متحف غدامس‎‎‎",
+          "lat": 30.1303955,
+          "lon": 9.4952328,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 101,
+      "candidate": "واحة واو الناموس وبحيراتها",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "واو الناموس",
+          "lat": 24.9171684,
+          "lon": 17.7652358,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "واو الناموس",
+          "lat": 24.9171684,
+          "lon": 17.7652358,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 102,
+      "candidate": "بحيرة أم الماء",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.7104619,
+          "lon": 13.334806,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.71046,
+          "lon": 13.3348,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.7104619,
+          "lon": 13.334806,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة أم الماء",
+          "lat": 26.71046,
+          "lon": 13.3348,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 103,
+      "candidate": "بحيرة قبر عون",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة قبر عون",
+          "lat": 26.8037138,
+          "lon": 13.5379457,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة قبر عون",
+          "lat": 26.8037138,
+          "lon": 13.5379457,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 104,
+      "candidate": "بحيرة أم الحصان",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة أم الحصان",
+          "lat": 26.9140724,
+          "lon": 13.4805465,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة أم الحصان",
+          "lat": 26.9140724,
+          "lon": 13.4805465,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 105,
+      "candidate": "بحيرة بزيمة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة بزيمة",
+          "lat": 24.8924127,
+          "lon": 22.0435899,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة بزيمة",
+          "lat": 22.04358,
+          "lon": 24.89241,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة بزيمة",
+          "lat": 24.8924127,
+          "lon": 22.0435899,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة بزيمة",
+          "lat": 22.04358,
+          "lon": 24.89241,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 106,
+      "candidate": "بحيرة تمسة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة تمسة",
+          "lat": 26.403131,
+          "lon": 15.8162336,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة تمسة",
+          "lat": 26.403131,
+          "lon": 15.8162336,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 107,
+      "candidate": "بحيرة ربيانة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة ربيانة",
+          "lat": 24.2891666666667,
+          "lon": 21.9672222222223,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة ربيانة",
+          "lat": 24.2891666666667,
+          "lon": 21.9672222222223,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 108,
+      "candidate": "بحيرة مافو",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة مافو",
+          "lat": 26.7876249,
+          "lon": 13.5072827,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة مافو",
+          "lat": 26.7876249,
+          "lon": 13.5072827,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 109,
+      "candidate": "بحيرات برقن",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرات برقن",
+          "lat": 27.5316778,
+          "lon": 13.6258365,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرات برقن",
+          "lat": 27.511145,
+          "lon": 13.6335675,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرات برقن",
+          "lat": 27.5316778,
+          "lon": 13.6258365,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرات برقن",
+          "lat": 27.511145,
+          "lon": 13.6335675,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 110,
+      "candidate": "بحيرات زلة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرات زلة",
+          "lat": 28.5428914,
+          "lon": 17.5572158,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرات زلة",
+          "lat": 28.5428914,
+          "lon": 17.5572158,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 111,
+      "candidate": "بحيرات وادي انوير",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرات وادي انوير",
+          "lat": 29.2917857,
+          "lon": 15.9955309,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرات وادي انوير",
+          "lat": 29.2917857,
+          "lon": 15.9955309,
+          "overlap": 3
+        }
+      ]
+    },
+    {
+      "rank": 112,
+      "candidate": "بحيرة وادي المجينين",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة وادي المجينين",
+          "lat": 32.2940425,
+          "lon": 13.2511782,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة وادي المجينين",
+          "lat": 32.2940425,
+          "lon": 13.2511782,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي المجينين",
+          "lat": 32.2936111111111,
+          "lon": 13.2477777777777,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سد وادي المجينين",
+          "lat": 32.2936111111111,
+          "lon": 13.2477777777777,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 113,
+      "candidate": "بحيرة وادي كعام",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة وادي المجينين",
+          "lat": 32.2940425,
+          "lon": 13.2511782,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي كعام",
+          "lat": 32.410219,
+          "lon": 14.3412352,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مصب وادي كعام",
+          "lat": 32.5274209,
+          "lon": 14.4466782,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة وادي المجينين",
+          "lat": 32.2940425,
+          "lon": 13.2511782,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سد وادي كعام",
+          "lat": 32.410219,
+          "lon": 14.3412352,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 114,
+      "candidate": "بحيرة عين الزيانة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة عين الزيانة",
+          "lat": 32.2149468,
+          "lon": 20.1555876,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة عين الزيانة",
+          "lat": 32.2149468,
+          "lon": 20.1555876,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 115,
+      "candidate": "بحيرة شمال بنغازي",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة شمال بنغازي",
+          "lat": 32.1457126,
+          "lon": 20.0969982,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة شمال بنغازي",
+          "lat": 32.1457126,
+          "lon": 20.0969982,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حديقة بحيرة بنغازي",
+          "lat": 32.1118772,
+          "lon": 20.0633097,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حديقة بحيرة بنغازي",
+          "lat": 32.1118772,
+          "lon": 20.0633097,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 116,
+      "candidate": "بحيرة طرونة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة طرونة",
+          "lat": 26.9283451,
+          "lon": 13.383472,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة طرونة",
+          "lat": 26.9283451,
+          "lon": 13.383472,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 117,
+      "candidate": "بحيرة الملح",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة الملح",
+          "lat": 29.1516667,
+          "lon": 15.8558333,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة الملح",
+          "lat": 29.1516667,
+          "lon": 15.8558333,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 118,
+      "candidate": "السبخة الكبيرة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "السبخة الكبيرة",
+          "lat": 30.1855471,
+          "lon": 18.8677623,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "السبخة الكبيرة",
+          "lat": 30.1855471,
+          "lon": 18.8677623,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سبخة",
+          "lat": 28.9360354,
+          "lon": 19.8060781,
+          "overlap": 0
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سبخة",
+          "lat": 28.9360354,
+          "lon": 19.8060781,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 119,
+      "candidate": "البحيرة الكبيرة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "البحيرة الكبيرة",
+          "lat": 32.1424786,
+          "lon": 20.0972986,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "البحيرة الكبيرة",
+          "lat": 32.1424786,
+          "lon": 20.0972986,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 0
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 120,
+      "candidate": "بحيرة العرايشة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة العرايشة",
+          "lat": 29.6094166666667,
+          "lon": 24.8604444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة العرايشة",
+          "lat": 29.6094166666667,
+          "lon": 24.8604444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "بحيرة",
+          "lat": 27.4750061,
+          "lon": 13.3255708,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 121,
+      "candidate": "محمية وادي الكوف",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "استراحة منتزه وادي الكوف",
+          "lat": 32.7017888888889,
+          "lon": 21.5634833333334,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "تفرع طريق محمية وادي الأثل",
+          "lat": 32.1583931,
+          "lon": 12.4833012,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف",
+          "lat": 32.6969085,
+          "lon": 21.5651463,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف القديم",
+          "lat": 32.6985923,
+          "lon": 21.5745439,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "محمية وادي الأثل",
+          "lat": 32.3091666666667,
+          "lon": 12.3869444444445,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 122,
+      "candidate": "شلال وادي الكوف",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "استراحة منتزه وادي الكوف",
+          "lat": 32.7017888888889,
+          "lon": 21.5634833333334,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف",
+          "lat": 32.6969085,
+          "lon": 21.5651463,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف القديم",
+          "lat": 32.6985923,
+          "lon": 21.5745439,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتجع وادي الكوف",
+          "lat": 32.70194,
+          "lon": 21.562313,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 123,
+      "candidate": "جسر وادي الكوف القديم",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف القديم",
+          "lat": 32.6985923,
+          "lon": 21.5745439,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "جسر وادي الكوف القديم",
+          "lat": 32.6985923,
+          "lon": 21.5745439,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "استراحة منتزه وادي الكوف",
+          "lat": 32.7017888888889,
+          "lon": 21.5634833333334,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "جسر وادي الكوف",
+          "lat": 32.6969085,
+          "lon": 21.5651463,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتجع وادي الكوف",
+          "lat": 32.70194,
+          "lon": 21.562313,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 125,
+      "candidate": "شلال بالفو / رأس الهلال",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "شلال بالفو‎‎‎‎‎",
+          "lat": 32.8660232,
+          "lon": 22.1789563,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "شلال رأس الهلال بافلو‎‎",
+          "lat": 32.8592767,
+          "lon": 22.1776082,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 126,
+      "candidate": "وادي مرقس / مرقص",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي مرقس",
+          "lat": 32.8472222,
+          "lon": 22.2072581,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي مرقس أو وادي الشواعر",
+          "lat": 32.860026,
+          "lon": 22.228278,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي مرقس",
+          "lat": 32.8472222,
+          "lon": 22.2072581,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 128,
+      "candidate": "وادي درنة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي درنة",
+          "lat": 32.6594444444444,
+          "lon": 22.5769444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي درنة",
+          "lat": 32.7505211,
+          "lon": 22.6304847,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي درنة",
+          "lat": 32.7646686,
+          "lon": 22.6438737,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سد وادي درنة",
+          "lat": 32.6594444444444,
+          "lon": 22.5769444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي درنة",
+          "lat": 32.7505211,
+          "lon": 22.6304847,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 130,
+      "candidate": "عين الفرس",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الفرس",
+          "lat": 30.1338226,
+          "lon": 9.4960901,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "عين الفرس",
+          "lat": 30.1338226,
+          "lon": 9.4960901,
+          "overlap": 1
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "عين الفرس‎",
+          "lat": 30.133823,
+          "lon": 9.49609,
+          "overlap": 1
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "فندق عين الفرس‎‎‎‎‎‎‎‎‎",
+          "lat": 30.1334857,
+          "lon": 9.494715,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 131,
+      "candidate": "عين الحفرة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حرم عين الحفرة",
+          "lat": 32.8257443,
+          "lon": 21.8740209,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الحفرة",
+          "lat": 32.8272329,
+          "lon": 21.8728472,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حرم عين الحفرة",
+          "lat": 32.8257443,
+          "lon": 21.8740209,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "عين الحفرة",
+          "lat": 32.8272329,
+          "lon": 21.8728472,
+          "overlap": 1
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "عين الحفرة‎‎‎‎‎‎‎‎‎",
+          "lat": 32.8272562,
+          "lon": 21.8728858,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 132,
+      "candidate": "وادي ماجر",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "تقاطع مدخل طريق وادي ماجر",
+          "lat": 32.3456526,
+          "lon": 14.5246625,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي ماجر",
+          "lat": 32.2449064,
+          "lon": 14.4314766,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "تقاطع مدخل طريق وادي ماجر",
+          "lat": 32.3456526,
+          "lon": 14.5246625,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي ماجر",
+          "lat": 32.2449064,
+          "lon": 14.4314766,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 133,
+      "candidate": "وادي لبدة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "سد وادي لبدة",
+          "lat": 32.5999114,
+          "lon": 14.2822318,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي لبدة",
+          "lat": 32.6376944,
+          "lon": 14.2967319,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "سد وادي لبدة",
+          "lat": 32.5999114,
+          "lon": 14.2822318,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي لبدة",
+          "lat": 32.6376944,
+          "lon": 14.2967319,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "وادي لبدة‎",
+          "lat": 32.637694,
+          "lon": 14.296732,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 134,
+      "candidate": "وادي الأثل",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "تفرع طريق محمية وادي الأثل",
+          "lat": 32.1583931,
+          "lon": 12.4833012,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "محمية وادي الأثل",
+          "lat": 32.3091666666667,
+          "lon": 12.3869444444445,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "تفرع طريق محمية وادي الأثل",
+          "lat": 32.1583931,
+          "lon": 12.4833012,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "محمية وادي الأثل",
+          "lat": 32.3091666666667,
+          "lon": 12.3869444444445,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 136,
+      "candidate": "وادي تنازوفت والفوار الساخن",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "الفوار أو البئر الساخن وادي تنازوفت",
+          "lat": 25.178641,
+          "lon": 10.2558818,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "الفوار أو البئر الساخن وادي تنازوفت",
+          "lat": 25.178641,
+          "lon": 10.2558818,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي تنازوفت",
+          "lat": 25.0410071,
+          "lon": 10.251818,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي تنازوفت",
+          "lat": 25.0410071,
+          "lon": 10.251818,
+          "overlap": 2
+        },
+        {
+          "source": "akakus.kml",
+          "name": "الفوار الساخن",
+          "lat": 25.17864,
+          "lon": 10.25588,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 137,
+      "candidate": "الفوار الكبريتي",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "الفوار الكبريتي",
+          "lat": 26.3757502,
+          "lon": 21.0529073,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "منتزه الفوار الكبريتي",
+          "lat": 32.35292,
+          "lon": 15.12665,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "الفوار الكبريتي",
+          "lat": 26.3757502,
+          "lon": 21.0529073,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "منتزه الفوار الكبريتي",
+          "lat": 32.35292,
+          "lon": 15.12665,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "الفوار",
+          "lat": 32.89998023897582,
+          "lon": 13.314980372688478,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 138,
+      "candidate": "حمام العجيلات السياحي",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام العجيلات السياحي",
+          "lat": 32.7316666666667,
+          "lon": 12.3947222222222,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام العجيلات السياحي",
+          "lat": 32.7316666666667,
+          "lon": 12.3947222222222,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام العجيلات",
+          "lat": 32.731286,
+          "lon": 12.39477,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام العجيلات",
+          "lat": 32.731286,
+          "lon": 12.39477,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 139,
+      "candidate": "حمام العسة الكبريتي",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام العسة الكبريتي",
+          "lat": 32.8887104,
+          "lon": 11.7128634000001,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام العسة الكبريتي",
+          "lat": 32.8887104,
+          "lon": 11.7128634000001,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام الجبيبينة العسة",
+          "lat": 32.88871,
+          "lon": 11.71286,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام بدر الكبريتي",
+          "lat": 32.0941818,
+          "lon": 11.6031787,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام الجبيبينة العسة",
+          "lat": 32.88871,
+          "lon": 11.71286,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 140,
+      "candidate": "حمام بدر الكبريتي",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام العسة الكبريتي",
+          "lat": 32.8887104,
+          "lon": 11.7128634000001,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام بدر الكبريتي",
+          "lat": 32.0941818,
+          "lon": 11.6031787,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام العسة الكبريتي",
+          "lat": 32.8887104,
+          "lon": 11.7128634000001,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام بدر الكبريتي",
+          "lat": 32.0941818,
+          "lon": 11.6031787,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام بدر",
+          "lat": 32.09418,
+          "lon": 11.60317,
+          "overlap": 1
+        }
+      ]
+    },
+    {
+      "rank": 141,
+      "candidate": "حمام وادي نينا",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام وادي نينا",
+          "lat": 29.7697964,
+          "lon": 15.2496203,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام وادي نينا",
+          "lat": 29.7697964,
+          "lon": 15.2496203,
+          "overlap": 3
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام الزلفة نينا",
+          "lat": 29.862589,
+          "lon": 15.2554822,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "مشروع وادي نينا الزراعي",
+          "lat": 29.7270422,
+          "lon": 15.2100563,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي نينا",
+          "lat": 29.1980145,
+          "lon": 14.8669575,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 142,
+      "candidate": "حمام درغوث",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "حمام درغوث",
+          "lat": 32.8985539,
+          "lon": 13.1771269,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "حمام درغوث",
+          "lat": 32.8985539,
+          "lon": 13.1771269,
+          "overlap": 2
+        },
+        {
+          "source": "old-tripoli.kml",
+          "name": "حمام درغوث الحمام الصغير\n ‎‎‎‎‏",
+          "lat": 32.8983288,
+          "lon": 13.1772236,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 143,
+      "candidate": "كهف هوا فطيح",
+      "matches": [
+        {
+          "source": "world-heritage-five.kml",
+          "name": "كهف هوا فطيح.‎‎‎‎‎‎‎‎‎‎",
+          "lat": 32.9001692,
+          "lon": 22.0516121,
+          "overlap": 1
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.881262,
+          "lon": 10.616836,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.88126,
+          "lon": 10.61683,
+          "overlap": 0
+        },
+        {
+          "source": "akakus.kml",
+          "name": "كهف",
+          "lat": 24.85884,
+          "lon": 10.5759,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 144,
+      "candidate": "كهوف وادي مرقس",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي مرقس",
+          "lat": 32.8472222,
+          "lon": 22.2072581,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "وادي مرقس أو وادي الشواعر",
+          "lat": 32.860026,
+          "lon": 22.228278,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "شلال وادي مرقس",
+          "lat": 32.8478912,
+          "lon": 22.2109384,
+          "overlap": 2
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "وادي مرقس",
+          "lat": 32.8472222,
+          "lon": 22.2072581,
+          "overlap": 2
+        }
+      ]
+    },
+    {
+      "rank": 146,
+      "candidate": "عين الغزالة",
+      "matches": [
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الغزالة",
+          "lat": 32.1856375,
+          "lon": 23.3061218,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "عين الغزالة",
+          "lat": 32.1856375,
+          "lon": 23.3061218,
+          "overlap": 1
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الغزال",
+          "lat": 27.6842201,
+          "lon": 10.130733,
+          "overlap": 0
+        },
+        {
+          "source": "atlasnatrual-with-media.geojson",
+          "name": "عين الغزال",
+          "lat": 32.19976563157895,
+          "lon": 23.264894684210528,
+          "overlap": 0
+        },
+        {
+          "source": "atlasnatrual.geojson",
+          "name": "عين الغزال",
+          "lat": 27.6842201,
+          "lon": 10.130733,
+          "overlap": 0
+        }
+      ]
+    },
+    {
+      "rank": 150,
+      "candidate": "جبال تادرارت أكاكوس الطبيعية",
+      "matches": [
+        {
+          "source": "akakus.kml",
+          "name": "جبال أكاكوس",
+          "lat": 24.863085,
+          "lon": 10.33775,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "جبال أكاكوس‎‎",
+          "lat": 24.863085,
+          "lon": 10.337754,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "جبال تادرارت أكوكاس",
+          "lat": 25.0239375,
+          "lon": 10.512191,
+          "overlap": 2
+        },
+        {
+          "source": "world-heritage-five.kml",
+          "name": "مواقع تادرارت أكاكوس الصخرية",
+          "lat": 24.812882,
+          "lon": 10.568242,
+          "overlap": 2
+        }
+      ]
+    }
+  ]
+}
