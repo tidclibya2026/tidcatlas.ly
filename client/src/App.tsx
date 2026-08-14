@@ -23,6 +23,8 @@ function Router() {
       <Route path={"/tidcatlas.ly/documentation-team"} component={DocumentationTeam} />
       <Route path={"/system-admin"} component={SystemAdmin} />
       <Route path={"/tidcatlas.ly/system-admin"} component={SystemAdmin} />
+      <Route path={"/admin"} component={SystemAdmin} />
+      <Route path={"/tidcatlas.ly/admin"} component={SystemAdmin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
