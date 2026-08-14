@@ -125,6 +125,11 @@ export const appRouter = router({
       ]);
       return { summary: JSON.parse(summaryText), manifest: JSON.parse(manifestText), report: reportText };
     }),
+    top150ReviewQueue: adminProcedure.input(z.object({ status: z.enum(["pending_review", "approved", "rejected"]).default("pending_review"), search: z.string().max(255).optional() }).optional()).query(async ({ input }) => {
+      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; status: string; confirmedName: string | null; matchScore: number; reviewStatus: string; sourceReport: string }> };
+      const search = input?.search?.trim().toLocaleLowerCase("ar");
+      return queue.rows.filter((row) => row.reviewStatus === (input?.status || "pending_review") && (!search || `${row.candidate} ${row.region} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
+    }),
     pointDetails: documentationProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input, ctx }) => ({ point: await getAtlasPoint(input.id), images: await listAtlasImages(input.id), comments: await listAtlasComments(input.id, ctx.user.role === "admin"), rating: await getAtlasRatingSummary(input.id, ctx.user.id) })),
     addComment: protectedProcedure.input(z.object({ pointId: z.number().int().positive(), body: z.string().trim().min(3).max(4000) })).mutation(async ({ input, ctx }) => {
       const point = await getAtlasPoint(input.pointId);
