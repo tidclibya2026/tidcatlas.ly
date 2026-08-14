@@ -145,16 +145,18 @@ export const appRouter = router({
       }));
       return enrichedRows.filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!input?.region || row.region.toLocaleLowerCase("ar").includes(input.region.toLocaleLowerCase("ar"))) && (!input?.category || row.category.toLocaleLowerCase("ar").includes(input.category.toLocaleLowerCase("ar"))) && (!search || `${row.candidate} ${row.region} ${row.category} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
     }),
-    top150ReviewHistory: adminProcedure.input(z.object({ status: z.enum(["all", "approved", "rejected", "pending_review"]).default("all"), search: z.string().max(255).optional() }).optional()).query(async ({ input }) => {
+    top150ReviewHistory: adminProcedure.input(z.object({ status: z.enum(["all", "approved", "rejected", "pending_review"]).default("all"), search: z.string().max(255).optional(), page: z.number().int().min(1).default(1), pageSize: z.number().int().min(5).max(100).default(20) }).optional()).query(async ({ input }) => {
       const queueVersion = "2026-08-14";
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; confirmedName: string | null }> };
-      const decisions = await listTop150ReviewDecisions(queueVersion);
+      const [decisions, points] = await Promise.all([listTop150ReviewDecisions(queueVersion), listAtlasPoints()]);
       const queueByRank = new Map(queue.rows.map((row) => [row.rank, row]));
       const search = input?.search?.trim().toLocaleLowerCase("ar");
-      return decisions
-        .map((decision) => ({ ...decision, candidate: queueByRank.get(decision.rank)?.candidate || decision.candidate, region: queueByRank.get(decision.rank)?.region || null, confirmedName: queueByRank.get(decision.rank)?.confirmedName || null }))
+      const allItems = decisions
+        .map((decision) => { const queueRow = queueByRank.get(decision.rank); const confirmedName = queueRow?.confirmedName || null; const matchedPoint = confirmedName ? points.find((point) => point.name === confirmedName || point.name.includes(confirmedName) || confirmedName.includes(point.name)) : undefined; return { ...decision, candidate: queueRow?.candidate || decision.candidate, region: queueRow?.region || null, confirmedName, matchedPointId: matchedPoint?.id || null }; })
         .filter((decision) => (input?.status === "all" || !input?.status || decision.status === input.status) && (!search || `${decision.candidate} ${decision.region || ""} ${decision.reviewNote || ""} ${decision.reviewedBy || ""}`.toLocaleLowerCase("ar").includes(search)))
         .sort((a, b) => new Date(b.reviewedAt || b.updatedAt || b.createdAt).getTime() - new Date(a.reviewedAt || a.updatedAt || a.createdAt).getTime());
+      const page = input?.page || 1; const pageSize = input?.pageSize || 20; const total = allItems.length;
+      return { items: allItems.slice((page - 1) * pageSize, page * pageSize), total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
     }),
     top150PendingMarkers: publicProcedure.query(async () => {
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; reviewStatus: string }> };
@@ -165,6 +167,15 @@ export const appRouter = router({
         if (!match || !Number.isFinite(match.lat) || !Number.isFinite(match.lon)) return [];
         return [{ rank: row.rank, name: row.candidate, region: row.region, lat: match.lat, lng: match.lon, source: match.source }];
       });
+    }),
+    undoTop150Review: adminProcedure.input(z.object({ rank: z.number().int().min(1).max(150), pointId: z.number().int().positive().optional(), reviewNote: z.string().trim().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
+      const queueVersion = "2026-08-14";
+      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; confirmedName: string | null; matchScore: number; sourceReport: string }> };
+      const row = queue.rows.find((candidate) => candidate.rank === input.rank); if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "سجل أفضل 150 غير موجود" });
+      if (input.pointId) { const point = await getAtlasPoint(input.pointId); if (!point) throw new TRPCError({ code: "NOT_FOUND", message: "النقطة المرتبطة بالقرار غير موجودة" }); await updateAtlasPoint(point.id, { status: "draft", recordStatus: "pending_review", reviewedBy: ctx.user.id, reviewedAt: new Date(), reviewNote: input.reviewNote || "تم التراجع عن القرار وإعادة النقطة للمراجعة." }); }
+      const decision = await upsertTop150ReviewDecision({ queueVersion, rank: row.rank, candidate: row.candidate, region: row.region, confirmedName: row.confirmedName || undefined, matchScore: row.matchScore, status: "pending_review", reviewNote: input.reviewNote || "تم التراجع عن القرار وإعادة السجل للمراجعة.", reviewedBy: ctx.user.id, reviewedAt: new Date(), sourceReport: row.sourceReport });
+      await createAuditLog({ entityType: "atlas_top150_review", entityId: decision?.id || 0, action: "undo", details: JSON.stringify({ rank: row.rank, pointId: input.pointId || null, reviewNote: input.reviewNote || null }), actorId: ctx.user.id });
+      return decision;
     }),
     reviewTop150: adminProcedure.input(z.object({ rank: z.number().int().min(1).max(150), status: z.enum(["approved", "rejected"]), pointId: z.number().int().positive().optional(), reviewNote: z.string().trim().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
       const queueVersion = "2026-08-14";
