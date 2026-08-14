@@ -47,4 +47,16 @@ describe("atlas documentation team", () => {
   it("does not allow normal users to manage layers", async () => {
     await expect(appRouter.createCaller(context("user")).atlas.manageLayers()).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
+
+  it("validates comment length before persistence", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.addComment({ pointId: 8, body: "  " })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("validates rating range before persistence", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.ratePoint({ pointId: 8, rating: 6 })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("requires reviewer access to moderate comments", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.moderateComment({ id: 8, status: "approved" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
 });

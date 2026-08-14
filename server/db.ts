@@ -1,8 +1,10 @@
-import { and, desc, eq, gt, lt, or } from "drizzle-orm";
+import { and, desc, eq, gt, like, lt, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   atlasAuditLogs,
   atlasBackups,
+  atlasComments,
+  atlasRatings,
   atlasImages,
   atlasImportJobs,
   atlasLayers,
@@ -14,6 +16,8 @@ import {
   InsertAtlasLayer,
   InsertAtlasPoint,
   InsertAtlasAuditLog,
+  InsertAtlasComment,
+  InsertAtlasRating,
   InsertAtlasTeamMember,
   InsertUser,
   users,
@@ -95,12 +99,19 @@ export async function listAtlasPoints(layerId?: string, status?: "draft" | "publ
   return db.select().from(atlasPoints).where(filters.length ? and(...filters) : undefined).orderBy(desc(atlasPoints.createdAt));
 }
 
-export async function listReviewQueue(recordStatus?: "draft" | "pending_review" | "approved" | "published" | "rejected" | "archived") {
+export async function listReviewQueue(recordStatus?: "draft" | "pending_review" | "approved" | "published" | "rejected" | "archived", filters?: { search?: string; layerId?: string; municipality?: string; category?: string; sort?: "newest" | "oldest" | "name" }) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(atlasPoints)
-    .where(recordStatus ? eq(atlasPoints.recordStatus, recordStatus) : undefined)
-    .orderBy(desc(atlasPoints.updatedAt));
+  const search = filters?.search?.trim();
+  const clauses = [
+    recordStatus ? eq(atlasPoints.recordStatus, recordStatus) : undefined,
+    filters?.layerId ? eq(atlasPoints.layerId, filters.layerId) : undefined,
+    filters?.municipality ? like(atlasPoints.municipality, `%${filters.municipality}%`) : undefined,
+    filters?.category ? like(atlasPoints.category, `%${filters.category}%`) : undefined,
+    search ? or(like(atlasPoints.name, `%${search}%`), like(atlasPoints.nameEn, `%${search}%`), like(atlasPoints.description, `%${search}%`), like(atlasPoints.source, `%${search}%`)) : undefined,
+  ].filter(Boolean) as any[];
+  const order = filters?.sort === "oldest" ? atlasPoints.createdAt : filters?.sort === "name" ? atlasPoints.name : desc(atlasPoints.updatedAt);
+  return db.select().from(atlasPoints).where(clauses.length ? and(...clauses) : undefined).orderBy(order);
 }
 
 export async function getAtlasPoint(id: number) {
@@ -212,6 +223,53 @@ export async function updateImportJob(id: number, patch: Partial<InsertAtlasImpo
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
   await db.update(atlasImportJobs).set(patch).where(eq(atlasImportJobs.id, id));
   const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function listAtlasComments(pointId: number, includePending = false) {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db.select({ id: atlasComments.id, pointId: atlasComments.pointId, userId: atlasComments.userId, userName: users.name, body: atlasComments.body, status: atlasComments.status, createdAt: atlasComments.createdAt, updatedAt: atlasComments.updatedAt }).from(atlasComments).leftJoin(users, eq(atlasComments.userId, users.id)).where(and(eq(atlasComments.pointId, pointId), includePending ? undefined : eq(atlasComments.status, "approved"))).orderBy(desc(atlasComments.createdAt));
+  return rows;
+}
+
+export async function createAtlasComment(comment: InsertAtlasComment) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const result = await db.insert(atlasComments).values(comment);
+  const rows = await db.select().from(atlasComments).where(eq(atlasComments.id, Number(result[0].insertId))).limit(1);
+  return rows[0];
+}
+
+export async function updateAtlasComment(id: number, patch: Partial<InsertAtlasComment>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasComments).set(patch).where(eq(atlasComments.id, id));
+  const rows = await db.select().from(atlasComments).where(eq(atlasComments.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function getAtlasRatingSummary(pointId: number, userId?: number) {
+  const db = await getDb();
+  if (!db) return { average: 0, count: 0, mine: null as number | null };
+  const ratings = await db.select().from(atlasRatings).where(eq(atlasRatings.pointId, pointId));
+  const total = ratings.reduce((sum, rating) => sum + rating.rating, 0);
+  return { average: ratings.length ? Number((total / ratings.length).toFixed(1)) : 0, count: ratings.length, mine: userId ? ratings.find((rating) => rating.userId === userId)?.rating ?? null : null };
+}
+
+export async function upsertAtlasRating(pointId: number, userId: number, rating: number) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const existing = await db.select().from(atlasRatings).where(and(eq(atlasRatings.pointId, pointId), eq(atlasRatings.userId, userId))).limit(1);
+  if (existing[0]) await db.update(atlasRatings).set({ rating }).where(eq(atlasRatings.id, existing[0].id));
+  else await db.insert(atlasRatings).values({ pointId, userId, rating });
+  return getAtlasRatingSummary(pointId, userId);
+}
+
+export async function getAtlasComment(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select().from(atlasComments).where(eq(atlasComments.id, id)).limit(1);
   return rows[0];
 }
 

@@ -6,7 +6,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, atlasEditorProcedure, atlasImportProcedure, atlasReviewerProcedure, documentationProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, getAtlasDataSnapshot, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, getAtlasDataSnapshot, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -113,8 +113,27 @@ export const appRouter = router({
     updateLayer: adminProcedure.input(z.object({ id: z.string().max(80), patch: z.object({ label: z.string().min(2).max(160).optional(), description: z.string().max(4000).optional(), color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(), icon: z.string().min(1).max(80).optional(), status: z.enum(["active", "archived"]).optional() }) })).mutation(async ({ input, ctx }) => { const layer = await updateAtlasLayer(input.id, input.patch); await createAuditLog({ entityType: "atlas_layer", entityId: 0, action: "update", details: JSON.stringify({ id: input.id, patch: input.patch }), actorId: ctx.user.id }); return layer; }),
     mine: protectedProcedure.query(({ ctx }) => listAtlasPoints(undefined, undefined, ctx.user.id)),
     myTeamAccess: protectedProcedure.query(async ({ ctx }) => ({ isAdmin: ctx.user.role === "admin", member: ctx.user.role === "admin" ? null : await getActiveTeamMemberForUser(ctx.user) })),
-    reviewQueue: documentationProcedure.input(z.object({ recordStatus: z.enum(["draft", "pending_review", "approved", "published", "rejected", "archived"]).optional() }).optional()).query(({ input }) => listReviewQueue(input?.recordStatus)),
-    pointDetails: documentationProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input }) => ({ point: await getAtlasPoint(input.id), images: await listAtlasImages(input.id) })),
+    reviewQueue: documentationProcedure.input(z.object({ recordStatus: z.enum(["draft", "pending_review", "approved", "published", "rejected", "archived"]).optional(), search: z.string().max(255).optional(), layerId: z.string().max(80).optional(), municipality: z.string().max(160).optional(), category: z.string().max(120).optional(), sort: z.enum(["newest", "oldest", "name"]).optional() }).optional()).query(({ input }) => listReviewQueue(input?.recordStatus, input)),
+    pointDetails: documentationProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input, ctx }) => ({ point: await getAtlasPoint(input.id), images: await listAtlasImages(input.id), comments: await listAtlasComments(input.id, ctx.user.role === "admin"), rating: await getAtlasRatingSummary(input.id, ctx.user.id) })),
+    addComment: protectedProcedure.input(z.object({ pointId: z.number().int().positive(), body: z.string().trim().min(3).max(4000) })).mutation(async ({ input, ctx }) => {
+      const point = await getAtlasPoint(input.pointId);
+      if (!point) throw new TRPCError({ code: "NOT_FOUND", message: "الوثيقة غير موجودة" });
+      const comment = await createAtlasComment({ pointId: input.pointId, userId: ctx.user.id, body: input.body, status: "pending" });
+      await createAuditLog({ entityType: "atlas_comment", entityId: comment.id, action: "create", details: JSON.stringify({ pointId: input.pointId }), actorId: ctx.user.id });
+      return comment;
+    }),
+    ratePoint: protectedProcedure.input(z.object({ pointId: z.number().int().positive(), rating: z.number().int().min(1).max(5) })).mutation(async ({ input, ctx }) => {
+      const point = await getAtlasPoint(input.pointId);
+      if (!point) throw new TRPCError({ code: "NOT_FOUND", message: "الوثيقة غير موجودة" });
+      return upsertAtlasRating(input.pointId, ctx.user.id, input.rating);
+    }),
+    moderateComment: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["approved", "rejected", "archived"]) })).mutation(async ({ input, ctx }) => {
+      const comment = await getAtlasComment(input.id);
+      if (!comment) throw new TRPCError({ code: "NOT_FOUND", message: "التعليق غير موجود" });
+      const updated = await updateAtlasComment(input.id, { status: input.status, moderatedBy: ctx.user.id, moderatedAt: new Date() });
+      await createAuditLog({ entityType: "atlas_comment", entityId: input.id, action: "moderate", details: JSON.stringify({ status: input.status }), actorId: ctx.user.id });
+      return updated;
+    }),
     findDuplicates: atlasReviewerProcedure.input(z.object({ name: z.string().min(1).max(255), latitude: z.number(), longitude: z.number() })).query(({ input }) => findPotentialDuplicatePoints(input.name, input.latitude, input.longitude)),
     update: atlasEditorProcedure.input(z.object({ id: z.number().int().positive(), patch: pointInput.partial() })).mutation(async ({ input, ctx }) => {
       const patch = { ...input.patch, metadata: input.patch.metadata ? JSON.stringify(input.patch.metadata) : undefined };

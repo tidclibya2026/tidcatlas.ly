@@ -65,6 +65,33 @@ export const atlasPoints = mysqlTable("atlas_points", {
 export type AtlasPoint = typeof atlasPoints.$inferSelect;
 export type InsertAtlasPoint = typeof atlasPoints.$inferInsert;
 
+export const atlasComments = mysqlTable("atlas_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId").notNull(),
+  userId: int("userId").notNull(),
+  body: text("body").notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "archived"]).default("pending").notNull(),
+  moderatedBy: int("moderatedBy"),
+  moderatedAt: timestamp("moderatedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ pointIdx: index("atlas_comments_point_idx").on(table.pointId), statusIdx: index("atlas_comments_status_idx").on(table.status), userIdx: index("atlas_comments_user_idx").on(table.userId) }));
+
+export type AtlasComment = typeof atlasComments.$inferSelect;
+export type InsertAtlasComment = typeof atlasComments.$inferInsert;
+
+export const atlasRatings = mysqlTable("atlas_ratings", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId").notNull(),
+  userId: int("userId").notNull(),
+  rating: int("rating").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ pointIdx: index("atlas_ratings_point_idx").on(table.pointId), userIdx: index("atlas_ratings_user_idx").on(table.userId) }));
+
+export type AtlasRating = typeof atlasRatings.$inferSelect;
+export type InsertAtlasRating = typeof atlasRatings.$inferInsert;
+
 export const atlasImages = mysqlTable("atlas_images", {
   id: int("id").autoincrement().primaryKey(),
   pointId: int("pointId").notNull(),
