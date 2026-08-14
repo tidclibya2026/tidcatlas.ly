@@ -125,3 +125,98 @@ button { cursor:pointer; }
 .brand-title .brand-slogan { color:#E7D6A8; font-size:10px; font-weight:600; white-space:nowrap; }
 .official-logo-cell span { max-width:190px; text-align:center; line-height:1.25; }
 @media (max-width: 900px) { .official-logo-cell span { max-width:120px; white-space:normal; } .brand-title .brand-slogan { white-space:normal; } }
+
+
+/* National institutional visual refinement */
+:root {
+  --atlas-blue: #0c2a3a;
+  --atlas-ink: #20323b;
+  --atlas-sand: #f5f2eb;
+  --atlas-paper: #fcfbf8;
+  --atlas-line: #d9d6cd;
+  --atlas-copper: #b98245;
+  --atlas-teal: #356f70;
+  --atlas-gold: #c8a15b;
+  --atlas-muted: #66747a;
+}
+body { background: var(--atlas-sand); color: var(--atlas-ink); }
+.atlas-shell { background: var(--atlas-sand); background-image: linear-gradient(180deg, #faf8f3 0%, #f1eee7 100%); }
+.topbar { min-height: 86px; height: auto; padding-block: 10px; background: linear-gradient(105deg, #071d2a 0%, #0c2a3a 62%, #123d4d 100%); border-bottom: 2px solid var(--atlas-gold); box-shadow: 0 8px 24px rgba(7,29,42,.18); }
+.brand-lockup { gap: 16px; }
+.project-mark { background: #f8f5ee; border: 1px solid rgba(200,161,91,.8); border-radius: 8px; box-shadow: 0 5px 16px rgba(7,29,42,.18); }
+.project-mark:after { display: none; }
+.brand-lockup .project-logo { filter: none; }
+.brand-title { min-width: 235px; }
+.brand-lockup h1 { color: #fbfaf6; letter-spacing: -.03em; }
+.brand-lockup h1 em { color: #e2c47d; }
+.brand-title small { color: #c5d3d4; }
+.eyebrow { color: #d8bd7a; letter-spacing: .08em; }
+.official-logos { min-width: 188px; margin-right: 10px; padding: 7px 12px; gap: 4px; border: 1px solid rgba(200,161,91,.75); border-radius: 8px; background: #f8f5ee; background-image: none; box-shadow: 0 5px 16px rgba(7,29,42,.16); }
+.official-logo-cell { min-width: 164px; gap: 8px; }
+.official-logo-cell img { width: 31px; height: 29px; filter: none; }
+.official-logo-cell span { color: #183746; font-size: 8px; }
+.logo-divider { background: #c8a15b80; }
+.topbar-actions { gap: 12px; }
+.header-gis-badge { color: #e2c47d; border-color: #c8a15b80; background: rgba(0,0,0,.12); border-radius: 6px; }
+.edition { color: #cedbd9; }
+.atlas-cover { background: #f5f2eb; border-bottom: 1px solid #d9d0bd; }
+.atlas-cover-frame { border-color: #c8a15b; border-radius: 10px; box-shadow: 0 18px 38px rgba(12,42,58,.14); }
+.atlas-cover-caption { background: rgba(12,42,58,.94); border-right: 3px solid #d2ae67; border-radius: 4px; box-shadow: 0 10px 25px rgba(7,29,42,.18); }
+.atlas-main { background: #dfe3e0; }
+.atlas-main .control-panel { border-color: #e3dfd5; border-radius: 12px; background: rgba(252,251,248,.97); box-shadow: 0 16px 36px rgba(12,42,58,.14); backdrop-filter: blur(8px); }
+.control-panel { background: #fcfbf8; background-image: none; border-left-color: #e5e0d6; box-shadow: -10px 0 28px rgba(12,42,58,.06); }
+.panel-intro { border-right-color: var(--atlas-gold); }
+.panel-intro h2, .panel-heading h3 { color: var(--atlas-blue); letter-spacing: -.035em; }
+.panel-intro p, .layer-copy span { color: var(--atlas-muted); }
+.search-box { background: #fffefa; border-color: #d8d4ca; border-radius: 8px; box-shadow: 0 5px 16px rgba(12,42,58,.06); }
+.search-box svg, .intro-kicker, .filter-heading button { color: var(--atlas-copper); }
+.filter-panel, .ai-panel, .route-panel { background: #f7f4ed; background-image: none; border-color: #ded9cf; border-right-color: var(--atlas-gold); border-radius: 8px; }
+.layer-list { gap: 4px; }
+.layer-row { min-height: 62px; border-bottom-color: #e6e2d9; }
+.layer-row:after { display: none; }
+.layer-row:hover { background: #f8f6f0; transform: translateX(-2px); }
+.layer-row.is-active { background: #f5efe2; border-color: #e0d5bd; box-shadow: none; }
+.layer-row.is-active:before { background: var(--atlas-gold); }
+.layer-row.is-active .layer-copy strong { color: #8a632c; }
+.layer-mark { color: #587477; filter: grayscale(.25); }
+.layer-row [role="switch"][data-state="checked"] { box-shadow: 0 0 0 3px rgba(185,130,69,.15); }
+.panel-foot { border-top-color: #dedbd2; }
+.atlas-map { filter: saturate(.82) contrast(.98); }
+.detail-panel, .map-overlay-title, .map-legend, .map-count { box-shadow: 0 10px 24px rgba(12,42,58,.12); }
+button, .layer-row, .search-result-list button { transition: background-color .18s var(--ease-out), border-color .18s var(--ease-out), color .18s var(--ease-out), transform .18s var(--ease-out), box-shadow .18s var(--ease-out); }
+@media (max-width: 900px) {
+  .brand-lockup { gap: 9px; }
+  .brand-title { min-width: 0; }
+  .official-logos { min-width: 0; padding-inline: 7px; }
+  .official-logo-cell { min-width: 132px; }
+}
+@media (max-width: 560px) {
+  .topbar { min-height: 72px; padding-block: 6px; }
+  .brand-lockup { gap: 6px; }
+  .official-logos { padding: 4px 5px; border-radius: 6px; }
+  .official-logo-cell { min-width: 96px; gap: 4px; }
+  .official-logo-cell img { width: 22px; height: 21px; }
+  .official-logo-cell span { font-size: 7px; }
+  .brand-lockup h1 { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .topbar, .atlas-cover-frame, .layer-row, button { transition: none !important; }
+}
+
+
+/* Quiet iconography and map chrome */
+.layer-mark { border: 1px solid rgba(12,42,58,.08); border-radius: 8px; background: #eef1ee !important; color: #4b6d70 !important; }
+.layer-mark-glyph { font-size: 16px; line-height: 1; filter: grayscale(.55) saturate(.65); }
+.layer-row.is-active .layer-mark { background: #efe4ce !important; color: #8a632c !important; border-color: #d8bc82; }
+.favorites-quick-action { color: #85612f; background: #f4ecdc; border-color: #d8bc82; }
+.category-filter-chips button.is-selected { background: #0c2a3a; color: #fff; border-color: #0c2a3a; }
+.category-filter-chips button { border-radius: 5px; border-color: #d8d4ca; color: #53676e; background: #fbfaf6; }
+.map-overlay-title { background: rgba(12,42,58,.91); border-right-color: #c8a15b; border-radius: 6px; }
+.map-overlay-title span { color: #dfc887; }
+.map-legend { background: rgba(252,251,248,.94); border-color: #ded9cf; color: #40565e; border-radius: 6px; }
+.map-legend i { box-shadow: none; opacity: .8; }
+.map-count { background: rgba(12,42,58,.92); border-color: rgba(200,161,91,.72); border-radius: 6px; }
+.map-count strong { color: #e2c47d; }
+.add-point-button, .detail-action, .route-button { background: #0c2a3a; border-color: #0c2a3a; }
+.add-point-button:hover, .detail-action:hover, .route-button:hover { background: #163f50; }
+.button-primary, [data-slot="button"].bg-\[\#123c52\] { box-shadow: 0 5px 12px rgba(12,42,58,.12); }
