@@ -14,6 +14,7 @@ import { FAVORITE_IMAGE, favoriteImageMetadata } from "@shared/favoriteImage";
 import { routeCoordinates } from "@shared/atlasRoute";
 import { buildDensityBins, densityColor } from "@shared/density";
 import { extractKmlImageUrl, toDisplayImageUrl, toFallbackImageUrl } from "@shared/kmlImage";
+import { verifiedSiteImageFallback } from "@shared/siteImageFallback";
 import L from "leaflet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,10 +99,18 @@ function parseKml(text: string, layerId: string): Site[] {
       const key = item.getAttribute("name");
       if (key) properties[key] = item.querySelector("value")?.textContent?.trim() || "";
     });
-    const imageSource = extractKmlImageUrl(rawDescription, properties);
+    const extractedImageSource = extractKmlImageUrl(rawDescription, properties);
+    const verifiedFallback = extractedImageSource ? undefined : verifiedSiteImageFallback(name);
+    const imageSource = extractedImageSource || verifiedFallback?.image_source;
     const imageUrl = toDisplayImageUrl(imageSource);
     if (imageSource) properties.image_source = imageSource;
     if (imageUrl) properties.image_url = imageUrl;
+    if (verifiedFallback) {
+      properties.image_author = verifiedFallback.image_author;
+      properties.image_license = verifiedFallback.image_license;
+      properties.image_license_note = verifiedFallback.image_license_note;
+      properties.image_source_type = "verified_commons_fallback";
+    }
     properties.source_layer = layerId;
     properties.source_format = "KML";
     return { id: `${layerId}-${index}`, name, description, lat, lng, imageUrl, properties, layerId };
