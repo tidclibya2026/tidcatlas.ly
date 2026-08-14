@@ -8,7 +8,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, atlasEditorProcedure, atlasImportProcedure, atlasReviewerProcedure, documentationProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating, listTop150ReviewDecisions, upsertTop150ReviewDecision } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -126,9 +126,32 @@ export const appRouter = router({
       return { summary: JSON.parse(summaryText), manifest: JSON.parse(manifestText), report: reportText };
     }),
     top150ReviewQueue: adminProcedure.input(z.object({ status: z.enum(["pending_review", "approved", "rejected"]).default("pending_review"), matchFilter: z.enum(["all", "confirmed", "manual_review"]).default("all"), search: z.string().max(255).optional() }).optional()).query(async ({ input }) => {
+      const queueVersion = "2026-08-14";
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; status: string; confirmedName: string | null; matchScore: number; reviewStatus: string; sourceReport: string }> };
+      const [decisions, points] = await Promise.all([listTop150ReviewDecisions(queueVersion), listAtlasPoints()]);
+      const decisionByRank = new Map(decisions.map((decision) => [decision.rank, decision]));
       const search = input?.search?.trim().toLocaleLowerCase("ar");
-      return queue.rows.filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!search || `${row.candidate} ${row.region} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
+      return queue.rows.map((row) => {
+        const decision = decisionByRank.get(row.rank);
+        const confirmedName = row.confirmedName;
+        const matchedPoint = confirmedName ? points.find((point) => point.name === confirmedName || point.name.includes(confirmedName) || confirmedName.includes(point.name)) : undefined;
+        return { ...row, reviewStatus: decision?.status || row.reviewStatus, decisionId: decision?.id || null, matchedPointId: matchedPoint?.id || null, matchedPointName: matchedPoint?.name || null, reviewNote: decision?.reviewNote || null };
+      }).filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!search || `${row.candidate} ${row.region} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
+    }),
+    reviewTop150: adminProcedure.input(z.object({ rank: z.number().int().min(1).max(150), status: z.enum(["approved", "rejected"]), pointId: z.number().int().positive().optional(), reviewNote: z.string().trim().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
+      const queueVersion = "2026-08-14";
+      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; confirmedName: string | null; matchScore: number; sourceReport: string }> };
+      const row = queue.rows.find((candidate) => candidate.rank === input.rank);
+      if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "سجل أفضل 150 غير موجود" });
+      if (input.status === "approved") {
+        if (!input.pointId) throw new TRPCError({ code: "BAD_REQUEST", message: "اختر رقم النقطة المطابقة قبل الاعتماد" });
+        const point = await getAtlasPoint(input.pointId);
+        if (!point) throw new TRPCError({ code: "NOT_FOUND", message: "النقطة المطابقة غير موجودة" });
+        await updateAtlasPoint(point.id, { status: "published", recordStatus: "published", reviewedBy: ctx.user.id, reviewedAt: new Date(), reviewNote: input.reviewNote || `اعتماد أفضل 150: ${row.candidate}` });
+      }
+      const decision = await upsertTop150ReviewDecision({ queueVersion, rank: row.rank, candidate: row.candidate, region: row.region, confirmedName: row.confirmedName || undefined, matchScore: row.matchScore, status: input.status, reviewNote: input.reviewNote, reviewedBy: ctx.user.id, reviewedAt: new Date(), sourceReport: row.sourceReport });
+      await createAuditLog({ entityType: "atlas_top150_review", entityId: decision?.id || 0, action: input.status, details: JSON.stringify({ rank: row.rank, candidate: row.candidate, pointId: input.pointId || null, reviewNote: input.reviewNote || null }), actorId: ctx.user.id });
+      return decision;
     }),
     pointDetails: documentationProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input, ctx }) => ({ point: await getAtlasPoint(input.id), images: await listAtlasImages(input.id), comments: await listAtlasComments(input.id, ctx.user.role === "admin"), rating: await getAtlasRatingSummary(input.id, ctx.user.id) })),
     addComment: protectedProcedure.input(z.object({ pointId: z.number().int().positive(), body: z.string().trim().min(3).max(4000) })).mutation(async ({ input, ctx }) => {

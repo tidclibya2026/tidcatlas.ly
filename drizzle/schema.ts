@@ -1,4 +1,4 @@
-import { index, int, mysqlEnum, mysqlTable, text, timestamp, varchar, double, boolean } from "drizzle-orm/mysql-core";
+import { index, uniqueIndex, int, mysqlEnum, mysqlTable, text, timestamp, varchar, double, boolean } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -175,6 +175,29 @@ export const atlasImportJobs = mysqlTable("atlas_import_jobs", {
 
 export type AtlasImportJob = typeof atlasImportJobs.$inferSelect;
 export type InsertAtlasImportJob = typeof atlasImportJobs.$inferInsert;
+
+export const atlasTop150Reviews = mysqlTable("atlas_top150_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  queueVersion: varchar("queueVersion", { length: 40 }).notNull(),
+  rank: int("rank").notNull(),
+  candidate: varchar("candidate", { length: 255 }).notNull(),
+  region: varchar("region", { length: 160 }),
+  confirmedName: varchar("confirmedName", { length: 255 }),
+  matchScore: double("matchScore").notNull(),
+  status: mysqlEnum("status", ["pending_review", "approved", "rejected"]).default("pending_review").notNull(),
+  reviewNote: text("reviewNote"),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  sourceReport: varchar("sourceReport", { length: 255 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  queueRankIdx: uniqueIndex("atlas_top150_queue_rank_uidx").on(table.queueVersion, table.rank),
+  statusIdx: index("atlas_top150_status_idx").on(table.status),
+}));
+
+export type AtlasTop150Review = typeof atlasTop150Reviews.$inferSelect;
+export type InsertAtlasTop150Review = typeof atlasTop150Reviews.$inferInsert;
 
 export const atlasAuditLogs = mysqlTable("atlas_audit_logs", {
   id: int("id").autoincrement().primaryKey(),

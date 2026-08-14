@@ -11,6 +11,8 @@ import {
   atlasLayers,
   atlasPoints,
   atlasTeamMembers,
+  atlasTop150Reviews,
+  InsertAtlasTop150Review,
   InsertAtlasBackup,
   InsertAtlasImage,
   InsertAtlasImportJob,
@@ -391,4 +393,30 @@ export async function createAuditLog(log: InsertAtlasAuditLog) {
   const db = await getDb();
   if (!db) return;
   await db.insert(atlasAuditLogs).values(log);
+}
+
+export async function listTop150ReviewDecisions(queueVersion: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasTop150Reviews).where(eq(atlasTop150Reviews.queueVersion, queueVersion));
+}
+
+export async function upsertTop150ReviewDecision(decision: InsertAtlasTop150Review) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.insert(atlasTop150Reviews).values(decision).onDuplicateKeyUpdate({
+    set: {
+      candidate: decision.candidate,
+      region: decision.region ?? null,
+      confirmedName: decision.confirmedName ?? null,
+      matchScore: decision.matchScore,
+      status: decision.status,
+      reviewNote: decision.reviewNote ?? null,
+      reviewedBy: decision.reviewedBy ?? null,
+      reviewedAt: decision.reviewedAt ?? null,
+      sourceReport: decision.sourceReport,
+    },
+  });
+  const rows = await db.select().from(atlasTop150Reviews).where(and(eq(atlasTop150Reviews.queueVersion, decision.queueVersion), eq(atlasTop150Reviews.rank, decision.rank))).limit(1);
+  return rows[0];
 }

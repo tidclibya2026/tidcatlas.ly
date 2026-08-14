@@ -87,3 +87,15 @@ describe("atlas documentation team", () => {
     expect(Array.isArray(result)).toBe(true);
   });
 });
+
+
+describe("top 150 review decisions", () => {
+  it("requires a matched atlas point before approval", async () => {
+    await expect(appRouter.createCaller(context("admin")).atlas.reviewTop150({ rank: 1, status: "approved" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("keeps top 150 decisions administrator-only", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.reviewTop150({ rank: 1, status: "rejected", reviewNote: "يحتاج مراجعة إضافية" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+});
+
