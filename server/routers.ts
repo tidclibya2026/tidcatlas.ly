@@ -118,19 +118,23 @@ export const appRouter = router({
     reviewQueue: documentationProcedure.input(z.object({ recordStatus: z.enum(["draft", "pending_review", "approved", "published", "rejected", "archived"]).optional(), search: z.string().max(255).optional(), layerId: z.string().max(80).optional(), municipality: z.string().max(160).optional(), category: z.string().max(120).optional(), sort: z.enum(["newest", "oldest", "name"]).optional() }).optional()).query(({ input }) => listReviewQueue(input?.recordStatus, input)),
     sourceReconciliation: adminProcedure.query(async () => {
       const root = process.cwd();
-      const [summaryText, manifestText, reportText] = await Promise.all([
+      const [summaryText, manifestText, reportText, userManifestText, userReconciliationText] = await Promise.all([
         readFile(resolve(root, "docs/normalized-attached-sources-2026-08-14.jsonl.summary.json"), "utf8"),
         readFile(resolve(root, "docs/import-job-attached-sources-2026-08-14.json"), "utf8"),
         readFile(resolve(root, "docs/attached-source-reconciliation-2026-08-14.md"), "utf8"),
+        readFile(resolve(root, "docs/user-requested-sources-manifest-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ files: [] })),
+        readFile(resolve(root, "docs/reconciliation-requested-sources-2026-08-14.json"), "utf8").catch(() => JSON.stringify({})),
       ]);
-      return { summary: JSON.parse(summaryText), manifest: JSON.parse(manifestText), report: reportText };
+      return { summary: JSON.parse(summaryText), manifest: JSON.parse(manifestText), report: reportText, userManifest: JSON.parse(userManifestText), userReconciliation: JSON.parse(userReconciliationText) };
     }),
     top150ReviewQueue: adminProcedure.input(z.object({ status: z.enum(["pending_review", "approved", "rejected"]).default("pending_review"), matchFilter: z.enum(["all", "confirmed", "manual_review"]).default("all"), search: z.string().max(255).optional() }).optional()).query(async ({ input }) => {
       const queueVersion = "2026-08-14";
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; status: string; confirmedName: string | null; matchScore: number; reviewStatus: string; sourceReport: string }> };
-      const [decisions, points, sourceMatchText] = await Promise.all([listTop150ReviewDecisions(queueVersion), listAtlasPoints(), readFile(resolve(process.cwd(), "docs/top-150-source-match-candidates-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ rows: [] }))]);
+      const [decisions, points, sourceMatchText, requestedReconciliationText] = await Promise.all([listTop150ReviewDecisions(queueVersion), listAtlasPoints(), readFile(resolve(process.cwd(), "docs/top-150-source-match-candidates-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ rows: [] })), readFile(resolve(process.cwd(), "docs/reconciliation-requested-sources-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ top150SourceMatches: [] }))]);
       const decisionByRank = new Map(decisions.map((decision) => [decision.rank, decision]));
-      const sourceMatchByRank = new Map((JSON.parse(sourceMatchText) as { rows: Array<{ rank: number; matches: Array<{ source: string; name: string; lat: number; lon: number; overlap: number }> }> }).rows.map((row) => [row.rank, row]));
+      const oldSourceMatches = (JSON.parse(sourceMatchText) as { rows: Array<{ rank: number; matches: Array<{ source: string; name: string; lat: number; lon: number; overlap: number }> }> }).rows;
+      const requestedSourceMatches = (JSON.parse(requestedReconciliationText) as { top150SourceMatches?: Array<{ rank: number; matches: Array<{ source: string; name: string; lat: number; lon: number; overlap: number }> }> }).top150SourceMatches || [];
+      const sourceMatchByRank = new Map([...oldSourceMatches, ...requestedSourceMatches].map((row) => [row.rank, row]));
       const search = input?.search?.trim().toLocaleLowerCase("ar");
       return queue.rows.map((row) => {
         const decision = decisionByRank.get(row.rank);

@@ -1,0 +1,183 @@
+{
+  "manifestVersion": "2026-08-14-user-requested-1",
+  "policy": "مصادر المستخدم محفوظة كما هي؛ لا إدخال أو نشر تلقائي قبل المطابقة والمراجعة وحقوق الصور.",
+  "files": [
+    {
+      "originalFileName": "atlasnatrual.geojson",
+      "storedFileName": "atlasnatrual_cff3cc8c58da.geojson",
+      "sourceKind": "geojson",
+      "sha256": "cff3cc8c58daf1246a30e0c95bd2cbe14ed91ae887876874d832d1a49993a8c6",
+      "sizeBytes": 781995,
+      "records": 945,
+      "coordinates": 945,
+      "imageReferences": 0,
+      "parseError": false
+    },
+    {
+      "originalFileName": "atlasnatrual-with-media.geojson",
+      "storedFileName": "atlasnatrual-with-media_b389136b4d9f.geojson",
+      "sourceKind": "geojson",
+      "sha256": "b389136b4d9f8fcc138f48999745b26b899747830489475b70988f679c442f49",
+      "sizeBytes": 809652,
+      "records": 945,
+      "coordinates": 945,
+      "imageReferences": 133,
+      "parseError": false
+    },
+    {
+      "originalFileName": "hotels_visual_qa_decisions.json",
+      "storedFileName": "hotels_visual_qa_decisions_ed829a811761.json",
+      "sourceKind": "json",
+      "sha256": "ed829a811761e43c1e269e0ef67e73560c7b0a84fff9ea78f2cd84a9f67814d6",
+      "sizeBytes": 8426,
+      "records": 53,
+      "coordinates": 0,
+      "imageReferences": 0,
+      "parseError": false,
+      "statuses": {
+        "VISUALLY_APPROVED": 53
+      }
+    },
+    {
+      "originalFileName": "أطلس_ليبيا_السياحي_2026_الفنادق_KML2025_مرجعي_DRAFT.kml",
+      "storedFileName": "أطلس_ليبيا_السياحي_2026_الفنادق_KML2025_مرجعي_DRAFT_bd4b42c017b0.kml",
+      "sourceKind": "kml",
+      "sha256": "bd4b42c017b0558af3f32e2951750603b295ea95f053d22d8885e12ccd00c3e4",
+      "sizeBytes": 1718117,
+      "records": 436,
+      "coordinates": 436,
+      "imageReferences": 1060,
+      "parseError": false,
+      "archivedOutsideCheckpoint": true,
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/أطلس_ليبيا_السياحي_2026_الفنادق_KML2025_مرجعي_DRAFT_bd4b42c017b0.kml"
+    },
+    {
+      "originalFileName": "اكاكوس.kml",
+      "storedFileName": "اكاكوس_641ab45b3ace.kml",
+      "sourceKind": "kml",
+      "sha256": "641ab45b3ace5e77eae78e63931b08fb925f2494a536f3736d74e01bf5ed2988",
+      "sizeBytes": 605606,
+      "records": 430,
+      "coordinates": 428,
+      "imageReferences": 112,
+      "parseError": false
+    },
+    {
+      "originalFileName": "الفنادق_LY.kml",
+      "storedFileName": "الفنادق_LY_88e20782d2bb.kml",
+      "sourceKind": "kml",
+      "sha256": "88e20782d2bb1fcdf92ad16f1d880550e7483ed373b13d6e29bb6cf1c59f7e03",
+      "sizeBytes": 3599364,
+      "records": 572,
+      "coordinates": 572,
+      "imageReferences": 2528,
+      "parseError": false,
+      "archivedOutsideCheckpoint": true,
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/الفنادق_LY_88e20782d2bb.kml"
+    },
+    {
+      "originalFileName": "القرى_والمنتجعاتالسياحية_LY.kml",
+      "storedFileName": "القرى_والمنتجعاتالسياحية_LY_1a1d1375c4cb.kml",
+      "sourceKind": "kml",
+      "sha256": "1a1d1375c4cb6357c5892566d7948b98923a185b688d6fc2c9b00c048dbb98a1",
+      "sizeBytes": 954175,
+      "records": 262,
+      "coordinates": 262,
+      "imageReferences": 560,
+      "parseError": false
+    },
+    {
+      "originalFileName": "المدينةالقديمة_طرابلس.kml",
+      "storedFileName": "المدينةالقديمة_طرابلس_26ffc9519ebc.kml",
+      "sourceKind": "kml",
+      "sha256": "26ffc9519ebccfaafbd029e070dd21e736c0f0bc839b36231668792d6866eab5",
+      "sizeBytes": 967226,
+      "records": 430,
+      "coordinates": 430,
+      "imageReferences": 494,
+      "parseError": false
+    },
+    {
+      "originalFileName": "المشاريعوفرصالاستثمارالسياحي.kml",
+      "storedFileName": "المشاريعوفرصالاستثمارالسياحي_05edb4b55f83.kml",
+      "sourceKind": "kml",
+      "sha256": "05edb4b55f83725b2e96fef1d092a81d04f097e19c86c799a06fd6593000a1cd",
+      "sizeBytes": 4367153,
+      "records": 0,
+      "coordinates": 0,
+      "imageReferences": 0,
+      "parseError": true,
+      "archivedOutsideCheckpoint": true,
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/المشاريعوفرصالاستثمارالسياحي_05edb4b55f83.kml"
+    },
+    {
+      "originalFileName": "المطاعمفيطرابلس.kml",
+      "storedFileName": "المطاعمفيطرابلس_7a3595c34450.kml",
+      "sourceKind": "kml",
+      "sha256": "7a3595c34450f7b3a997af3dfc11f7ec757fad7dd70ea05ae258a97bcb275075",
+      "sizeBytes": 295964,
+      "records": 75,
+      "coordinates": 75,
+      "imageReferences": 694,
+      "parseError": false
+    },
+    {
+      "originalFileName": "المقاهي_طرابلس.kml",
+      "storedFileName": "المقاهي_طرابلس_c6392c3ad020.kml",
+      "sourceKind": "kml",
+      "sha256": "c6392c3ad020840fcc3860f95f1cd19dc3efb1f91336587c9d27232cd5068919",
+      "sizeBytes": 465256,
+      "records": 404,
+      "coordinates": 404,
+      "imageReferences": 210,
+      "parseError": false
+    },
+    {
+      "originalFileName": "فنادقفيطرابلس.kml",
+      "storedFileName": "فنادقفيطرابلس_ff1261d3f995.kml",
+      "sourceKind": "kml",
+      "sha256": "ff1261d3f99502329dadc4cc207f6cd2e10550bb9695e3b89e5ec1209d88ea96",
+      "sizeBytes": 646419,
+      "records": 196,
+      "coordinates": 195,
+      "imageReferences": 632,
+      "parseError": false
+    },
+    {
+      "originalFileName": "مواقعالتراثالعالميالخمسة_LY.kml",
+      "storedFileName": "مواقعالتراثالعالميالخمسة_LY_07f88ae5fbca.kml",
+      "sourceKind": "kml",
+      "sha256": "07f88ae5fbcad07d7d653d3a4a8ca6c6f1c77772b4fe6adba6aabfc7f4def555",
+      "sizeBytes": 1430511,
+      "records": 345,
+      "coordinates": 345,
+      "imageReferences": 514,
+      "parseError": false,
+      "archivedOutsideCheckpoint": true,
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/مواقعالتراثالعالميالخمسة_LY_07f88ae5fbca.kml"
+    }
+  ],
+  "largeFilePolicy": "Files larger than 1 MB are preserved in the external project asset archive and should be uploaded through Management UI File Storage before publishing.",
+  "archivedLargeFiles": [
+    {
+      "originalFileName": "أطلس_ليبيا_السياحي_2026_الفنادق_KML2025_مرجعي_DRAFT.kml",
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/أطلس_ليبيا_السياحي_2026_الفنادق_KML2025_مرجعي_DRAFT_bd4b42c017b0.kml",
+      "sizeBytes": 1718117
+    },
+    {
+      "originalFileName": "الفنادق_LY.kml",
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/الفنادق_LY_88e20782d2bb.kml",
+      "sizeBytes": 3599364
+    },
+    {
+      "originalFileName": "المشاريعوفرصالاستثمارالسياحي.kml",
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/المشاريعوفرصالاستثمارالسياحي_05edb4b55f83.kml",
+      "sizeBytes": 4367153
+    },
+    {
+      "originalFileName": "مواقعالتراثالعالميالخمسة_LY.kml",
+      "archivePath": "/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14/مواقعالتراثالعالميالخمسة_LY_07f88ae5fbca.kml",
+      "sizeBytes": 1430511
+    }
+  ]
+}
