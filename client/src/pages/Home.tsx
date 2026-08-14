@@ -14,6 +14,7 @@ import { FAVORITE_IMAGE, favoriteImageMetadata } from "@shared/favoriteImage";
 import { routeCoordinates } from "@shared/atlasRoute";
 import { buildDensityBins, densityColor } from "@shared/density";
 import { extractKmlImageUrl, toDisplayImageUrl, toFallbackImageUrl } from "@shared/kmlImage";
+import { verifiedSiteImageFallback } from "@shared/siteImageFallback";
 import L from "leaflet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ type LayerConfig = { id: string; name: string; short: string; color: string; ico
 
 const PAGES_BASE = import.meta.env.BASE_URL || "/";
 const pagesAsset = (name: string) => `${PAGES_BASE}${name}`;
+const dataAsset = (name: string) => `${PAGES_BASE}data/${name}`;
 
 const DATA = {
   projectLogo: pagesAsset("atlas-tourism-project_c75dcab1.png"),
@@ -46,15 +48,15 @@ const DATA = {
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
 
 const layers: LayerConfig[] = [
-  { id: "heritage", name: "التراث العالمي", short: "مواقع أثرية وتاريخية", color: "#B96D3B", icon: <Landmark size={19} strokeWidth={1.8} />, url: pagesAsset("world-heritage_ae1639b4.kml"), kind: "kml", description: "مواقع التراث العالمي والمكونات التابعة لها", featured: true },
-  { id: "natural", name: "الموارد الطبيعية", short: "مشاهد وجغرافيا طبيعية", color: "#287A70", icon: <Trees size={19} strokeWidth={1.8} />, url: pagesAsset("natural-atlas-with-media_5ccb1fb0.geojson"), kind: "geojson", description: "سجل أطلس الموارد الطبيعية الليبية" },
-  { id: "akakus", name: "تادرارت أكاكوس", short: "الفن الصخري والصحراء", color: "#A76027", icon: <Mountain size={19} strokeWidth={1.8} />, url: pagesAsset("akakus_60c47b41.kml"), kind: "kml", description: "الفن الصخري والمشهد الصحراوي" },
-  { id: "old-tripoli", name: "المدينة القديمة طرابلس", short: "معالم تاريخية", color: "#3E7183", icon: <Building2 size={19} strokeWidth={1.8} />, url: pagesAsset("old-tripoli_5c62867b.kml"), kind: "kml", description: "مبانٍ ومعالم المدينة القديمة" },
-  { id: "hotels", name: "الفنادق والإيواء", short: "خدمات الضيافة", color: "#B34B42", icon: <Hotel size={19} strokeWidth={1.8} />, url: pagesAsset("hotels_b9547235.kml"), kind: "kml", description: "الفنادق ومنشآت الإيواء" },
-  { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: <Waves size={19} strokeWidth={1.8} />, url: pagesAsset("resorts_e4a8f065.kml"), kind: "kml", description: "القرى والمنتجعات والشاليهات" },
+  { id: "heritage", name: "التراث العالمي", short: "مواقع أثرية وتاريخية", color: "#B96D3B", icon: <Landmark size={19} strokeWidth={1.8} />, url: dataAsset("world-heritage_ae1639b4.kml"), kind: "kml", description: "مواقع التراث العالمي والمكونات التابعة لها", featured: true },
+  { id: "natural", name: "الموارد الطبيعية", short: "مشاهد وجغرافيا طبيعية", color: "#287A70", icon: <Trees size={19} strokeWidth={1.8} />, url: dataAsset("natural-atlas-with-media_5ccb1fb0.geojson"), kind: "geojson", description: "سجل أطلس الموارد الطبيعية الليبية" },
+  { id: "akakus", name: "تادرارت أكاكوس", short: "الفن الصخري والصحراء", color: "#A76027", icon: <Mountain size={19} strokeWidth={1.8} />, url: dataAsset("akakus_60c47b41.kml"), kind: "kml", description: "الفن الصخري والمشهد الصحراوي" },
+  { id: "old-tripoli", name: "المدينة القديمة طرابلس", short: "معالم تاريخية", color: "#3E7183", icon: <Building2 size={19} strokeWidth={1.8} />, url: dataAsset("old-tripoli_5c62867b.kml"), kind: "kml", description: "مبانٍ ومعالم المدينة القديمة" },
+  { id: "hotels", name: "الفنادق والإيواء", short: "خدمات الضيافة", color: "#B34B42", icon: <Hotel size={19} strokeWidth={1.8} />, url: dataAsset("hotels_b9547235.kml"), kind: "kml", description: "الفنادق ومنشآت الإيواء" },
+  { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: <Waves size={19} strokeWidth={1.8} />, url: dataAsset("resorts_e4a8f065.kml"), kind: "kml", description: "القرى والمنتجعات والشاليهات" },
   { id: "density", name: "كثافة التجمعات السياحية", short: "فنادق وقرى ومنتجعات", color: "#D04C45", icon: <Activity size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "توزيع مكاني محسوب من سجلات الفنادق والقرى والمنتجعات" },
-  { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: <TrendingUp size={19} strokeWidth={1.8} />, url: pagesAsset("investment_de22d4a0.kml"), kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
-  { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: <Utensils size={19} strokeWidth={1.8} />, url: pagesAsset("restaurants_0642e048.kml"), kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
+  { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: <TrendingUp size={19} strokeWidth={1.8} />, url: dataAsset("investment_de22d4a0.kml"), kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
+  { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: <Utensils size={19} strokeWidth={1.8} />, url: dataAsset("restaurants_0642e048.kml"), kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
   { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: <Star size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
 ];
 
@@ -98,10 +100,18 @@ function parseKml(text: string, layerId: string): Site[] {
       const key = item.getAttribute("name");
       if (key) properties[key] = item.querySelector("value")?.textContent?.trim() || "";
     });
-    const imageSource = extractKmlImageUrl(rawDescription, properties);
+    const extractedImageSource = extractKmlImageUrl(rawDescription, properties);
+    const verifiedFallback = extractedImageSource ? undefined : verifiedSiteImageFallback(name);
+    const imageSource = extractedImageSource || verifiedFallback?.image_source;
     const imageUrl = toDisplayImageUrl(imageSource);
     if (imageSource) properties.image_source = imageSource;
     if (imageUrl) properties.image_url = imageUrl;
+    if (verifiedFallback) {
+      properties.image_author = verifiedFallback.image_author;
+      properties.image_license = verifiedFallback.image_license;
+      properties.image_license_note = verifiedFallback.image_license_note;
+      properties.image_source_type = "verified_commons_fallback";
+    }
     properties.source_layer = layerId;
     properties.source_format = "KML";
     return { id: `${layerId}-${index}`, name, description, lat, lng, imageUrl, properties, layerId };
