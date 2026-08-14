@@ -145,6 +145,12 @@ export const appRouter = router({
       }));
       return enrichedRows.filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!input?.region || row.region.toLocaleLowerCase("ar").includes(input.region.toLocaleLowerCase("ar"))) && (!input?.category || row.category.toLocaleLowerCase("ar").includes(input.category.toLocaleLowerCase("ar"))) && (!search || `${row.candidate} ${row.region} ${row.category} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
     }),
+    top150ReviewStats: adminProcedure.query(async () => {
+      const decisions = await listTop150ReviewDecisions("2026-08-14");
+      const counts = { approved: decisions.filter((item) => item.status === "approved").length, rejected: decisions.filter((item) => item.status === "rejected").length, pending_review: decisions.filter((item) => item.status === "pending_review").length };
+      const total = decisions.length;
+      return { total, counts, percentages: { approved: total ? Math.round((counts.approved / total) * 100) : 0, rejected: total ? Math.round((counts.rejected / total) * 100) : 0, pending_review: total ? Math.round((counts.pending_review / total) * 100) : 0 } };
+    }),
     top150ReviewHistory: adminProcedure.input(z.object({ status: z.enum(["all", "approved", "rejected", "pending_review"]).default("all"), search: z.string().max(255).optional(), page: z.number().int().min(1).default(1), pageSize: z.number().int().min(5).max(100).default(20) }).optional()).query(async ({ input }) => {
       const queueVersion = "2026-08-14";
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; confirmedName: string | null }> };
