@@ -4,8 +4,9 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, listAtlasImages, listAtlasPoints, listReviewQueue, mergeAtlasPoints, updateAtlasImage, updateAtlasPoint } from "./db";
-import { storagePut } from "./storage";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, getImportJob, listAtlasImages, listAtlasPoints, listImportJobs, listReviewQueue, mergeAtlasPoints, updateAtlasImage, updateAtlasPoint, updateImportJob } from "./db";
+import { parseExcel, parseKml, type ImportRow } from "./importParsers";
+import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
 
 const assistantSiteInput = z.object({
@@ -160,7 +161,39 @@ export const appRouter = router({
       await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "review", details: JSON.stringify({ reviewStatus: input.reviewStatus }), actorId: ctx.user.id });
       return image;
     }),
-    startImport: adminProcedure.input(z.object({ fileName: z.string().min(1).max(255), sourceKind: z.enum(["kml", "excel"]), storageKey: z.string().optional() })).mutation(({ input, ctx }) => createImportJob({ fileName: input.fileName, sourceKind: input.sourceKind, storageKey: input.storageKey, status: "uploaded", createdBy: ctx.user.id })),
+    importJobs: adminProcedure.query(({ ctx }) => listImportJobs(ctx.user.id)),
+    previewImport: adminProcedure.input(z.object({ sourceKind: z.enum(["kml", "excel"]), fileName: z.string().min(1).max(255), fileDataBase64: z.string().min(10).max(30_000_000), layerId: z.string().max(80).optional() })).mutation(async ({ input }) => {
+      const parsed = input.sourceKind === "kml" ? parseKml(Buffer.from(input.fileDataBase64, "base64"), { layerId: input.layerId, source: input.fileName }) : parseExcel(Buffer.from(input.fileDataBase64, "base64"), { layerId: input.layerId, source: input.fileName });
+      return { fileName: input.fileName, sourceKind: input.sourceKind, ...parsed, rows: parsed.rows.slice(0, 500) };
+    }),
+    startImport: adminProcedure.input(z.object({ fileName: z.string().min(1).max(255), sourceKind: z.enum(["kml", "excel"]), storageKey: z.string().optional(), fileDataBase64: z.string().min(10).max(30_000_000).optional() })).mutation(async ({ input, ctx }) => {
+      let storageKey = input.storageKey;
+      if (input.fileDataBase64) storageKey = (await storagePut(`atlas-imports/${ctx.user.id}/${crypto.randomUUID()}-${input.fileName.replace(/[^a-z0-9._-]/gi, "_")}`, Buffer.from(input.fileDataBase64, "base64"), input.sourceKind === "kml" ? "application/vnd.google-earth.kml+xml" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).key;
+      return createImportJob({ fileName: input.fileName, sourceKind: input.sourceKind, storageKey, status: "uploaded", createdBy: ctx.user.id });
+    }),
+    commitImport: adminProcedure.input(z.object({ jobId: z.number().int().positive(), sourceKind: z.enum(["kml", "excel"]), fileName: z.string().min(1).max(255), fileDataBase64: z.string().min(10).max(30_000_000).optional(), layerId: z.string().max(80).optional() })).mutation(async ({ input, ctx }) => {
+      const job = await getImportJob(input.jobId);
+      if (!job?.storageKey) throw new TRPCError({ code: "BAD_REQUEST", message: "ملف الاستيراد غير موجود في التخزين" });
+      await updateImportJob(input.jobId, { status: "processing" });
+      try {
+        const sourceUrl = await storageGetSignedUrl(job.storageKey);
+        const response = await fetch(sourceUrl);
+        if (!response.ok) throw new Error(`تعذر قراءة ملف الاستيراد (${response.status})`);
+        const fileBuffer = Buffer.from(await response.arrayBuffer());
+        const parsed = input.sourceKind === "kml" ? parseKml(fileBuffer, { layerId: input.layerId, source: input.fileName }) : parseExcel(fileBuffer, { layerId: input.layerId, source: input.fileName });
+        const existing = await listAtlasPoints();
+        const known = new Set(existing.map((row) => row.fingerprint).filter(Boolean));
+        const unique = parsed.rows.filter((row) => { if (known.has(row.fingerprint)) return false; known.add(row.fingerprint); return true; });
+        const points = unique.map((row: ImportRow) => ({ layerId: row.layerId, name: row.name, nameEn: row.nameEn, description: row.description, latitude: row.latitude, longitude: row.longitude, municipality: row.municipality, category: row.category, source: row.source, sourceKind: row.sourceKind, sourceRecordId: row.sourceRecordId, metadata: JSON.stringify(row.metadata), status: "draft" as const, recordStatus: "pending_review" as const, fingerprint: row.fingerprint, createdBy: ctx.user.id }));
+        await createAtlasPointsBatch(points);
+        await updateImportJob(input.jobId, { status: parsed.issues.length ? "needs_review" : "completed", totalRows: parsed.totalRows, importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length, errorSummary: parsed.issues.length ? JSON.stringify(parsed.issues.slice(0, 100)) : null });
+        await createAuditLog({ entityType: "atlas_import_job", entityId: input.jobId, action: "commit", details: JSON.stringify({ importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length }), actorId: ctx.user.id });
+        return { jobId: input.jobId, status: parsed.issues.length ? "needs_review" : "completed", totalRows: parsed.totalRows, importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length, issues: parsed.issues.slice(0, 100) };
+      } catch (error) {
+        await updateImportJob(input.jobId, { status: "failed", errorSummary: error instanceof Error ? error.message : "فشل غير معروف" });
+        throw error;
+      }
+    }),
     create: adminProcedure.input(pointInput).mutation(async ({ input, ctx }) => {
       let imageUrl: string | undefined;
       let imageKey: string | undefined;

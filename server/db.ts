@@ -90,6 +90,14 @@ export async function createAtlasPoint(point: InsertAtlasPoint) {
   return getAtlasPoint(id);
 }
 
+export async function createAtlasPointsBatch(points: InsertAtlasPoint[]) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  if (!points.length) return { inserted: 0 };
+  await db.insert(atlasPoints).values(points);
+  return { inserted: points.length };
+}
+
 export async function updateAtlasPoint(id: number, patch: Partial<InsertAtlasPoint>) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
@@ -156,6 +164,19 @@ export async function createImportJob(job: InsertAtlasImportJob) {
   const result = await db.insert(atlasImportJobs).values(job);
   const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, Number(result[0].insertId))).limit(1);
   return rows[0];
+}
+
+export async function getImportJob(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function listImportJobs(createdBy?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasImportJobs).where(createdBy ? eq(atlasImportJobs.createdBy, createdBy) : undefined).orderBy(desc(atlasImportJobs.createdAt));
 }
 
 export async function updateImportJob(id: number, patch: Partial<InsertAtlasImportJob>) {

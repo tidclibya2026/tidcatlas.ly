@@ -42,6 +42,17 @@ describe("atlas documentation success flows", () => {
     expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ action: "merge_duplicate" }));
   });
 
+  it("previews a KML file before committing", async () => {
+    const kml = Buffer.from(`<kml><Placemark><name>موقع تجريبي</name><Point><coordinates>14.2,32.6,0</coordinates></Point></Placemark></kml>`).toString("base64");
+    const result = await appRouter.createCaller(ctx()).atlas.previewImport({ sourceKind: "kml", fileName: "sample.kml", fileDataBase64: kml, layerId: "heritage" });
+    expect(result).toMatchObject({ totalRows: 1, sourceKind: "kml" });
+    expect(result.rows[0]).toMatchObject({ name: "موقع تجريبي", layerId: "heritage" });
+  });
+
+  it("refuses commit when the import job has no stored file", async () => {
+    await expect(appRouter.createCaller(ctx()).atlas.commitImport({ jobId: 9999, sourceKind: "kml", fileName: "missing.kml", layerId: "heritage" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
   it("adds and reviews an externally sourced image with rights metadata", async () => {
     const caller = appRouter.createCaller(ctx());
     const image = await caller.atlas.addImage({ pointId: 4, imageUrl: "https://example.com/site.jpg", sourceUrl: "https://example.com/source", sourceKind: "web_page", ownerName: "TIDC", license: "Permission pending", rightsNote: "يجب مراجعة إذن الاستخدام قبل النشر.", rightsWarning: true, isPrimary: true });
