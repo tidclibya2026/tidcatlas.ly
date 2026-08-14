@@ -29,29 +29,32 @@ import {
 type Site = { id: string; name: string; description: string; lat: number; lng: number; properties: Record<string, string>; layerId: string; imageUrl?: string | null };
 type LayerConfig = { id: string; name: string; short: string; color: string; icon: ReactNode; url: string; kind: "kml" | "geojson"; description: string; featured?: boolean };
 
+const PAGES_BASE = import.meta.env.BASE_URL || "/";
+const pagesAsset = (name: string) => `${PAGES_BASE}${name}`;
+
 const DATA = {
-  projectLogo: "/manus-storage/atlas-tourism-project_c75dcab1.png",
-  ministryLogo: "/manus-storage/ministry-tourism_feb6f439.png",
-  centerLogo: "/manus-storage/tourism-documentation-center_0d098924.png",
-  hero: "/manus-storage/libya-atlas-hero_ebb8b2b9.jpg",
-  desert: "/manus-storage/libya-atlas-desert_8d3e876d.jpg",
-  heritage: "/manus-storage/libya-atlas-heritage_baefbb7e.jpg",
-  cover: "/manus-storage/libya-atlas-cover-gis-landscape_22a918d0.png",
-  intro: "/manus-storage/IMG_6898_91929b39.PNG",
+  projectLogo: pagesAsset("atlas-tourism-project_c75dcab1.png"),
+  ministryLogo: pagesAsset("ministry-tourism_feb6f439.png"),
+  centerLogo: pagesAsset("tourism-documentation-center_0d098924.png"),
+  hero: pagesAsset("libya-atlas-hero_ebb8b2b9.jpg"),
+  desert: pagesAsset("libya-atlas-desert_8d3e876d.jpg"),
+  heritage: pagesAsset("libya-atlas-heritage_baefbb7e.jpg"),
+  cover: pagesAsset("libya-atlas-cover-gis-landscape_22a918d0.png"),
+  intro: pagesAsset("IMG_6898_91929b39.PNG"),
 };
 
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
 
 const layers: LayerConfig[] = [
-  { id: "heritage", name: "التراث العالمي", short: "مواقع أثرية وتاريخية", color: "#B96D3B", icon: <Landmark size={19} strokeWidth={1.8} />, url: "/manus-storage/world-heritage_ae1639b4.kml", kind: "kml", description: "مواقع التراث العالمي والمكونات التابعة لها", featured: true },
-  { id: "natural", name: "الموارد الطبيعية", short: "مشاهد وجغرافيا طبيعية", color: "#287A70", icon: <Trees size={19} strokeWidth={1.8} />, url: "/manus-storage/natural-atlas-with-media_5ccb1fb0.geojson", kind: "geojson", description: "سجل أطلس الموارد الطبيعية الليبية" },
-  { id: "akakus", name: "تادرارت أكاكوس", short: "الفن الصخري والصحراء", color: "#A76027", icon: <Mountain size={19} strokeWidth={1.8} />, url: "/manus-storage/akakus_60c47b41.kml", kind: "kml", description: "الفن الصخري والمشهد الصحراوي" },
-  { id: "old-tripoli", name: "المدينة القديمة طرابلس", short: "معالم تاريخية", color: "#3E7183", icon: <Building2 size={19} strokeWidth={1.8} />, url: "/manus-storage/old-tripoli_5c62867b.kml", kind: "kml", description: "مبانٍ ومعالم المدينة القديمة" },
-  { id: "hotels", name: "الفنادق والإيواء", short: "خدمات الضيافة", color: "#B34B42", icon: <Hotel size={19} strokeWidth={1.8} />, url: "/manus-storage/hotels_b9547235.kml", kind: "kml", description: "الفنادق ومنشآت الإيواء" },
-  { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: <Waves size={19} strokeWidth={1.8} />, url: "/manus-storage/resorts_e4a8f065.kml", kind: "kml", description: "القرى والمنتجعات والشاليهات" },
+  { id: "heritage", name: "التراث العالمي", short: "مواقع أثرية وتاريخية", color: "#B96D3B", icon: <Landmark size={19} strokeWidth={1.8} />, url: pagesAsset("world-heritage_ae1639b4.kml"), kind: "kml", description: "مواقع التراث العالمي والمكونات التابعة لها", featured: true },
+  { id: "natural", name: "الموارد الطبيعية", short: "مشاهد وجغرافيا طبيعية", color: "#287A70", icon: <Trees size={19} strokeWidth={1.8} />, url: pagesAsset("natural-atlas-with-media_5ccb1fb0.geojson"), kind: "geojson", description: "سجل أطلس الموارد الطبيعية الليبية" },
+  { id: "akakus", name: "تادرارت أكاكوس", short: "الفن الصخري والصحراء", color: "#A76027", icon: <Mountain size={19} strokeWidth={1.8} />, url: pagesAsset("akakus_60c47b41.kml"), kind: "kml", description: "الفن الصخري والمشهد الصحراوي" },
+  { id: "old-tripoli", name: "المدينة القديمة طرابلس", short: "معالم تاريخية", color: "#3E7183", icon: <Building2 size={19} strokeWidth={1.8} />, url: pagesAsset("old-tripoli_5c62867b.kml"), kind: "kml", description: "مبانٍ ومعالم المدينة القديمة" },
+  { id: "hotels", name: "الفنادق والإيواء", short: "خدمات الضيافة", color: "#B34B42", icon: <Hotel size={19} strokeWidth={1.8} />, url: pagesAsset("hotels_b9547235.kml"), kind: "kml", description: "الفنادق ومنشآت الإيواء" },
+  { id: "resorts", name: "القرى والمنتجعات", short: "سياحة ساحلية", color: "#3D8C8A", icon: <Waves size={19} strokeWidth={1.8} />, url: pagesAsset("resorts_e4a8f065.kml"), kind: "kml", description: "القرى والمنتجعات والشاليهات" },
   { id: "density", name: "كثافة التجمعات السياحية", short: "فنادق وقرى ومنتجعات", color: "#D04C45", icon: <Activity size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "توزيع مكاني محسوب من سجلات الفنادق والقرى والمنتجعات" },
-  { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: <TrendingUp size={19} strokeWidth={1.8} />, url: "/manus-storage/investment_de22d4a0.kml", kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
-  { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: <Utensils size={19} strokeWidth={1.8} />, url: "/manus-storage/restaurants_0642e048.kml", kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
+  { id: "investment", name: "فرص الاستثمار", short: "مشاريع وتنمية", color: "#AF7A24", icon: <TrendingUp size={19} strokeWidth={1.8} />, url: pagesAsset("investment_de22d4a0.kml"), kind: "kml", description: "المشاريع والفرص الاستثمارية السياحية" },
+  { id: "food", name: "المطاعم والمقاهي", short: "خدمات الطعام", color: "#855D42", icon: <Utensils size={19} strokeWidth={1.8} />, url: pagesAsset("restaurants_0642e048.kml"), kind: "kml", description: "مطاعم ومقاهٍ في طرابلس" },
   { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: <Star size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
 ];
 
