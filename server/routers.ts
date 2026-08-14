@@ -145,6 +145,17 @@ export const appRouter = router({
       }));
       return enrichedRows.filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!input?.region || row.region.toLocaleLowerCase("ar").includes(input.region.toLocaleLowerCase("ar"))) && (!input?.category || row.category.toLocaleLowerCase("ar").includes(input.category.toLocaleLowerCase("ar"))) && (!search || `${row.candidate} ${row.region} ${row.category} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
     }),
+    top150ReviewHistory: adminProcedure.input(z.object({ status: z.enum(["all", "approved", "rejected", "pending_review"]).default("all"), search: z.string().max(255).optional() }).optional()).query(async ({ input }) => {
+      const queueVersion = "2026-08-14";
+      const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; confirmedName: string | null }> };
+      const decisions = await listTop150ReviewDecisions(queueVersion);
+      const queueByRank = new Map(queue.rows.map((row) => [row.rank, row]));
+      const search = input?.search?.trim().toLocaleLowerCase("ar");
+      return decisions
+        .map((decision) => ({ ...decision, candidate: queueByRank.get(decision.rank)?.candidate || decision.candidate, region: queueByRank.get(decision.rank)?.region || null, confirmedName: queueByRank.get(decision.rank)?.confirmedName || null }))
+        .filter((decision) => (input?.status === "all" || !input?.status || decision.status === input.status) && (!search || `${decision.candidate} ${decision.region || ""} ${decision.reviewNote || ""} ${decision.reviewedBy || ""}`.toLocaleLowerCase("ar").includes(search)))
+        .sort((a, b) => new Date(b.reviewedAt || b.updatedAt || b.createdAt).getTime() - new Date(a.reviewedAt || a.updatedAt || a.createdAt).getTime());
+    }),
     top150PendingMarkers: publicProcedure.query(async () => {
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; reviewStatus: string }> };
       const sourceReport = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-source-match-candidates-2026-08-14.json"), "utf8").catch(() => JSON.stringify({ rows: [] }))) as { rows: Array<{ rank: number; matches: Array<{ lat: number; lon: number; source: string; name: string }> }> };
