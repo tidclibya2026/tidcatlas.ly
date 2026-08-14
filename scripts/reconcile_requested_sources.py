@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path('/home/ubuntu/libya-tourism-atlas-app')
 SOURCE = ROOT / 'docs/source-imports/2026-08-14/user-requested'
+ARCHIVE = Path('/home/ubuntu/webdev-static-assets/libya-tourism-atlas-source-archive-2026-08-14')
 CURRENT = ROOT / 'client/public/data'
 OUT = ROOT / 'docs/reconciliation-requested-sources-2026-08-14.json'
 
@@ -43,7 +44,8 @@ def geojson_rows(path):
 def key(row): return f"{norm(row['name'])}|{row['lat']:.5f}|{row['lon']:.5f}"
 
 new_rows = []
-for path in sorted(SOURCE.iterdir()):
+source_paths = list(SOURCE.iterdir()) + (list(ARCHIVE.iterdir()) if ARCHIVE.exists() else [])
+for path in sorted(source_paths):
     if path.suffix.lower() == '.kml': new_rows.extend(kml_rows(path))
     elif path.suffix.lower() == '.geojson': new_rows.extend(geojson_rows(path))
 current_rows = []
