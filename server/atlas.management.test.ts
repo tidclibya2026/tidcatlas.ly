@@ -68,4 +68,22 @@ describe("atlas documentation team", () => {
   it("requires reviewer access to moderate comments", async () => {
     await expect(appRouter.createCaller(context("user")).atlas.moderateComment({ id: 8, status: "approved" })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
+
+  it("requires a point for visitor edit suggestions", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.submitSuggestion({ suggestionType: "edit", sourceKind: "custom", rightsNote: "اقتراح زائر" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("requires an image source for visitor image suggestions", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.submitSuggestion({ suggestionType: "image", sourceKind: "photographer", rightsNote: "الصورة ملك المصور" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("protects the visitor suggestion review queue from normal users", async () => {
+    await expect(appRouter.createCaller(context("user")).atlas.suggestionQueue({ status: "pending" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(appRouter.createCaller(context("user")).atlas.reviewSuggestion({ id: 1, status: "approved" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("allows administrators to read the visitor suggestion queue", async () => {
+    const result = await appRouter.createCaller(context("admin")).atlas.suggestionQueue({ status: "pending" });
+    expect(Array.isArray(result)).toBe(true);
+  });
 });

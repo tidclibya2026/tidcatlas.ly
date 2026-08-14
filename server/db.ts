@@ -5,6 +5,7 @@ import {
   atlasBackups,
   atlasComments,
   atlasRatings,
+  atlasSuggestions,
   atlasImages,
   atlasImportJobs,
   atlasLayers,
@@ -18,6 +19,7 @@ import {
   InsertAtlasAuditLog,
   InsertAtlasComment,
   InsertAtlasRating,
+  InsertAtlasSuggestion,
   InsertAtlasTeamMember,
   InsertUser,
   users,
@@ -146,6 +148,32 @@ export async function updateAtlasPoint(id: number, patch: Partial<InsertAtlasPoi
 
 export async function archiveAtlasPoint(id: number, duplicateOfId?: number) {
   return updateAtlasPoint(id, { status: "archived", recordStatus: "archived", duplicateOfId });
+}
+
+export async function listAtlasSuggestions(status: "pending" | "approved" | "rejected" | "archived" = "pending") {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ suggestion: atlasSuggestions, pointName: atlasPoints.name, pointLayerId: atlasPoints.layerId, pointLatitude: atlasPoints.latitude, pointLongitude: atlasPoints.longitude })
+    .from(atlasSuggestions)
+    .leftJoin(atlasPoints, eq(atlasSuggestions.pointId, atlasPoints.id))
+    .where(eq(atlasSuggestions.status, status))
+    .orderBy(desc(atlasSuggestions.createdAt));
+}
+
+export async function createAtlasSuggestion(suggestion: InsertAtlasSuggestion) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const result = await db.insert(atlasSuggestions).values(suggestion);
+  const rows = await db.select().from(atlasSuggestions).where(eq(atlasSuggestions.id, Number(result[0].insertId))).limit(1);
+  return rows[0];
+}
+
+export async function updateAtlasSuggestion(id: number, patch: Partial<InsertAtlasSuggestion>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasSuggestions).set(patch).where(eq(atlasSuggestions.id, id));
+  const rows = await db.select().from(atlasSuggestions).where(eq(atlasSuggestions.id, id)).limit(1);
+  return rows[0];
 }
 
 export async function listAtlasImages(pointId?: number) {

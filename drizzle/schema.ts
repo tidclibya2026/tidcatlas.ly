@@ -92,6 +92,38 @@ export const atlasRatings = mysqlTable("atlas_ratings", {
 export type AtlasRating = typeof atlasRatings.$inferSelect;
 export type InsertAtlasRating = typeof atlasRatings.$inferInsert;
 
+export const atlasSuggestions = mysqlTable("atlas_suggestions", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId"),
+  userId: int("userId").notNull(),
+  suggestionType: mysqlEnum("suggestionType", ["edit", "image"]).notNull(),
+  proposedName: varchar("proposedName", { length: 255 }),
+  proposedDescription: text("proposedDescription"),
+  proposedCategory: varchar("proposedCategory", { length: 120 }),
+  proposedMetadata: text("proposedMetadata"),
+  imageUrl: text("imageUrl"),
+  storageKey: text("storageKey"),
+  sourceUrl: text("sourceUrl"),
+  sourceKind: mysqlEnum("sourceKind", ["agency", "photographer", "web_page", "facebook", "wikimedia", "kml", "excel", "custom", "other"]).default("other").notNull(),
+  ownerName: varchar("ownerName", { length: 255 }),
+  photographerName: varchar("photographerName", { length: 255 }),
+  license: varchar("license", { length: 255 }),
+  rightsNote: text("rightsNote"),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "archived"]).default("pending").notNull(),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  reviewNote: text("reviewNote"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  pointIdx: index("atlas_suggestions_point_idx").on(table.pointId),
+  statusIdx: index("atlas_suggestions_status_idx").on(table.status),
+  userIdx: index("atlas_suggestions_user_idx").on(table.userId),
+}));
+
+export type AtlasSuggestion = typeof atlasSuggestions.$inferSelect;
+export type InsertAtlasSuggestion = typeof atlasSuggestions.$inferInsert;
+
 export const atlasImages = mysqlTable("atlas_images", {
   id: int("id").autoincrement().primaryKey(),
   pointId: int("pointId").notNull(),

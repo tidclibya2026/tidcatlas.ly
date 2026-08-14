@@ -6,7 +6,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, atlasEditorProcedure, atlasImportProcedure, atlasReviewerProcedure, documentationProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -126,6 +126,42 @@ export const appRouter = router({
       const point = await getAtlasPoint(input.pointId);
       if (!point) throw new TRPCError({ code: "NOT_FOUND", message: "الوثيقة غير موجودة" });
       return upsertAtlasRating(input.pointId, ctx.user.id, input.rating);
+    }),
+    submitSuggestion: protectedProcedure.input(z.object({ pointId: z.number().int().positive().optional(), suggestionType: z.enum(["edit", "image"]), proposedName: z.string().trim().max(255).optional(), proposedDescription: z.string().trim().max(10000).optional(), proposedCategory: z.string().trim().max(120).optional(), proposedMetadata: z.record(z.string(), z.string()).optional(), imageUrl: z.string().url().optional(), imageDataUrl: z.string().max(8_000_000).optional(), fileName: z.string().max(180).optional(), contentType: z.string().max(120).optional(), sourceUrl: z.string().url().optional(), sourceKind: z.enum(["agency", "photographer", "web_page", "facebook", "wikimedia", "kml", "excel", "custom", "other"]), ownerName: z.string().max(255).optional(), photographerName: z.string().max(255).optional(), license: z.string().max(255).optional(), rightsNote: z.string().trim().min(3).max(4000) })).mutation(async ({ input, ctx }) => {
+      if (input.pointId) {
+        const point = await getAtlasPoint(input.pointId);
+        if (!point) throw new TRPCError({ code: "NOT_FOUND", message: "المعلم المطلوب غير موجود" });
+      }
+      if (input.suggestionType === "edit" && !input.pointId) throw new TRPCError({ code: "BAD_REQUEST", message: "اختر المعلم المطلوب تعديله" });
+      if (input.suggestionType === "image" && !input.imageUrl && !input.imageDataUrl) throw new TRPCError({ code: "BAD_REQUEST", message: "أضف رابط الصورة أو ارفع ملفًا" });
+      let imageUrl = input.imageUrl;
+      let storageKey: string | undefined;
+      if (input.imageDataUrl) {
+        const match = input.imageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (!match) throw new TRPCError({ code: "BAD_REQUEST", message: "صيغة الصورة غير صالحة" });
+        const extension = (input.fileName?.split(".").pop() || "jpg").replace(/[^a-z0-9]/gi, "").toLowerCase() || "jpg";
+        const stored = await storagePut(`atlas-suggestions/${ctx.user.id}/${crypto.randomUUID()}.${extension}`, Buffer.from(match[2], "base64"), input.contentType || match[1]);
+        imageUrl = stored.url; storageKey = stored.key;
+      }
+      const suggestion = await createAtlasSuggestion({ pointId: input.pointId, userId: ctx.user.id, suggestionType: input.suggestionType, proposedName: input.proposedName, proposedDescription: input.proposedDescription, proposedCategory: input.proposedCategory, proposedMetadata: input.proposedMetadata ? JSON.stringify(input.proposedMetadata) : undefined, imageUrl, storageKey, sourceUrl: input.sourceUrl, sourceKind: input.sourceKind, ownerName: input.ownerName, photographerName: input.photographerName, license: input.license, rightsNote: input.rightsNote, status: "pending" });
+      await createAuditLog({ entityType: "atlas_suggestion", entityId: suggestion.id, action: "create", details: JSON.stringify({ pointId: input.pointId, suggestionType: input.suggestionType, sourceKind: input.sourceKind, sourceUrl: input.sourceUrl }), actorId: ctx.user.id });
+      return suggestion;
+    }),
+    suggestionQueue: atlasReviewerProcedure.input(z.object({ status: z.enum(["pending", "approved", "rejected", "archived"]).default("pending") }).optional()).query(({ input }) => listAtlasSuggestions(input?.status || "pending")),
+    reviewSuggestion: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["approved", "rejected", "archived"]), reviewNote: z.string().max(4000).optional() })).mutation(async ({ input, ctx }) => {
+      const queue = await listAtlasSuggestions("pending");
+      const row = queue.find((item) => item.suggestion.id === input.id);
+      if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "الاقتراح غير موجود أو تمت مراجعته" });
+      if (input.status === "approved" && row.suggestion.suggestionType === "edit" && row.suggestion.pointId) {
+        const patch = { name: row.suggestion.proposedName || undefined, description: row.suggestion.proposedDescription || undefined, category: row.suggestion.proposedCategory || undefined, metadata: row.suggestion.proposedMetadata || undefined, recordStatus: "pending_review" as const };
+        await updateAtlasPoint(row.suggestion.pointId, patch);
+      }
+      if (input.status === "approved" && row.suggestion.suggestionType === "image" && row.suggestion.pointId && row.suggestion.imageUrl) {
+        await createAtlasImage({ pointId: row.suggestion.pointId, imageUrl: row.suggestion.imageUrl, storageKey: row.suggestion.storageKey || undefined, sourceUrl: row.suggestion.sourceUrl || undefined, sourceKind: row.suggestion.sourceKind, ownerName: row.suggestion.ownerName || undefined, photographerName: row.suggestion.photographerName || undefined, license: row.suggestion.license || undefined, rightsNote: row.suggestion.rightsNote || "تمت مراجعة المصدر والحقوق من فريق الأطلس.", rightsWarning: false, isPrimary: false, reviewStatus: "approved", createdBy: ctx.user.id });
+      }
+      const suggestion = await updateAtlasSuggestion(input.id, { status: input.status, reviewedBy: ctx.user.id, reviewedAt: new Date(), reviewNote: input.reviewNote });
+      await createAuditLog({ entityType: "atlas_suggestion", entityId: input.id, action: "review", details: JSON.stringify({ status: input.status, reviewNote: input.reviewNote }), actorId: ctx.user.id });
+      return suggestion;
     }),
     moderateComment: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["approved", "rejected", "archived"]) })).mutation(async ({ input, ctx }) => {
       const comment = await getAtlasComment(input.id);
