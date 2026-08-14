@@ -1,0 +1,54 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const { auditLog } = vi.hoisted(() => ({ auditLog: vi.fn() }));
+vi.mock("./db", async () => {
+  const actual = await vi.importActual<typeof import("./db")>("./db");
+  return {
+    ...actual,
+    updateAtlasPoint: vi.fn(async (id: number, patch: unknown) => ({ id, ...patch })),
+    archiveAtlasPoint: vi.fn(async (id: number, duplicateOfId?: number) => ({ id, status: "archived", recordStatus: "archived", duplicateOfId })),
+    mergeAtlasPoints: vi.fn(async (primaryId: number, duplicateId: number) => ({ id: primaryId, mergedDuplicateId: duplicateId })),
+    createAtlasImage: vi.fn(async (image: unknown) => ({ id: 21, ...(image as object) })),
+    updateAtlasImage: vi.fn(async (id: number, patch: unknown) => ({ id, ...(patch as object) })),
+    createAuditLog: auditLog,
+    getAtlasPoint: vi.fn(async (id: number) => ({ id })),
+    listAtlasImages: vi.fn(async () => []),
+  };
+});
+
+import { appRouter } from "./routers";
+import type { TrpcContext } from "./_core/context";
+
+const ctx = (): TrpcContext => ({ user: { id: 7, openId: "admin-test", email: "admin@example.com", name: "Admin", loginMethod: "test", role: "admin", createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() }, req: { protocol: "https", headers: {} } as TrpcContext["req"], res: {} as TrpcContext["res"] });
+
+describe("atlas documentation success flows", () => {
+  beforeEach(() => auditLog.mockClear());
+
+  it("reviews and publishes a point with an audit record", async () => {
+    const result = await appRouter.createCaller(ctx()).atlas.review({ id: 4, recordStatus: "published", reviewNote: "تم التحقق" });
+    expect(result).toMatchObject({ id: 4, recordStatus: "published", status: "published" });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_point", action: "review", actorId: 7 }));
+  });
+
+  it("archives a duplicate and records the decision", async () => {
+    const result = await appRouter.createCaller(ctx()).atlas.archiveDuplicate({ id: 5, duplicateOfId: 4 });
+    expect(result).toMatchObject({ id: 5, recordStatus: "archived", duplicateOfId: 4 });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ action: "archive_duplicate" }));
+  });
+
+  it("merges duplicate points and records the primary id", async () => {
+    const result = await appRouter.createCaller(ctx()).atlas.mergeDuplicate({ primaryId: 4, duplicateId: 5 });
+    expect(result).toMatchObject({ id: 4, mergedDuplicateId: 5 });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ action: "merge_duplicate" }));
+  });
+
+  it("adds and reviews an externally sourced image with rights metadata", async () => {
+    const caller = appRouter.createCaller(ctx());
+    const image = await caller.atlas.addImage({ pointId: 4, imageUrl: "https://example.com/site.jpg", sourceUrl: "https://example.com/source", sourceKind: "web_page", ownerName: "TIDC", license: "Permission pending", rightsNote: "يجب مراجعة إذن الاستخدام قبل النشر.", rightsWarning: true, isPrimary: true });
+    expect(image).toMatchObject({ pointId: 4, sourceKind: "web_page", rightsWarning: true });
+    const reviewed = await caller.atlas.reviewImage({ id: 21, reviewStatus: "approved", rightsNote: "تم توثيق المصدر." });
+    expect(reviewed).toMatchObject({ id: 21, reviewStatus: "approved" });
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_image", action: "create" }));
+    expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_image", action: "review" }));
+  });
+});

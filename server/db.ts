@@ -1,6 +1,17 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt, lt, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertAtlasPoint, InsertUser, atlasPoints, users } from "../drizzle/schema";
+import {
+  atlasAuditLogs,
+  atlasImages,
+  atlasImportJobs,
+  atlasPoints,
+  InsertAtlasImage,
+  InsertAtlasImportJob,
+  InsertAtlasPoint,
+  InsertAtlasAuditLog,
+  InsertUser,
+  users,
+} from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -56,11 +67,107 @@ export async function listAtlasPoints(layerId?: string, status?: "draft" | "publ
   return db.select().from(atlasPoints).where(filters.length ? and(...filters) : undefined).orderBy(desc(atlasPoints.createdAt));
 }
 
+export async function listReviewQueue(recordStatus?: "draft" | "pending_review" | "approved" | "published" | "rejected" | "archived") {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasPoints)
+    .where(recordStatus ? eq(atlasPoints.recordStatus, recordStatus) : undefined)
+    .orderBy(desc(atlasPoints.updatedAt));
+}
+
+export async function getAtlasPoint(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select().from(atlasPoints).where(eq(atlasPoints.id, id)).limit(1);
+  return rows[0];
+}
+
 export async function createAtlasPoint(point: InsertAtlasPoint) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
   const result = await db.insert(atlasPoints).values(point);
   const id = Number(result[0].insertId);
-  const rows = await db.select().from(atlasPoints).where(eq(atlasPoints.id, id)).limit(1);
+  return getAtlasPoint(id);
+}
+
+export async function updateAtlasPoint(id: number, patch: Partial<InsertAtlasPoint>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasPoints).set(patch).where(eq(atlasPoints.id, id));
+  return getAtlasPoint(id);
+}
+
+export async function archiveAtlasPoint(id: number, duplicateOfId?: number) {
+  return updateAtlasPoint(id, { status: "archived", recordStatus: "archived", duplicateOfId });
+}
+
+export async function listAtlasImages(pointId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(atlasImages)
+    .where(pointId ? eq(atlasImages.pointId, pointId) : undefined)
+    .orderBy(desc(atlasImages.isPrimary), desc(atlasImages.createdAt));
+}
+
+export async function createAtlasImage(image: InsertAtlasImage) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const result = await db.insert(atlasImages).values(image);
+  const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, Number(result[0].insertId))).limit(1);
   return rows[0];
+}
+
+export async function updateAtlasImage(id: number, patch: Partial<InsertAtlasImage>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasImages).set(patch).where(eq(atlasImages.id, id));
+  const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function archiveAtlasImage(id: number, rightsNote: string) {
+  return updateAtlasImage(id, { reviewStatus: "rejected", rightsWarning: true, rightsNote });
+}
+
+export async function mergeAtlasPoints(primaryId: number, duplicateId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.transaction(async (tx) => {
+    await tx.update(atlasImages).set({ pointId: primaryId }).where(eq(atlasImages.pointId, duplicateId));
+    await tx.update(atlasPoints).set({ status: "archived", recordStatus: "archived", duplicateOfId: primaryId, reviewNote: "تم دمج السجل مع النقطة الأصلية." }).where(eq(atlasPoints.id, duplicateId));
+  });
+  return getAtlasPoint(primaryId);
+}
+
+export async function findPotentialDuplicatePoints(name: string, latitude: number, longitude: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const delta = 0.0005;
+  return db.select().from(atlasPoints).where(and(
+    or(eq(atlasPoints.name, name), eq(atlasPoints.fingerprint, name)),
+    gt(atlasPoints.latitude, latitude - delta), lt(atlasPoints.latitude, latitude + delta),
+    gt(atlasPoints.longitude, longitude - delta), lt(atlasPoints.longitude, longitude + delta),
+  )).limit(20);
+}
+
+export async function createImportJob(job: InsertAtlasImportJob) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const result = await db.insert(atlasImportJobs).values(job);
+  const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, Number(result[0].insertId))).limit(1);
+  return rows[0];
+}
+
+export async function updateImportJob(id: number, patch: Partial<InsertAtlasImportJob>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(atlasImportJobs).set(patch).where(eq(atlasImportJobs.id, id));
+  const rows = await db.select().from(atlasImportJobs).where(eq(atlasImportJobs.id, id)).limit(1);
+  return rows[0];
+}
+
+export async function createAuditLog(log: InsertAtlasAuditLog) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(atlasAuditLogs).values(log);
 }

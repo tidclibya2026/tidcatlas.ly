@@ -4,7 +4,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { createAtlasPoint, listAtlasPoints } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasPoint, createAuditLog, createImportJob, findPotentialDuplicatePoints, getAtlasPoint, listAtlasImages, listAtlasPoints, listReviewQueue, mergeAtlasPoints, updateAtlasImage, updateAtlasPoint } from "./db";
 import { storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
 
@@ -43,6 +43,8 @@ const pointInput = z.object({
   municipality: z.string().max(160).optional(),
   category: z.string().max(120).optional(),
   source: z.string().max(255).optional(),
+  sourceKind: z.enum(["kml", "excel", "agency", "web_page", "facebook", "other"]).optional(),
+  sourceRecordId: z.string().max(255).optional(),
   metadata: z.record(z.string(), z.string()).optional(),
   imageDataUrl: z.string().max(8_000_000).optional(),
   imageFileName: z.string().max(180).optional(),
@@ -103,6 +105,62 @@ export const appRouter = router({
       .input(z.object({ layerId: z.string().max(80).optional() }).optional())
       .query(({ input }) => listAtlasPoints(input?.layerId, "published")),
     mine: protectedProcedure.query(({ ctx }) => listAtlasPoints(undefined, undefined, ctx.user.id)),
+    reviewQueue: adminProcedure.input(z.object({ recordStatus: z.enum(["draft", "pending_review", "approved", "published", "rejected", "archived"]).optional() }).optional()).query(({ input }) => listReviewQueue(input?.recordStatus)),
+    pointDetails: protectedProcedure.input(z.object({ id: z.number().int().positive() })).query(async ({ input }) => ({ point: await getAtlasPoint(input.id), images: await listAtlasImages(input.id) })),
+    findDuplicates: adminProcedure.input(z.object({ name: z.string().min(1).max(255), latitude: z.number(), longitude: z.number() })).query(({ input }) => findPotentialDuplicatePoints(input.name, input.latitude, input.longitude)),
+    update: adminProcedure.input(z.object({ id: z.number().int().positive(), patch: pointInput.partial() })).mutation(async ({ input, ctx }) => {
+      const patch = { ...input.patch, metadata: input.patch.metadata ? JSON.stringify(input.patch.metadata) : undefined };
+      const updated = await updateAtlasPoint(input.id, patch);
+      await createAuditLog({ entityType: "atlas_point", entityId: input.id, action: "update", details: JSON.stringify(input.patch), actorId: ctx.user.id });
+      return updated;
+    }),
+    review: adminProcedure.input(z.object({ id: z.number().int().positive(), recordStatus: z.enum(["draft", "pending_review", "approved", "published", "rejected", "archived"]), reviewNote: z.string().max(4000).optional() })).mutation(async ({ input, ctx }) => {
+      const updated = await updateAtlasPoint(input.id, { recordStatus: input.recordStatus, status: input.recordStatus === "published" ? "published" : input.recordStatus === "archived" ? "archived" : "draft", reviewNote: input.reviewNote, reviewedBy: ctx.user.id, reviewedAt: new Date() });
+      await createAuditLog({ entityType: "atlas_point", entityId: input.id, action: "review", details: JSON.stringify({ recordStatus: input.recordStatus, reviewNote: input.reviewNote }), actorId: ctx.user.id });
+      return updated;
+    }),
+    archiveDuplicate: adminProcedure.input(z.object({ id: z.number().int().positive(), duplicateOfId: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
+      const updated = await archiveAtlasPoint(input.id, input.duplicateOfId);
+      await createAuditLog({ entityType: "atlas_point", entityId: input.id, action: "archive_duplicate", details: JSON.stringify({ duplicateOfId: input.duplicateOfId }), actorId: ctx.user.id });
+      return updated;
+    }),
+    mergeDuplicate: adminProcedure.input(z.object({ primaryId: z.number().int().positive(), duplicateId: z.number().int().positive() })).mutation(async ({ input, ctx }) => {
+      if (input.primaryId === input.duplicateId) throw new TRPCError({ code: "BAD_REQUEST", message: "لا يمكن دمج النقطة مع نفسها" });
+      const primary = await mergeAtlasPoints(input.primaryId, input.duplicateId);
+      await createAuditLog({ entityType: "atlas_point", entityId: input.duplicateId, action: "merge_duplicate", details: JSON.stringify({ primaryId: input.primaryId }), actorId: ctx.user.id });
+      return primary;
+    }),
+    archive: adminProcedure.input(z.object({ id: z.number().int().positive(), reason: z.string().min(3).max(4000) })).mutation(async ({ input, ctx }) => {
+      const updated = await archiveAtlasPoint(input.id);
+      await createAuditLog({ entityType: "atlas_point", entityId: input.id, action: "archive", details: JSON.stringify({ reason: input.reason }), actorId: ctx.user.id });
+      return updated;
+    }),
+    archiveImage: adminProcedure.input(z.object({ id: z.number().int().positive(), reason: z.string().min(3).max(4000) })).mutation(async ({ input, ctx }) => {
+      const image = await archiveAtlasImage(input.id, input.reason);
+      await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "archive", details: JSON.stringify({ reason: input.reason }), actorId: ctx.user.id });
+      return image;
+    }),
+    addImage: adminProcedure.input(z.object({ pointId: z.number().int().positive(), imageUrl: z.string().url().optional(), imageDataUrl: z.string().max(8_000_000).optional(), fileName: z.string().max(180).optional(), contentType: z.string().max(120).optional(), sourceUrl: z.string().url().optional(), sourceKind: z.enum(["agency", "photographer", "web_page", "facebook", "kml", "other"]), ownerName: z.string().max(255).optional(), photographerName: z.string().max(255).optional(), license: z.string().max(255).optional(), rightsNote: z.string().min(3).max(4000), rightsWarning: z.boolean().default(true), isPrimary: z.boolean().default(false) })).mutation(async ({ input, ctx }) => {
+      let imageUrl = input.imageUrl;
+      let storageKey: string | undefined;
+      if (input.imageDataUrl) {
+        const match = input.imageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (!match) throw new TRPCError({ code: "BAD_REQUEST", message: "صيغة الصورة غير صالحة" });
+        const extension = (input.fileName?.split(".").pop() || "jpg").replace(/[^a-z0-9]/gi, "").toLowerCase() || "jpg";
+        const stored = await storagePut(`atlas-images/${ctx.user.id}/${crypto.randomUUID()}.${extension}`, Buffer.from(match[2], "base64"), input.contentType || match[1]);
+        imageUrl = stored.url; storageKey = stored.key;
+      }
+      if (!imageUrl) throw new TRPCError({ code: "BAD_REQUEST", message: "يجب توفير ملف الصورة أو رابطها" });
+      const image = await createAtlasImage({ pointId: input.pointId, imageUrl, storageKey, sourceUrl: input.sourceUrl, sourceKind: input.sourceKind, ownerName: input.ownerName, photographerName: input.photographerName, license: input.license, rightsNote: input.rightsNote, rightsWarning: input.rightsWarning, isPrimary: input.isPrimary, reviewStatus: "pending", createdBy: ctx.user.id });
+      await createAuditLog({ entityType: "atlas_image", entityId: image.id, action: "create", details: JSON.stringify({ pointId: input.pointId, sourceKind: input.sourceKind, sourceUrl: input.sourceUrl, rightsWarning: input.rightsWarning }), actorId: ctx.user.id });
+      return image;
+    }),
+    reviewImage: adminProcedure.input(z.object({ id: z.number().int().positive(), reviewStatus: z.enum(["pending", "approved", "rejected"]), rightsNote: z.string().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
+      const image = await updateAtlasImage(input.id, { reviewStatus: input.reviewStatus, rightsNote: input.rightsNote, reviewedBy: ctx.user.id, reviewedAt: new Date() });
+      await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "review", details: JSON.stringify({ reviewStatus: input.reviewStatus }), actorId: ctx.user.id });
+      return image;
+    }),
+    startImport: adminProcedure.input(z.object({ fileName: z.string().min(1).max(255), sourceKind: z.enum(["kml", "excel"]), storageKey: z.string().optional() })).mutation(({ input, ctx }) => createImportJob({ fileName: input.fileName, sourceKind: input.sourceKind, storageKey: input.storageKey, status: "uploaded", createdBy: ctx.user.id })),
     create: adminProcedure.input(pointInput).mutation(async ({ input, ctx }) => {
       let imageUrl: string | undefined;
       let imageKey: string | undefined;
