@@ -1,4 +1,4 @@
-export type CustomDocumentationLayer = { id: string; label: string; description: string; color: string; active: boolean };
+export type CustomDocumentationLayer = { id: string; label: string; description: string; color: string; icon: string; active: boolean };
 
 const STORAGE_KEY = "tidc.documentation.layers";
 

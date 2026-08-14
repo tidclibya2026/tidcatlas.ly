@@ -121,3 +121,7 @@ button { cursor:pointer; }
 .atlas-main .leaflet-control-zoom a:focus-visible { outline:3px solid #D7B66D; outline-offset:-3px; }
 .atlas-main .leaflet-control-zoom a:active { background:#D7B66D; color:#123C52; }
 @media (max-width:640px) { .atlas-main .leaflet-control-zoom { margin:12px 12px 0 0; } .atlas-main .leaflet-control-zoom a { width:46px; height:46px; line-height:44px; font-size:28px; } }
+
+.brand-title .brand-slogan { color:#E7D6A8; font-size:10px; font-weight:600; white-space:nowrap; }
+.official-logo-cell span { max-width:190px; text-align:center; line-height:1.25; }
+@media (max-width: 900px) { .official-logo-cell span { max-width:120px; white-space:normal; } .brand-title .brand-slogan { white-space:normal; } }
