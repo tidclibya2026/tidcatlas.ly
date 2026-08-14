@@ -136,12 +136,14 @@ export const appRouter = router({
       const requestedSourceMatches = (JSON.parse(requestedReconciliationText) as { top150SourceMatches?: Array<{ rank: number; matches: Array<{ source: string; name: string; lat: number; lon: number; overlap: number }> }> }).top150SourceMatches || [];
       const sourceMatchByRank = new Map([...oldSourceMatches, ...requestedSourceMatches].map((row) => [row.rank, row]));
       const search = input?.search?.trim().toLocaleLowerCase("ar");
-      return queue.rows.map((row) => {
+      const enrichedRows = await Promise.all(queue.rows.map(async (row) => {
         const decision = decisionByRank.get(row.rank);
         const confirmedName = row.confirmedName;
         const matchedPoint = confirmedName ? points.find((point) => point.name === confirmedName || point.name.includes(confirmedName) || confirmedName.includes(point.name)) : undefined;
-        return { ...row, reviewStatus: decision?.status || row.reviewStatus, decisionId: decision?.id || null, matchedPointId: matchedPoint?.id || null, matchedPointName: matchedPoint?.name || null, category: matchedPoint?.category || row.category || "غير مصنف", reviewNote: decision?.reviewNote || null, sourceMatches: sourceMatchByRank.get(row.rank)?.matches || [] };
-      }).filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!input?.region || row.region.toLocaleLowerCase("ar").includes(input.region.toLocaleLowerCase("ar"))) && (!input?.category || row.category.toLocaleLowerCase("ar").includes(input.category.toLocaleLowerCase("ar"))) && (!search || `${row.candidate} ${row.region} ${row.category} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
+        const matchedImages = matchedPoint ? await listAtlasImages(matchedPoint.id) : [];
+        return { ...row, reviewStatus: decision?.status || row.reviewStatus, decisionId: decision?.id || null, matchedPointId: matchedPoint?.id || null, matchedPointName: matchedPoint?.name || null, matchedPointDescription: matchedPoint?.description || null, matchedPointMunicipality: matchedPoint?.municipality || null, matchedPointMetadata: matchedPoint?.metadata || null, category: matchedPoint?.category || row.category || "غير مصنف", reviewNote: decision?.reviewNote || null, sourceMatches: sourceMatchByRank.get(row.rank)?.matches || [], matchedImages };
+      }));
+      return enrichedRows.filter((row) => row.reviewStatus === (input?.status || "pending_review") && (input?.matchFilter === "all" || (input?.matchFilter === "confirmed" ? row.matchScore === 1 : row.matchScore < 1)) && (!input?.region || row.region.toLocaleLowerCase("ar").includes(input.region.toLocaleLowerCase("ar"))) && (!input?.category || row.category.toLocaleLowerCase("ar").includes(input.category.toLocaleLowerCase("ar"))) && (!search || `${row.candidate} ${row.region} ${row.category} ${row.confirmedName || ""}`.toLocaleLowerCase("ar").includes(search)));
     }),
     top150PendingMarkers: publicProcedure.query(async () => {
       const queue = JSON.parse(await readFile(resolve(process.cwd(), "docs/top-150-review-queue-2026-08-14.json"), "utf8")) as { rows: Array<{ rank: number; candidate: string; region: string; reviewStatus: string }> };
