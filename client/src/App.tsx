@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import DocumentationTeam from "./pages/DocumentationTeam";
 import SystemAdmin from "./pages/SystemAdmin";
+import ManagementPortal from "./pages/ManagementPortal";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -14,6 +15,10 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/tidcatlas.ly/"} component={Home} />
+      <Route path={"/public"} component={Home} />
+      <Route path={"/tidcatlas.ly/public"} component={Home} />
+      <Route path={"/management"} component={ManagementPortal} />
+      <Route path={"/tidcatlas.ly/management"} component={ManagementPortal} />
       <Route path={"/documentation-team"} component={DocumentationTeam} />
       <Route path={"/tidcatlas.ly/documentation-team"} component={DocumentationTeam} />
       <Route path={"/system-admin"} component={SystemAdmin} />
