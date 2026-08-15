@@ -16,3 +16,12 @@ describe("standalone local authentication", () => {
     await expect(verifyPassword("password", "plain-text")).resolves.toBe(false);
   });
 });
+
+
+  it("creates a new one-way hash when a password is reset", async () => {
+    const first = await hashPassword("OldAtlas!2026");
+    const next = await hashPassword("NewAtlas!2026");
+    expect(next).not.toBe(first);
+    await expect(verifyPassword("NewAtlas!2026", next)).resolves.toBe(true);
+    await expect(verifyPassword("OldAtlas!2026", next)).resolves.toBe(false);
+  });

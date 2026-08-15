@@ -9,6 +9,7 @@ import { sdk } from "./sdk";
 const scrypt = promisify(scryptCallback);
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(8) });
 const bootstrapSchema = loginSchema.extend({ name: z.string().min(2).max(160) });
+const localResetSchema = loginSchema;
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16).toString("hex");
@@ -50,6 +51,26 @@ export function registerLocalAuthRoutes(app: Express) {
   app.post("/api/auth/local/logout", (_req, res) => {
     res.clearCookie(COOKIE_NAME, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
     res.status(204).end();
+  });
+
+  app.post("/api/auth/local/reset-password", async (req, res) => {
+    // Deliberately local-only: production resets must use the email-token flow.
+    if (process.env.AUTH_MODE !== "local" || process.env.NODE_ENV === "production") {
+      res.status(404).json({ error: "مسار إعادة الضبط المحلي غير متاح" });
+      return;
+    }
+    try {
+      const { email, password } = localResetSchema.parse(req.body);
+      const user = await db.getUserByEmail(email);
+      if (!user) {
+        res.status(404).json({ error: "لا يوجد مستخدم بهذا البريد" });
+        return;
+      }
+      await db.updateUserPasswordHash(user.id, await hashPassword(password));
+      res.json({ email: user.email, reset: true });
+    } catch (error) {
+      res.status(400).json({ error: error instanceof Error ? error.message : "تعذر إعادة ضبط كلمة المرور" });
+    }
   });
 
   app.post("/api/auth/local/bootstrap", async (req, res) => {
