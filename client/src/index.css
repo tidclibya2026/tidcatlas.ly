@@ -385,3 +385,10 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 .ai-quick-prompts button:hover { transform:translateY(-2px); background:#f5e4b9; color:var(--atlas-blue-deep); }
 .ai-quick-prompts button:active { transform:scale(.96); }
 .ai-quick-prompts button:focus-visible { outline:2px solid var(--atlas-teal); outline-offset:2px; }
+
+.atlas-layer-marker-wrap { background: transparent; border: 0; }
+.atlas-layer-marker { display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 50% 50% 50% 8px; transform: rotate(-45deg); background: var(--marker-color); color: #fff; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 14px; font-weight: 800; box-shadow: 0 5px 12px rgba(8,42,58,.28), inset 0 0 0 3px rgba(255,255,255,.16); animation: marker-drop .24s var(--ease-out); }
+.atlas-layer-marker::first-letter { transform: rotate(45deg); }
+.atlas-layer-marker { text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+@keyframes marker-drop { from { opacity: .2; transform: rotate(-45deg) scale(.72) translateY(-5px); } to { opacity: 1; transform: rotate(-45deg) scale(1) translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .atlas-layer-marker { animation: none; } }

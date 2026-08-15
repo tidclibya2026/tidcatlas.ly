@@ -76,6 +76,19 @@ const layers: LayerConfig[] = [
   { id: "favorites", name: "المواقع المفضلة", short: "مختارات الأطلس", color: "#C08A2E", icon: <Star size={19} strokeWidth={1.8} />, url: "", kind: "geojson", description: "مختارات من المواقع الطبيعية والتراثية المميزة" },
 ];
 
+const layerMarkerGlyphs: Record<string, string> = {
+  heritage: "♜",
+  natural: "✿",
+  akakus: "◇",
+  "old-tripoli": "⌂",
+  hotels: "▣",
+  resorts: "≈",
+  density: "◎",
+  investment: "◆",
+  food: "✦",
+  favorites: "★",
+};
+
 function isFavoriteSite(site: Site) {
   return isFavoriteSiteName(site.name);
 }
@@ -336,7 +349,7 @@ export default function Home() {
       const radius = config.id === "hotels" ? 9 : config.id === "resorts" ? 8 : config.id === "natural" ? 7 : 6.5;
       const halo = L.circleMarker([site.lat, site.lng], { radius: radius + 5, color: config.color, weight: 1, fillColor: config.color, fillOpacity: 0.12, opacity: 0.35, interactive: false });
       halo.addTo(map);
-      const marker = L.circleMarker([site.lat, site.lng], { radius, color: "#fff", weight: 2, fillColor: config.color, fillOpacity: 0.92, opacity: 0.98 });
+      const marker = L.marker([site.lat, site.lng], { icon: L.divIcon({ className: "atlas-layer-marker-wrap", html: `<span class="atlas-layer-marker" style="--marker-color:${config.color}">${layerMarkerGlyphs[config.id] || "•"}</span>`, iconSize: [34, 38], iconAnchor: [17, 34] }) });
       marker.addTo(map);
       marker.bindTooltip(site.name, { direction: "top", offset: [0, -7], opacity: 0.95 });
       marker.on("click", () => { setSelected(site); setMobileOpen(false); });
