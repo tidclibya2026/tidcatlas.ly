@@ -21,4 +21,9 @@ export const ENV = {
   aiApiUrl: process.env.AI_API_URL ?? "",
   aiApiKey: process.env.AI_API_KEY ?? "",
   aiModel: process.env.AI_MODEL ?? "",
+  notificationWebhookUrl: process.env.NOTIFICATION_WEBHOOK_URL ?? "",
+  mapsApiUrl: process.env.MAPS_API_URL ?? "",
+  mapsApiKey: process.env.MAPS_API_KEY ?? "",
+  transcriptionApiUrl: process.env.TRANSCRIPTION_API_URL ?? "",
+  transcriptionApiKey: process.env.TRANSCRIPTION_API_KEY ?? "",
 };

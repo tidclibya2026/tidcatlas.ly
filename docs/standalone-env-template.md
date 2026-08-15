@@ -26,6 +26,22 @@ OIDC_CLIENT_SECRET=
 OIDC_REDIRECT_URI=http://localhost:3000/api/auth/oidc/callback
 VITE_MAP_TILE_URL=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
 VITE_MAP_ATTRIBUTION=© OpenStreetMap contributors
+
+# Optional OpenAI-compatible LLM provider
+AI_API_URL=
+AI_API_KEY=
+AI_MODEL=
+
+# Optional notification webhook; local JSONL logging is used when empty
+NOTIFICATION_WEBHOOK_URL=
+
+# Optional Google Maps-compatible proxy/provider
+MAPS_API_URL=
+MAPS_API_KEY=
+
+# Optional Whisper-compatible transcription provider
+TRANSCRIPTION_API_URL=
+TRANSCRIPTION_API_KEY=
 ```
 
 يجب تغيير كلمة مرور المسؤول الأول وحذف قيم bootstrap بعد إنشاء الحساب. لا تُحفظ كلمات المرور أو مفاتيح التخزين أو `DATABASE_URL` في GitHub.
