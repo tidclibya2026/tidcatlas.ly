@@ -24,8 +24,12 @@ export const startLogin = () => {
     window.alert("تسجيل الدخول الإداري يعمل من نطاق الخادم الكامل فقط، وليس من نسخة GitHub Pages العامة. افتح رابط الإدارة المؤسسي.");
     return;
   }
-  const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
-  const appId = import.meta.env.VITE_APP_ID;
+  const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL as string | undefined;
+  const appId = import.meta.env.VITE_APP_ID as string | undefined;
+  if (!oauthPortalUrl || !appId) {
+    window.alert("إعدادات تسجيل الدخول غير موجودة في النسخة المحلية. استخدم رابط الإدارة المنشور أو أضف VITE_OAUTH_PORTAL_URL وVITE_APP_ID إلى ملف البيئة ثم أعد تشغيل الخادم.");
+    return;
+  }
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
 
   const nonce = crypto.randomUUID();
