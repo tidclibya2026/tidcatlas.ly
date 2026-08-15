@@ -243,9 +243,9 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 }
 .brand-lockup .project-logo { width: 54px; height: 56px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.22)); }
 .brand-title { order: 2; min-width: 270px; }
-.brand-title .eyebrow { color: #d9bb75; font-size: 9px; letter-spacing: .1em; }
-.brand-lockup h1 { font-size: clamp(21px, 2.2vw, 30px); line-height: 1.1; color: #fffdf5; }
-.brand-title .brand-slogan { display: block; margin-top: 7px; color: #d4e0dd; font-size: 11px; }
+.brand-title .eyebrow { color: #f6d47e; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+.brand-lockup h1 { font-size: clamp(24px, 2.45vw, 34px); line-height: 1.08; color: #f6c95f; text-shadow: 0 2px 12px rgba(246,201,95,.18); }
+.brand-title .brand-slogan { display: block; margin-top: 8px; color: #f1dfae; font-size: 12px; font-weight: 600; }
 .official-logos {
   order: 1;
   min-width: 290px;
@@ -266,7 +266,7 @@ button, .layer-row, .search-result-list button { transition: background-color .1
   background: #f7f4ea;
   border: 1px solid rgba(224, 193, 117, .65);
 }
-.official-logo-cell span { color: #f1ead7; font-size: 9px; font-weight: 700; text-align: right; }
+.official-logo-cell span { color: #ffeab0; font-size: 9px; font-weight: 700; text-align: right; }
 .logo-divider { background: rgba(224, 193, 117, .45); }
 .topbar-actions { gap: 14px; }
 .header-gis-badge { padding: 7px 10px; border-radius: 8px; background: rgba(255,255,255,.06); }
