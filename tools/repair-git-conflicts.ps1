@@ -17,11 +17,14 @@ if ($content -notmatch '<<<<<<<|=======|>>>>>>>') {
   exit 0
 }
 
-# This file is restored from the committed version because the conflict state
-# can contain duplicated imports and incomplete JSX branches.
-$headContent = git show HEAD:client/src/pages/Home.tsx
+# Restore the complete file, not only conflict marker lines. Prefer origin/main
+# because a local HEAD may itself be the result of a bad conflict resolution.
+$headContent = git show origin/main:client/src/pages/Home.tsx 2>$null
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($headContent)) {
-  throw "تعذر قراءة النسخة المحفوظة من HEAD. لم يتم تعديل الملف الأصلي."
+  $headContent = git show HEAD:client/src/pages/Home.tsx
+}
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($headContent)) {
+  throw "تعذر قراءة نسخة Home.tsx من origin/main أو HEAD. نفّذ git fetch origin أولًا."
 }
 Set-Content -Path $target -Value $headContent -Encoding UTF8
 
