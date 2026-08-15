@@ -521,3 +521,24 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 @media (max-width:1200px) { .topbar-quick-search { width:230px; min-width:170px; } .topbar-actions .edition { display:none; } }
 @media (max-width:900px) { .topbar { position:sticky; } .topbar-quick-search { order:4; width:100%; min-width:0; grid-column:1 / -1; } .topbar { flex-wrap:wrap; } .topbar .brand-lockup { flex:1 1 auto; } .topbar-actions { flex:none; } .topbar.is-compact { padding-block:5px; } .topbar.is-compact .official-logos { display:none; } }
 @media (max-width:560px) { .topbar-quick-search { height:34px; margin-top:4px; font-size:10px; } .topbar-actions { gap:5px; } .language-toggle { min-width:34px; padding-inline:7px; } .language-toggle span { font-size:9px; } .topbar.is-compact .topbar-quick-search { display:none; } }
+
+/* Header refinement: one-line institutional identity and integrated logo treatment */
+.topbar { background:linear-gradient(108deg,#061e2b 0%,#0b3545 48%,#104d5d 100%); }
+.topbar::after { opacity:.28; background:linear-gradient(90deg,rgba(224,193,117,.1),transparent 36%,rgba(224,193,117,.12)),radial-gradient(circle at 72% 50%,rgba(255,255,255,.12),transparent 32%); }
+.brand-lockup { grid-template-columns:auto minmax(250px,1fr) minmax(430px,520px); gap:15px; }
+.brand-title { white-space:nowrap; }
+.brand-title .eyebrow { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.brand-lockup h1 { white-space:nowrap; font-size:clamp(23px,2.35vw,34px); }
+.brand-title .brand-slogan { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.official-logos { display:flex; align-items:center; gap:0; min-width:0; padding:5px 8px; border:1px solid rgba(235,210,147,.55); border-radius:14px; background:linear-gradient(100deg,rgba(255,253,246,.12),rgba(255,253,246,.2)); box-shadow:inset 0 1px rgba(255,255,255,.17),0 8px 18px rgba(0,0,0,.12); backdrop-filter:blur(9px); }
+.official-logo-cell { display:flex; grid-template-columns:none; align-items:center; gap:8px; min-width:0; padding:5px 10px; }
+.official-logo-cell + .official-logo-cell { border-inline-start:1px solid rgba(238,211,145,.42); }
+.official-logo-cell img { width:38px; height:36px; padding:4px; border:1px solid rgba(238,211,145,.58); border-radius:10px; background:rgba(255,252,241,.82); }
+.official-logo-cell div { min-width:0; }
+.official-logo-cell .official-kicker { color:#d9bd76; font-size:7px; white-space:nowrap; }
+.official-logo-cell strong { color:#f6ebc9; font-size:9px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.topbar.is-compact .brand-lockup { grid-template-columns:auto minmax(230px,1fr) minmax(380px,470px); }
+.topbar.is-compact .brand-title .brand-slogan, .topbar.is-compact .brand-title .eyebrow { display:none; }
+@media (max-width:1200px) { .brand-lockup { grid-template-columns:auto minmax(210px,1fr) minmax(360px,430px); } .official-logo-cell { padding-inline:6px; } .official-logo-cell strong { font-size:8px; } }
+@media (max-width:900px) { .brand-title { white-space:normal; } .brand-lockup h1 { font-size:20px; } .official-logos { background:rgba(255,253,246,.12); } }
+@media (max-width:560px) { .brand-lockup { grid-template-columns:auto minmax(0,1fr); } .brand-lockup h1 { white-space:nowrap; font-size:17px; } .brand-title .brand-slogan { white-space:nowrap; } .official-logos { display:flex; } .official-logo-cell { padding-inline:4px; } .official-logo-cell strong { font-size:7px; } .official-logo-cell img { width:28px; height:27px; padding:3px; } }
