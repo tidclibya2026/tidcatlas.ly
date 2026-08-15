@@ -398,3 +398,41 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 .ai-confidence-high { color:#23674e; background:#dff1e6; }
 .ai-confidence-medium { color:#80611e; background:#f7eac5; }
 .ai-confidence-low { color:#8a463c; background:#f5ddd8; }
+
+/* Map clustering and accessible theme switch */
+.atlas-cluster { display:grid; place-items:center; border:3px solid rgba(255,255,255,.9); border-radius:50%; background:radial-gradient(circle at 35% 30%, #e9cf8b 0 12%, #b5792f 13% 52%, #7b4d1f 53% 100%); color:#fff; font-family:'Noto Kufi Arabic',sans-serif; font-weight:900; box-shadow:0 8px 18px rgba(8,42,58,.28); }
+.atlas-cluster span { display:grid; place-items:center; width:31px; height:31px; border:1px solid rgba(255,255,255,.45); border-radius:50%; font-size:11px; }
+.atlas-cluster-small { transform:scale(.86); }
+.atlas-cluster-medium { transform:scale(1); background:radial-gradient(circle at 35% 30%, #f1d796 0 12%, #a76027 13% 52%, #713b22 53% 100%); }
+.atlas-cluster-large { transform:scale(1.12); background:radial-gradient(circle at 35% 30%, #f7e6ae 0 12%, #b34b42 13% 52%, #762c2a 53% 100%); }
+.theme-toggle { width:34px; height:34px; color:#f2d890; border:1px solid rgba(224,193,117,.65); background:rgba(255,255,255,.06); border-radius:999px; transition:transform .18s var(--ease-out), background .18s var(--ease-out), color .18s var(--ease-out); }
+.theme-toggle:hover { color:#fff; background:rgba(224,193,117,.18); transform:translateY(-1px); }
+.theme-toggle:active { transform:scale(.94); }
+
+.dark body { background:#071923; color:#e4eeeb; }
+.dark .atlas-shell { color:#e4eeeb; background:#071923; background-image:linear-gradient(135deg,#071923 0%,#0b2632 52%,#102f3c 100%); }
+.dark .atlas-main { background:#0b2632; }
+.dark .control-panel { background:rgba(7,25,35,.96); border-color:#31515a; color:#e6efed; }
+.dark .panel-intro h2, .dark .panel-heading h3, .dark .layer-copy strong, .dark .ai-panel-heading, .dark .route-panel .ai-panel-heading { color:#f2dfad; }
+.dark .panel-intro p, .dark .layer-copy span, .dark .layer-copy small, .dark .ai-panel p, .dark .route-note { color:#afc3c1; }
+.dark .search-box, .dark .filter-panel, .dark .ai-panel, .dark .route-panel, .dark .search-results { background:#102f3b; border-color:#3a5b62; color:#e6efed; }
+.dark .search-box input, .dark .filter-panel select, .dark .ai-question input, .dark .route-controls input { color:#e6efed; background:transparent; }
+.dark .filter-panel select, .dark .route-controls input { background:#0a2530; border-color:#3a5b62; }
+.dark .category-filter-chips button, .dark .ai-quick-prompts button { color:#eedb9e; background:#143944; border-color:#4b6970; }
+.dark .category-filter-chips button.is-selected, .dark .ai-quick-prompts button:hover { color:#09212d; background:#dfbd69; }
+.dark .layer-row { border-color:#294951; }
+.dark .layer-row:hover, .dark .layer-row.is-active { background:#163d47; }
+.dark .map-stage { background-color:#173943; }
+.dark .map-overlay-title, .dark .map-legend, .dark .map-count { background:rgba(7,25,35,.88); color:#e9f1ed; border-color:#c8a15b; }
+.dark .map-overlay-title strong { color:#f0d995; }
+.dark .map-legend span, .dark .map-count span { color:#bfd0cc; }
+.dark .story-strip { background:#0b2632; border-color:#3a5b62; }
+.dark .story-copy h2, .dark .story-copy p { color:#e8f0ed; }
+.dark .detail-sheet, .dark .sheet-content { background:#0b2632; color:#e6efed; border-color:#3a5b62; }
+.dark .detail-sheet h2, .dark .detail-sheet h3, .dark .detail-grid strong { color:#f0d995; }
+.dark .detail-sheet p, .dark .detail-grid span, .dark .image-source-note { color:#b9cbc7; }
+.dark .ai-answer, .dark .route-result { background:#153944; border-color:#527078; color:#e7efed; }
+.dark .leaflet-control-zoom a { background:#102f3b !important; color:#f0d995 !important; border-color:#3a5b62 !important; }
+.dark .leaflet-control-attribution { background:rgba(7,25,35,.82) !important; color:#b9cbc7; }
+.dark .leaflet-control-attribution a { color:#e2c47d; }
+@media (max-width:560px) { .theme-toggle { width:30px; height:30px; } .topbar-actions { gap:6px; } }

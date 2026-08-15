@@ -8,6 +8,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { getManagementUrl, startLogin } from "@/const";
 import { MapView } from "@/components/Map";
+import { useTheme } from "@/contexts/ThemeContext";
 import { atlasCategoryFamilies, filterAtlasSites, inferAtlasCategory } from "@shared/atlasFilters";
 import { isFavoriteSiteName } from "@shared/favoriteSites";
 import { FAVORITE_IMAGE, favoriteImageMetadata } from "@shared/favoriteImage";
@@ -26,7 +27,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import {
   Activity, ArrowLeft, Building2, ChevronDown, Database, ExternalLink, Eye, EyeOff, Flag, Hotel,   ImagePlus, ImageOff, Landmark, Layers3, MessageSquarePlus,
-  MapPinned, MapPinPlus, Menu, Mountain, Route, Search, ShieldCheck, SlidersHorizontal, Sparkles, Star, Trees, TrendingUp, Utensils, Waves, X, ZoomIn
+  MapPinned, MapPinPlus, Menu, Moon, Mountain, Route, Search, ShieldCheck, SlidersHorizontal, Sparkles, Star, Sun, Trees, TrendingUp, Utensils, Waves, X, ZoomIn
 } from "lucide-react";
 
 type Site = { id: string; name: string; description: string; lat: number; lng: number; properties: Record<string, string>; layerId: string; imageUrl?: string | null };
@@ -220,6 +221,7 @@ export default function Home() {
   // startLogin() during render (no href={startLogin()}) — it mints a one-time
   // nonce cookie and must run only at the moment of navigation.
   let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const [hasEnteredAtlas, setHasEnteredAtlas] = useState(false);
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
@@ -266,6 +268,7 @@ export default function Home() {
   const [imageDisplayUrl, setImageDisplayUrl] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [map, setMap] = useState<L.Map | null>(null);
+  const [clusterGroup, setClusterGroup] = useState<L.MarkerClusterGroup | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [loadingLayers, setLoadingLayers] = useState<string[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -278,6 +281,7 @@ export default function Home() {
   const adminPoints = trpc.atlas.mine.useQuery(undefined, { enabled: Boolean(isAuthenticated && user?.role === "admin") });
   const trpcUtils = trpc.useUtils();
   const handleMapReady = useCallback((instance: L.Map) => { setMap(instance); setMapReady(true); }, []);
+  const handleClusterReady = useCallback((cluster: L.MarkerClusterGroup) => { setClusterGroup(cluster); }, []);
   const smartSearch = trpc.atlas.smartSearch.useMutation();
   const routePlan = trpc.atlas.routePlan.useMutation();
   const submitSuggestion = trpc.atlas.submitSuggestion.useMutation({
@@ -350,12 +354,12 @@ export default function Home() {
       const halo = L.circleMarker([site.lat, site.lng], { radius: radius + 5, color: config.color, weight: 1, fillColor: config.color, fillOpacity: 0.12, opacity: 0.35, interactive: false });
       halo.addTo(map);
       const marker = L.marker([site.lat, site.lng], { icon: L.divIcon({ className: "atlas-layer-marker-wrap", html: `<span class="atlas-layer-marker" style="--marker-color:${config.color}">${layerMarkerGlyphs[config.id] || "•"}</span>`, iconSize: [34, 38], iconAnchor: [17, 34] }) });
-      marker.addTo(map);
+      marker.addTo(clusterGroup || map);
       marker.bindTooltip(site.name, { direction: "top", offset: [0, -7], opacity: 0.95 });
       marker.on("click", () => { setSelected(site); setMobileOpen(false); });
       return [halo, marker];
     });
-  }, [clearMarkers, map]);
+  }, [clearMarkers, map, clusterGroup]);
 
   const renderDensity = useCallback((sites: Site[]) => {
     if (!map) return;
@@ -415,13 +419,13 @@ export default function Home() {
     if (!map) return;
     clearMarkers("pendingTop150");
     markers.current.pendingTop150 = (pendingTop150.data ?? []).map((item) => {
-      const marker = L.marker([item.lat, item.lng], { icon: L.divIcon({ className: "atlas-pending-marker", html: '<span style="display:grid;place-items:center;width:28px;height:28px;border:2px solid #fff;border-radius:999px;background:#b34b42;color:#fff;font-size:16px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.28)">!</span>', iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map);
+      const marker = L.marker([item.lat, item.lng], { icon: L.divIcon({ className: "atlas-pending-marker", html: '<span style="display:grid;place-items:center;width:28px;height:28px;border:2px solid #fff;border-radius:999px;background:#b34b42;color:#fff;font-size:16px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.28)">!</span>', iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(clusterGroup || map);
       marker.bindTooltip(`بانتظار الاعتماد اليدوي · ${item.name} · ${item.region}`, { direction: "top", opacity: 0.96 });
       marker.on("click", () => toast.info(`هذا الموقع بانتظار مراجعة فريق التوثيق: ${item.name}`));
       return marker;
     });
     return () => clearMarkers("pendingTop150");
-  }, [map, pendingTop150.data, clearMarkers]);
+  }, [map, clusterGroup, pendingTop150.data, clearMarkers]);
 
   useEffect(() => {
     if (!map || !pickMode) return;
@@ -492,7 +496,7 @@ export default function Home() {
     <main dir="rtl" className="atlas-shell">
       <header className="topbar" data-visual-language="national-institutional">
         <div className="brand-lockup"><div className="project-mark"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /></div><div className="brand-title"><span className="eyebrow">مشروع وطني للتوثيق والاستكشاف</span><h1>أطلس ليبيا <em>السياحي</em></h1><small className="brand-slogan">ليبيا.. ملتقى الحضارات، ومهد الأصالة</small></div><div className="official-logos" aria-label="الجهات الرسمية المشرفة على المشروع"><div className="official-logo-cell"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><span>وزارة السياحة والصناعات التقليدية</span></div><span className="logo-divider" /><div className="official-logo-cell"><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /><span>مركز المعلومات والتوثيق السياحي</span></div></div></div>
-        <div className="topbar-actions"><div className="header-gis-badge"><Layers3 size={14} /><span>GIS</span><small>خريطة وطنية</small></div><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span>{!isPublicRoute && <Button className="system-admin-topbar-button" variant="outline" size="sm" onClick={() => { if (isAuthenticated && user?.role === "admin") { window.location.href = `${import.meta.env.BASE_URL}management`; } else { startLogin(); } }}><ShieldCheck size={15} /> مسؤول النظام</Button>}<Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
+        <div className="topbar-actions"><Button type="button" variant="ghost" size="icon" className="theme-toggle" onClick={() => toggleTheme?.()} aria-label={theme === "dark" ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي"} title={theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}>{theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}</Button><div className="header-gis-badge"><Layers3 size={14} /><span>GIS</span><small>خريطة وطنية</small></div><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span>{!isPublicRoute && <Button className="system-admin-topbar-button" variant="outline" size="sm" onClick={() => { if (isAuthenticated && user?.role === "admin") { window.location.href = `${import.meta.env.BASE_URL}management`; } else { startLogin(); } }}><ShieldCheck size={15} /> مسؤول النظام</Button>}<Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
       </header>
 
 
@@ -510,7 +514,7 @@ export default function Home() {
           <div className="panel-foot"><div><Database size={15} /><span>السجلات المعروضة</span><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong></div><button onClick={focusLibya}><ZoomIn size={14} /> إعادة تمركز الخريطة</button></div>
         </aside>
 
-        <section className="map-stage"><div className={`map-loading-overlay ${isAtlasLoading ? "is-visible" : ""}`} aria-live="polite" aria-busy={isAtlasLoading}><div className="loading-orbit"><span /><span /><span /></div><strong>{!mapReady ? "جارٍ تهيئة الخريطة" : "جارٍ تحميل الطبقات"}</strong><small>{loadingLayers.length ? `يتم تجهيز ${loadingLayers.length.toLocaleString("ar-LY")} طبقة` : "لحظات ونبدأ الاستكشاف"}</small></div><div className="map-overlay-title"><span>المشهد الجغرافي الوطني</span><strong>استكشف ليبيا طبقةً بعد طبقة</strong></div><MapView className="atlas-map" initialCenter={INITIAL_CENTER} initialZoom={5} onMapReady={handleMapReady} /><div className="map-legend"><span><i style={{ background: "#B96D3B" }} /> مواقع موثقة</span><span><i style={{ background: "#AF7A24" }} /> فرص وتنمية</span><span><i style={{ background: "#287A70" }} /> موارد طبيعية</span>{activeLayers.includes("density") && <span className="density-legend"><i style={{ background: "#2FBEF0" }} /> تركّز منخفض <i style={{ background: "#D94B45" }} /> تركّز مرتفع</span>}</div><div className="map-count"><MapPinned size={15} /><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong><span>موقع ظاهر</span></div></section>
+        <section className="map-stage"><div className={`map-loading-overlay ${isAtlasLoading ? "is-visible" : ""}`} aria-live="polite" aria-busy={isAtlasLoading}><div className="loading-orbit"><span /><span /><span /></div><strong>{!mapReady ? "جارٍ تهيئة الخريطة" : "جارٍ تحميل الطبقات"}</strong><small>{loadingLayers.length ? `يتم تجهيز ${loadingLayers.length.toLocaleString("ar-LY")} طبقة` : "لحظات ونبدأ الاستكشاف"}</small></div><div className="map-overlay-title"><span>المشهد الجغرافي الوطني</span><strong>استكشف ليبيا طبقةً بعد طبقة</strong></div><MapView className="atlas-map" initialCenter={INITIAL_CENTER} initialZoom={5} onMapReady={handleMapReady} onClusterReady={handleClusterReady} /><div className="map-legend"><span><i style={{ background: "#B96D3B" }} /> مواقع موثقة</span><span><i style={{ background: "#AF7A24" }} /> فرص وتنمية</span><span><i style={{ background: "#287A70" }} /> موارد طبيعية</span>{activeLayers.includes("density") && <span className="density-legend"><i style={{ background: "#2FBEF0" }} /> تركّز منخفض <i style={{ background: "#D94B45" }} /> تركّز مرتفع</span>}</div><div className="map-count"><MapPinned size={15} /><strong>{visibleSites.length.toLocaleString("ar-LY")}</strong><span>موقع ظاهر</span></div></section>
       </section>
 
       <section className="story-strip"><div className="story-image" style={{ backgroundImage: `url(${DATA.heritage})` }} /><div className="story-copy"><span className="section-eyebrow">ذاكرة المكان</span><h2>الموقع ليس نقطة على الخريطة؛ إنه <i>قصة كاملة.</i></h2><p>نحوّل السجلات والطبقات والصور إلى معرفة مكانية تساعد على الحصر والتوثيق والتخطيط السياحي.</p><button onClick={() => { setActiveLayers(["heritage"]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>ابدأ من التراث العالمي <ArrowLeft size={16} /></button></div><div className="story-stat"><strong>10</strong><span>مسارات بيانات<br />قابلة للاستكشاف</span></div></section>

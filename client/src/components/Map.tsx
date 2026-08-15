@@ -2,11 +2,14 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { cn } from "@/lib/utils";
 
-interface MapViewProps { className?: string; initialCenter?: [number, number]; initialZoom?: number; onMapReady?: (map: L.Map) => void; }
+interface MapViewProps { className?: string; initialCenter?: [number, number]; initialZoom?: number; onMapReady?: (map: L.Map) => void; onClusterReady?: (cluster: L.MarkerClusterGroup) => void; }
 
-export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom = 5, onMapReady }: MapViewProps) {
+export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom = 5, onMapReady, onClusterReady }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   useEffect(() => {
@@ -14,6 +17,21 @@ export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom =
     const libyaBounds = L.latLngBounds([18.8, 8.2], [34.2, 25.6]);
     const map = L.map(container.current, { zoomControl: false, minZoom: 5, maxZoom: 18, maxBounds: libyaBounds, maxBoundsViscosity: 0.92, worldCopyJump: false, attributionControl: true }).setView(initialCenter, initialZoom);
     const zoomControl = L.control.zoom({ position: "topright" }).addTo(map);
+    const cluster = L.markerClusterGroup({
+      chunkedLoading: true,
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      disableClusteringAtZoom: 13,
+      maxClusterRadius: (zoom) => zoom <= 7 ? 68 : zoom <= 10 ? 52 : 38,
+      zoomToBoundsOnClick: true,
+      iconCreateFunction: (group) => {
+        const count = group.getChildCount();
+        const size = count >= 100 ? "large" : count >= 25 ? "medium" : "small";
+        return L.divIcon({ className: `atlas-cluster atlas-cluster-${size}`, html: `<span>${count.toLocaleString("ar-LY")}</span>`, iconSize: [46, 46] });
+      },
+    });
+    cluster.addTo(map);
+    onClusterReady?.(cluster);
     zoomControl.getContainer()?.setAttribute("aria-label", "أدوات تكبير وتصغير الخريطة");
     const primaryTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(map);
     let fallbackTiles: L.TileLayer | null = null;
@@ -30,7 +48,7 @@ export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom =
     const resize = () => map.invalidateSize();
     window.addEventListener("resize", resize);
     const timer = window.setTimeout(resize, 180);
-    return () => { window.clearTimeout(timer); window.removeEventListener("resize", resize); primaryTiles.off("tileerror", useFallbackTiles); fallbackTiles?.removeFrom(map); map.remove(); mapRef.current = null; };
-  }, [initialCenter, initialZoom, onMapReady]);
+    return () => { window.clearTimeout(timer); window.removeEventListener("resize", resize); primaryTiles.off("tileerror", useFallbackTiles); fallbackTiles?.removeFrom(map); cluster.clearLayers(); cluster.removeFrom(map); map.remove(); mapRef.current = null; };
+  }, [initialCenter, initialZoom, onMapReady, onClusterReady]);
   return <div ref={container} className={cn("w-full h-[500px]", className)} aria-label="الخريطة التفاعلية لأطلس ليبيا السياحي" />;
 }
