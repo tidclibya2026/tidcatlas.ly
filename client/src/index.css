@@ -589,3 +589,17 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 [dir="ltr"] .topbar-search-results button small { text-align:left; }
 @media (max-width:720px) { .intro-full-art > img { object-position:center center; } .intro-enter-overlay { bottom:22px; min-width:205px; } }
 @media (max-aspect-ratio: 3/4) { .intro-full-art > img { object-fit:cover; object-position:57% center; } }
+
+/* Search thumbnails and personal favorites */
+.topbar-search-results button { display:flex; align-items:center; gap:10px; width:100%; }
+.search-suggestion-visual { display:grid; place-items:center; width:38px; height:38px; flex:none; overflow:hidden; border:1px solid rgba(200,149,61,.36); border-radius:11px; background:rgba(200,149,61,.1); }
+.search-suggestion-visual img { width:100%; height:100%; object-fit:cover; }
+.search-suggestion-glyph { font-size:22px; line-height:1; }
+.search-suggestion-copy { display:grid; min-width:0; gap:2px; text-align:inherit; }
+.search-suggestion-copy strong,.search-suggestion-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.search-suggestion-copy strong { color:inherit; font-size:12px; }
+.search-suggestion-copy small { opacity:.68; font-size:10px; }
+.favorite-action { margin-top:8px; }
+.favorite-action.is-favorite { background:#b7832e; border-color:#b7832e; color:#fffaf0; }
+.favorite-action.is-favorite:hover { background:#c9953e; }
+.dark .search-suggestion-visual { border-color:rgba(233,204,132,.42); background:rgba(233,204,132,.12); }
