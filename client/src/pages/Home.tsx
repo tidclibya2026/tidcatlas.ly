@@ -192,10 +192,10 @@ function imageCandidates(source: string) {
   if (isProxy) {
     try {
       const original = new URL(source).searchParams.get("url");
-      return Array.from(new Set([source, original || undefined, toFallbackImageUrl(original || undefined)].filter((value): value is string => Boolean(value))));
+      return Array.from(new Set([original || undefined, source, toFallbackImageUrl(original || undefined)].filter((value): value is string => Boolean(value))));
     } catch { return [source]; }
   }
-  return Array.from(new Set([toDisplayImageUrl(source), toFallbackImageUrl(source), source].filter((value): value is string => Boolean(value))));
+  return Array.from(new Set([source, toDisplayImageUrl(source), toFallbackImageUrl(source)].filter((value): value is string => Boolean(value))));
 }
 
 async function loadLayer(config: LayerConfig): Promise<Site[]> {
