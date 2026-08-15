@@ -12,6 +12,7 @@ import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLaye
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
+import { transcribeAudio } from "./_core/voiceTranscription";
 
 const assistantSiteInput = z.object({
   id: z.string().max(160),
@@ -62,6 +63,20 @@ const pointInput = z.object({
 
 export const appRouter = router({
   system: systemRouter,
+  voice: router({
+    transcribe: publicProcedure.input(z.object({ audioDataUrl: z.string().regex(/^data:audio\/[a-z0-9.+-]+;base64,/i).max(24_000_000), language: z.enum(["ar", "en"]).default("ar") })).mutation(async ({ input }) => {
+      const match = input.audioDataUrl.match(/^data:(audio\/[a-z0-9.+-]+);base64,(.+)$/i);
+      if (!match) throw new TRPCError({ code: "BAD_REQUEST", message: input.language === "en" ? "Invalid audio recording." : "التسجيل الصوتي غير صالح." });
+      const [, contentType, encoded] = match;
+      const buffer = Buffer.from(encoded, "base64");
+      if (!buffer.length || buffer.length > 16 * 1024 * 1024) throw new TRPCError({ code: "PAYLOAD_TOO_LARGE", message: input.language === "en" ? "Audio must be smaller than 16 MB." : "يجب أن يكون التسجيل الصوتي أصغر من 16 ميغابايت." });
+      const extension = contentType.split("/")[1]?.split(";")[0] || "webm";
+      const uploaded = await storagePut(`voice/atlas-question.${extension}`, buffer, contentType);
+      const result = await transcribeAudio({ audioUrl: uploaded.url, language: input.language, prompt: input.language === "en" ? "Transcribe a tourism and geography question in English." : "حوّل سؤالًا عن السياحة والجغرافيا في ليبيا إلى نص عربي واضح." });
+      if ("error" in result) throw new TRPCError({ code: "BAD_REQUEST", message: result.error, cause: result });
+      return { text: result.text, language: result.language || input.language };
+    }),
+  }),
   auth: router({
     me: publicProcedure.query(({ ctx }) => ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
