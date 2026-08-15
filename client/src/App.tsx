@@ -5,12 +5,26 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import DocumentationTeam from "./pages/DocumentationTeam";
+import SystemAdmin from "./pages/SystemAdmin";
+import ManagementPortal from "./pages/ManagementPortal";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/tidcatlas.ly/"} component={Home} />
+      <Route path={"/public"} component={Home} />
+      <Route path={"/tidcatlas.ly/public"} component={Home} />
+      <Route path={"/management"} component={ManagementPortal} />
+      <Route path={"/tidcatlas.ly/management"} component={ManagementPortal} />
+      <Route path={"/documentation-team"} component={DocumentationTeam} />
+      <Route path={"/tidcatlas.ly/documentation-team"} component={DocumentationTeam} />
+      <Route path={"/system-admin"} component={SystemAdmin} />
+      <Route path={"/tidcatlas.ly/system-admin"} component={SystemAdmin} />
+      <Route path={"/admin"} component={SystemAdmin} />
+      <Route path={"/tidcatlas.ly/admin"} component={SystemAdmin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -28,7 +42,7 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider
         defaultTheme="light"
-        // switchable
+        switchable
       >
         <TooltipProvider>
           <Toaster />

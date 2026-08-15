@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { extractKmlImageUrl, toDisplayImageUrl } from "./kmlImage";
+import { extractKmlImageUrl, extractKmlImageUrls, normalizeKmlImageRights, toDisplayImageUrl, toFallbackImageUrl } from "./kmlImage";
 
 describe("extractKmlImageUrl", () => {
+  it("normalizes KML image rights fields", () => {
+    expect(normalizeKmlImageRights({ Photographer: "TIDC", photo_license: "CC BY-SA 4.0", image_license_note: "Attribution required" })).toEqual({ author: "TIDC", license: "CC BY-SA 4.0", note: "Attribution required" });
+  });
+  it("extracts every distinct image URL from description and image fields", () => {
+    const urls = extractKmlImageUrls('<img src="https://example.com/a.jpg"><img src="https://example.com/b.jpg"> https://example.com/a.jpg', { image_URL: "https://example.com/c.jpg" });
+    expect(urls).toEqual(["https://example.com/c.jpg", "https://example.com/a.jpg", "https://example.com/b.jpg"]);
+  });
   it("extracts image URLs from KML img markup", () => {
     expect(extractKmlImageUrl('<img src="https://mymaps.usercontent.google.com/hostedimage/theatre.png?x=1&amp;y=2" />')).toBe("https://mymaps.usercontent.google.com/hostedimage/theatre.png?x=1&y=2");
   });
@@ -24,4 +31,16 @@ describe("extractKmlImageUrl", () => {
     expect(toDisplayImageUrl(source)).toContain("https://images.weserv.nl/?url=");
     expect(decodeURIComponent(toDisplayImageUrl(source)!.split("?url=")[1].split("&w=")[0])).toBe(source);
   });
+});
+
+
+it("supports alternate image fields and keeps the original source", () => {
+  expect(extractKmlImageUrl("", { image_href: "https://example.com/site.webp" })).toBe("https://example.com/site.webp");
+  expect(extractKmlImageUrl("", { thumbnail_url: "https://example.com/thumb.jpg" })).toBe("https://example.com/thumb.jpg");
+});
+
+it("creates a second fallback proxy URL", () => {
+  const source = "https://example.com/site.jpg?x=1&y=2";
+  expect(toFallbackImageUrl(source)).toContain("https://wsrv.nl/?url=");
+  expect(decodeURIComponent(toFallbackImageUrl(source)!.split("?url=")[1].split("&w=")[0])).toBe(source);
 });

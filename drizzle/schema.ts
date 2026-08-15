@@ -1,17 +1,7 @@
-import { index, int, mysqlEnum, mysqlTable, text, timestamp, varchar, double } from "drizzle-orm/mysql-core";
+import { index, uniqueIndex, int, mysqlEnum, mysqlTable, text, timestamp, varchar, double, boolean } from "drizzle-orm/mysql-core";
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -25,6 +15,21 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+export const atlasLayers = mysqlTable("atlas_layers", {
+  id: varchar("id", { length: 80 }).primaryKey(),
+  label: varchar("label", { length: 160 }).notNull(),
+  description: text("description"),
+  color: varchar("color", { length: 20 }).default("#287a70").notNull(),
+  icon: varchar("icon", { length: 80 }).default("map-pin").notNull(),
+  status: mysqlEnum("status", ["active", "archived"]).default("active").notNull(),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_layers_status_idx").on(table.status) }));
+
+export type AtlasLayer = typeof atlasLayers.$inferSelect;
+export type InsertAtlasLayer = typeof atlasLayers.$inferInsert;
+
 export const atlasPoints = mysqlTable("atlas_points", {
   id: int("id").autoincrement().primaryKey(),
   layerId: varchar("layerId", { length: 80 }).notNull(),
@@ -36,17 +41,203 @@ export const atlasPoints = mysqlTable("atlas_points", {
   municipality: varchar("municipality", { length: 160 }),
   category: varchar("category", { length: 120 }),
   source: varchar("source", { length: 255 }),
+  sourceKind: mysqlEnum("sourceKind", ["kml", "excel", "agency", "photographer", "web_page", "facebook", "wikimedia", "custom", "other"]).default("other").notNull(),
+  sourceRecordId: varchar("sourceRecordId", { length: 255 }),
   metadata: text("metadata"),
   imageUrl: text("imageUrl"),
   imageKey: text("imageKey"),
   status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  recordStatus: mysqlEnum("recordStatus", ["draft", "pending_review", "approved", "published", "rejected", "archived"]).default("draft").notNull(),
+  reviewNote: text("reviewNote"),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  duplicateOfId: int("duplicateOfId"),
+  fingerprint: varchar("fingerprint", { length: 128 }),
   createdBy: int("createdBy").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
-  layerStatusIdx: index("atlas_points_layer_status_idx").on(table.layerId, table.status),
+  layerStatusIdx: index("atlas_points_layer_status_idx").on(table.layerId, table.recordStatus),
   coordinatesIdx: index("atlas_points_coordinates_idx").on(table.latitude, table.longitude),
+  fingerprintIdx: index("atlas_points_fingerprint_idx").on(table.fingerprint),
 }));
 
 export type AtlasPoint = typeof atlasPoints.$inferSelect;
 export type InsertAtlasPoint = typeof atlasPoints.$inferInsert;
+
+export const atlasComments = mysqlTable("atlas_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId").notNull(),
+  userId: int("userId").notNull(),
+  body: text("body").notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "archived"]).default("pending").notNull(),
+  moderatedBy: int("moderatedBy"),
+  moderatedAt: timestamp("moderatedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ pointIdx: index("atlas_comments_point_idx").on(table.pointId), statusIdx: index("atlas_comments_status_idx").on(table.status), userIdx: index("atlas_comments_user_idx").on(table.userId) }));
+
+export type AtlasComment = typeof atlasComments.$inferSelect;
+export type InsertAtlasComment = typeof atlasComments.$inferInsert;
+
+export const atlasRatings = mysqlTable("atlas_ratings", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId").notNull(),
+  userId: int("userId").notNull(),
+  rating: int("rating").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ pointIdx: index("atlas_ratings_point_idx").on(table.pointId), userIdx: index("atlas_ratings_user_idx").on(table.userId) }));
+
+export type AtlasRating = typeof atlasRatings.$inferSelect;
+export type InsertAtlasRating = typeof atlasRatings.$inferInsert;
+
+export const atlasSuggestions = mysqlTable("atlas_suggestions", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId"),
+  userId: int("userId").notNull(),
+  suggestionType: mysqlEnum("suggestionType", ["edit", "image"]).notNull(),
+  proposedName: varchar("proposedName", { length: 255 }),
+  proposedDescription: text("proposedDescription"),
+  proposedCategory: varchar("proposedCategory", { length: 120 }),
+  proposedMetadata: text("proposedMetadata"),
+  imageUrl: text("imageUrl"),
+  storageKey: text("storageKey"),
+  sourceUrl: text("sourceUrl"),
+  sourceKind: mysqlEnum("sourceKind", ["agency", "photographer", "web_page", "facebook", "wikimedia", "kml", "excel", "custom", "other"]).default("other").notNull(),
+  ownerName: varchar("ownerName", { length: 255 }),
+  photographerName: varchar("photographerName", { length: 255 }),
+  license: varchar("license", { length: 255 }),
+  rightsNote: text("rightsNote"),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "archived"]).default("pending").notNull(),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  reviewNote: text("reviewNote"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  pointIdx: index("atlas_suggestions_point_idx").on(table.pointId),
+  statusIdx: index("atlas_suggestions_status_idx").on(table.status),
+  userIdx: index("atlas_suggestions_user_idx").on(table.userId),
+}));
+
+export type AtlasSuggestion = typeof atlasSuggestions.$inferSelect;
+export type InsertAtlasSuggestion = typeof atlasSuggestions.$inferInsert;
+
+export const atlasImages = mysqlTable("atlas_images", {
+  id: int("id").autoincrement().primaryKey(),
+  pointId: int("pointId").notNull(),
+  storageKey: text("storageKey"),
+  imageUrl: text("imageUrl").notNull(),
+  sourceUrl: text("sourceUrl"),
+  sourceKind: mysqlEnum("sourceKind", ["agency", "photographer", "web_page", "facebook", "wikimedia", "kml", "excel", "custom", "other"]).default("other").notNull(),
+  sourceRecordId: varchar("sourceRecordId", { length: 255 }),
+  sourceFileName: varchar("sourceFileName", { length: 255 }),
+  assetHash: varchar("assetHash", { length: 128 }),
+  importJobId: int("importJobId"),
+  ownerName: varchar("ownerName", { length: 255 }),
+  photographerName: varchar("photographerName", { length: 255 }),
+  license: varchar("license", { length: 255 }),
+  rightsNote: text("rightsNote").notNull(),
+  rightsWarning: boolean("rightsWarning").default(true).notNull(),
+  isPrimary: boolean("isPrimary").default(false).notNull(),
+  reviewStatus: mysqlEnum("reviewStatus", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  pointIdx: index("atlas_images_point_idx").on(table.pointId),
+  reviewIdx: index("atlas_images_review_idx").on(table.reviewStatus),
+  pointSourceIdx: index("atlas_images_point_source_idx").on(table.pointId, table.sourceKind),
+  assetHashIdx: index("atlas_images_asset_hash_idx").on(table.assetHash),
+}));
+
+export type AtlasImage = typeof atlasImages.$inferSelect;
+export type InsertAtlasImage = typeof atlasImages.$inferInsert;
+
+export const atlasImportJobs = mysqlTable("atlas_import_jobs", {
+  id: int("id").autoincrement().primaryKey(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  sourceKind: mysqlEnum("sourceKind", ["kml", "excel"]).notNull(),
+  storageKey: text("storageKey"),
+  status: mysqlEnum("status", ["uploaded", "processing", "needs_review", "completed", "failed"]).default("uploaded").notNull(),
+  totalRows: int("totalRows").default(0).notNull(),
+  importedRows: int("importedRows").default(0).notNull(),
+  duplicateRows: int("duplicateRows").default(0).notNull(),
+  rejectedRows: int("rejectedRows").default(0).notNull(),
+  errorSummary: text("errorSummary"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_import_jobs_status_idx").on(table.status) }));
+
+export type AtlasImportJob = typeof atlasImportJobs.$inferSelect;
+export type InsertAtlasImportJob = typeof atlasImportJobs.$inferInsert;
+
+export const atlasTop150Reviews = mysqlTable("atlas_top150_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  queueVersion: varchar("queueVersion", { length: 40 }).notNull(),
+  rank: int("rank").notNull(),
+  candidate: varchar("candidate", { length: 255 }).notNull(),
+  region: varchar("region", { length: 160 }),
+  confirmedName: varchar("confirmedName", { length: 255 }),
+  matchScore: double("matchScore").notNull(),
+  status: mysqlEnum("status", ["pending_review", "approved", "rejected"]).default("pending_review").notNull(),
+  reviewNote: text("reviewNote"),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  sourceReport: varchar("sourceReport", { length: 255 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  queueRankIdx: uniqueIndex("atlas_top150_queue_rank_uidx").on(table.queueVersion, table.rank),
+  statusIdx: index("atlas_top150_status_idx").on(table.status),
+}));
+
+export type AtlasTop150Review = typeof atlasTop150Reviews.$inferSelect;
+export type InsertAtlasTop150Review = typeof atlasTop150Reviews.$inferInsert;
+
+export const atlasAuditLogs = mysqlTable("atlas_audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  entityType: varchar("entityType", { length: 80 }).notNull(),
+  entityId: int("entityId").notNull(),
+  action: varchar("action", { length: 80 }).notNull(),
+  details: text("details"),
+  actorId: int("actorId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({ entityIdx: index("atlas_audit_entity_idx").on(table.entityType, table.entityId) }));
+
+export type AtlasAuditLog = typeof atlasAuditLogs.$inferSelect;
+export type InsertAtlasAuditLog = typeof atlasAuditLogs.$inferInsert;
+
+export const atlasTeamMembers = mysqlTable("atlas_team_members", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  displayName: varchar("displayName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  teamRole: mysqlEnum("teamRole", ["reviewer", "editor", "import_manager"]).default("reviewer").notNull(),
+  status: mysqlEnum("status", ["active", "suspended", "pending"]).default("pending").notNull(),
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_team_members_status_idx").on(table.status), roleIdx: index("atlas_team_members_role_idx").on(table.teamRole) }));
+
+export type AtlasTeamMember = typeof atlasTeamMembers.$inferSelect;
+export type InsertAtlasTeamMember = typeof atlasTeamMembers.$inferInsert;
+
+export const atlasBackups = mysqlTable("atlas_backups", {
+  id: int("id").autoincrement().primaryKey(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  storageKey: varchar("storageKey", { length: 700 }),
+  status: mysqlEnum("status", ["creating", "completed", "failed"]).default("creating").notNull(),
+  sizeBytes: int("sizeBytes"),
+  errorSummary: text("errorSummary"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({ statusIdx: index("atlas_backups_status_idx").on(table.status), createdAtIdx: index("atlas_backups_created_at_idx").on(table.createdAt) }));
+
+export type AtlasBackup = typeof atlasBackups.$inferSelect;
+export type InsertAtlasBackup = typeof atlasBackups.$inferInsert;

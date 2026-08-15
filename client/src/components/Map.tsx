@@ -13,14 +13,24 @@ export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom =
     if (!container.current || mapRef.current) return;
     const libyaBounds = L.latLngBounds([18.8, 8.2], [34.2, 25.6]);
     const map = L.map(container.current, { zoomControl: false, minZoom: 5, maxZoom: 18, maxBounds: libyaBounds, maxBoundsViscosity: 0.92, worldCopyJump: false, attributionControl: true }).setView(initialCenter, initialZoom);
-    L.control.zoom({ position: "bottomright" }).addTo(map);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(map);
+    const zoomControl = L.control.zoom({ position: "topright" }).addTo(map);
+    zoomControl.getContainer()?.setAttribute("aria-label", "أدوات تكبير وتصغير الخريطة");
+    const primaryTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(map);
+    let fallbackTiles: L.TileLayer | null = null;
+    let switchedToFallback = false;
+    const useFallbackTiles = () => {
+      if (switchedToFallback) return;
+      switchedToFallback = true;
+      primaryTiles.removeFrom(map);
+      fallbackTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" }).addTo(map);
+    };
+    primaryTiles.once("tileerror", useFallbackTiles);
     mapRef.current = map;
     onMapReady?.(map);
     const resize = () => map.invalidateSize();
     window.addEventListener("resize", resize);
     const timer = window.setTimeout(resize, 180);
-    return () => { window.clearTimeout(timer); window.removeEventListener("resize", resize); map.remove(); mapRef.current = null; };
+    return () => { window.clearTimeout(timer); window.removeEventListener("resize", resize); primaryTiles.off("tileerror", useFallbackTiles); fallbackTiles?.removeFrom(map); map.remove(); mapRef.current = null; };
   }, [initialCenter, initialZoom, onMapReady]);
   return <div ref={container} className={cn("w-full h-[500px]", className)} aria-label="الخريطة التفاعلية لأطلس ليبيا السياحي" />;
 }

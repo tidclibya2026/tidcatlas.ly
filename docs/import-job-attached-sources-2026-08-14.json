@@ -1,0 +1,24 @@
+{
+  "jobType": "attached-source-reconciliation",
+  "createdAt": "2026-08-14",
+  "status": "pending_review",
+  "sourceFiles": [
+    "docs/source-imports/2026-08-14/atlasnatrual.geojson",
+    "docs/source-imports/2026-08-14/atlasnatrual-with-media.geojson",
+    "docs/source-imports/2026-08-14/akakus.kml",
+    "docs/source-imports/2026-08-14/old-tripoli.kml",
+    "docs/source-imports/2026-08-14/tourism-investment-projects.kml",
+    "docs/source-imports/2026-08-14/world-heritage-five.kml"
+  ],
+  "normalizedManifest": "docs/normalized-attached-sources-2026-08-14.jsonl",
+  "rawRecords": 3770,
+  "uniqueNameCoordinateKeys": 2671,
+  "duplicateGroups": 1072,
+  "strategy": {
+    "geojsonPreference": "atlasnatrual-with-media.geojson when id or name+coordinate match is exact",
+    "kmlHandling": "separate source records with sourceFile and sourceRecordId",
+    "publication": "pending review; no automatic publication",
+    "images": "pointId and provenance required before publication",
+    "unknowns": "records with conflicting names, coordinates, or rights remain pending"
+  }
+}
