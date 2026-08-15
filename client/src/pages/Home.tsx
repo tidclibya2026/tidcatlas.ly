@@ -180,18 +180,21 @@ function parseMetadata(raw: string | null) {
 }
 
 function imageSourcesForSite(site: Site) {
-
+  const values: unknown[] = [site.properties.image_source, site.imageUrl, site.properties.imageUrl, site.properties.image_url, site.properties.photo_url, site.properties.photo_URL, site.properties.thumbnail_url, site.properties.image, site.properties.photo];
   const raw = site.properties.image_sources;
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed.filter((value): value is string => typeof value === "string" && (value.startsWith("http://") || value.startsWith("https://")));
-    } catch { /* keep the single-source fallback */ }
-  }
-  return [site.properties.image_source, site.properties.image_url, site.properties.imageUrl, site.properties.photo_url, site.properties.thumbnail_url, site.imageUrl].filter((value): value is string => typeof value === "string" && value.trim().length > 0);
+  if (Array.isArray(raw)) values.push(...raw);
+  else if (typeof raw === "string") { try { const parsed = JSON.parse(raw); if (Array.isArray(parsed)) values.push(...parsed); } catch { values.push(raw); } }
+  return Array.from(new Set(values.flatMap((value) => typeof value === "string" ? value.split(/[,\n;]/).map((item) => item.trim()).filter(Boolean) : [])));
 }
 
 function imageCandidates(source: string) {
+  const isProxy = /(?:images\.weserv\.nl|wsrv\.nl)/i.test(source);
+  if (isProxy) {
+    try {
+      const original = new URL(source).searchParams.get("url");
+      return Array.from(new Set([source, original || undefined, toFallbackImageUrl(original || undefined)].filter((value): value is string => Boolean(value))));
+    } catch { return [source]; }
+  }
   return Array.from(new Set([toDisplayImageUrl(source), toFallbackImageUrl(source), source].filter((value): value is string => Boolean(value))));
 }
 
