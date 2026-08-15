@@ -315,3 +315,73 @@ button, .layer-row, .search-result-list button { transition: background-color .1
   .header-gis-badge { display: none; }
   .atlas-main .control-panel { width: calc(100vw - 24px); inset: 12px auto 12px 12px; padding: 17px 14px; }
 }
+
+/* Atlas 2026 visual system: contemporary cartography over ceremonial ornament */
+:root {
+  --atlas-blue-deep: #082a3a;
+  --atlas-blue-mid: #0f4b62;
+  --atlas-gold: #d6a84f;
+  --atlas-gold-soft: #f1dfb0;
+  --atlas-mist: #eef3f1;
+  --atlas-shadow: 0 22px 55px rgba(8,42,58,.16);
+}
+.atlas-shell { background: #eaf0ee; background-image: linear-gradient(135deg, #edf2ef 0%, #e7edeb 52%, #dce6e3 100%); }
+.topbar { height: 88px; padding: 0 clamp(18px, 3vw, 52px); background: linear-gradient(110deg, #061f2c 0%, #0c3d50 58%, #11556b 100%); border-bottom: 1px solid rgba(214,168,79,.8); box-shadow: 0 8px 24px rgba(4,27,38,.2); }
+.topbar::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background-image: linear-gradient(90deg, transparent 0 49%, rgba(214,168,79,.35) 50%, transparent 51%), linear-gradient(0deg, transparent 0 49%, rgba(214,168,79,.22) 50%, transparent 51%); background-size: 44px 44px; mask-image: linear-gradient(90deg, #000, transparent 72%); }
+.brand-lockup { gap: 16px; position: relative; z-index: 1; }
+.project-mark { width: 62px; height: 62px; border-radius: 14px; background: linear-gradient(145deg, #fffaf0, #e8ddc5); border: 1px solid var(--atlas-gold); box-shadow: 0 10px 22px rgba(0,0,0,.18); }
+.brand-lockup .project-logo { width: 56px; height: 58px; }
+.brand-title { min-width: 240px; }
+.brand-lockup h1 { font-size: 25px; letter-spacing: -.045em; color: #fff; }
+.brand-lockup h1 em { color: var(--atlas-gold-soft); }
+.brand-title .eyebrow { color: #b6d4d0; font-size: 9px; }
+.brand-title small { color: #e3d3a9; font-size: 10px; }
+.official-logos { margin-right: 8px; padding: 7px 13px; border: 1px solid rgba(214,168,79,.45); border-radius: 10px; background: rgba(255,250,240,.96); box-shadow: 0 10px 22px rgba(0,0,0,.16); }
+.official-logo-cell img { width: 38px; height: 34px; }
+.official-logo-cell span { font-size: 8px; color: var(--atlas-blue-deep); }
+.topbar-actions { position: relative; z-index: 1; }
+.header-gis-badge { border-radius: 999px; padding: 7px 11px; background: rgba(4,26,36,.4); border-color: rgba(214,168,79,.65); }
+.atlas-main { min-height: calc(100vh - 88px); background: #d6e0de; }
+.atlas-main .control-panel { inset: 18px auto 18px 18px; width: min(398px, calc(100vw - 36px)); max-height: calc(100vh - 124px); padding: 22px 20px; border: 1px solid rgba(255,255,255,.85); border-radius: 18px; box-shadow: var(--atlas-shadow); background: rgba(249,251,249,.9); }
+.panel-intro { border-right: 4px solid var(--atlas-gold); padding-right: 15px; margin-bottom: 20px; }
+.panel-intro h2 { font-size: 20px; color: var(--atlas-blue-deep); letter-spacing: -.05em; }
+.panel-intro p { color: #526b72; font-size: 12px; }
+.search-box { border-radius: 12px; padding: 8px 13px; background: #fff; border-color: #d4e0dc; box-shadow: 0 10px 24px rgba(8,42,58,.08); }
+.filter-panel { border-right: 3px solid var(--atlas-blue-mid); border-radius: 12px; background: linear-gradient(135deg, #f7faf8, #edf3ef); }
+.ai-panel,.route-panel { border-radius: 14px; border: 1px solid #cfddd8; box-shadow: 0 10px 24px rgba(8,42,58,.06); background: linear-gradient(145deg, rgba(236,246,243,.95), rgba(255,251,242,.95)); }
+.ai-panel { border-right: 3px solid #b17a27; }
+.route-panel { border-right: 3px solid #26847a; }
+.ai-panel-heading { font-size: 12px; }
+.ai-panel-heading svg { color: #b17a27; }
+.ai-question input { border-radius: 9px; height: 36px; font-size: 11px; }
+.ai-question button,.route-button { border-radius: 9px; background: var(--atlas-blue-deep); box-shadow: 0 7px 14px rgba(8,42,58,.15); }
+.ai-answer,.route-result { border-radius: 10px; border-right: 3px solid var(--atlas-gold); background: rgba(255,255,255,.8); }
+.panel-heading { padding-top: 6px; }
+.panel-heading h3 { font-size: 17px; color: var(--atlas-blue-deep); }
+.layer-list { gap: 8px; }
+.layer-row { min-height: 74px; padding: 10px 11px; border: 1px solid #dce6e2; border-radius: 12px; background: rgba(255,255,255,.55); }
+.layer-row:hover { background: #fff; border-color: #c7d9d2; transform: translateX(-4px); box-shadow: 0 8px 18px rgba(8,42,58,.08); }
+.layer-row.is-active { background: linear-gradient(90deg, #fff 0%, #f8fbf8 100%); border-color: #d6c085; box-shadow: 0 9px 20px rgba(8,42,58,.1); }
+.layer-row.is-active::before { background: var(--atlas-gold); width: 4px; border-radius: 4px; }
+.layer-mark { width: 39px; height: 39px; border-radius: 12px; border: 1px solid currentColor; box-shadow: inset 0 0 0 4px rgba(255,255,255,.5); }
+.layer-mark-glyph { display: grid; place-items: center; }
+.layer-copy strong { font-size: 12px; color: var(--atlas-blue-deep); }
+.layer-copy span { color: #5e777c; }
+.map-stage { height: calc(100vh - 88px); background-color: #d3dedb; }
+.map-overlay-title { top: 22px; right: 24px; border-right: 3px solid var(--atlas-gold); border-left: 0; border-radius: 10px; padding: 9px 13px; background: rgba(255,255,255,.88); box-shadow: 0 10px 24px rgba(8,42,58,.11); }
+.map-overlay-title strong { color: var(--atlas-blue-deep); }
+.map-legend { border-radius: 10px; background: rgba(255,255,255,.92); box-shadow: 0 10px 24px rgba(8,42,58,.1); }
+.map-count { border-radius: 10px; background: var(--atlas-blue-deep); box-shadow: 0 10px 22px rgba(8,42,58,.2); }
+.story-strip { border-top: 1px solid rgba(214,168,79,.5); }
+.detail-sheet { border-radius: 20px 0 0 20px; }
+.detail-sheet h2 { color: var(--atlas-blue-deep); }
+.detail-grid div { border-radius: 10px; background: #eef3ef; border: 1px solid #dce6e2; }
+.detail-action { border-radius: 10px; background: var(--atlas-blue-deep); }
+@media (max-width: 900px) { .topbar { height: 74px; } .map-stage { height: calc(100vh - 74px); } .atlas-main .control-panel { display: none; } }
+@media (max-width: 560px) { .topbar { height: 70px; } .project-mark { border-radius: 10px; } .brand-lockup h1 { font-size: 18px; } .official-logos { border-radius: 8px; } }
+
+.ai-quick-prompts { display:flex; flex-wrap:wrap; gap:5px; margin:8px 0 10px; }
+.ai-quick-prompts button { border:1px solid #d6c38f; border-radius:999px; padding:5px 8px; background:#fffaf0; color:#7d5c22; font-size:9px; transition:transform .18s var(--ease-out), background .18s var(--ease-out), color .18s var(--ease-out); }
+.ai-quick-prompts button:hover { transform:translateY(-2px); background:#f5e4b9; color:var(--atlas-blue-deep); }
+.ai-quick-prompts button:active { transform:scale(.96); }
+.ai-quick-prompts button:focus-visible { outline:2px solid var(--atlas-teal); outline-offset:2px; }
