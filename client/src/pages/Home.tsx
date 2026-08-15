@@ -33,20 +33,20 @@ type Site = { id: string; name: string; description: string; lat: number; lng: n
 type LayerConfig = { id: string; name: string; short: string; color: string; icon: ReactNode; url: string; kind: "kml" | "geojson"; description: string; featured?: boolean };
 
 const PAGES_BASE = import.meta.env.BASE_URL || "/";
-  const isPublicRoute = typeof window !== "undefined" && window.location.pathname.includes("/public");
+  const isPublicRoute = typeof window !== "undefined" && (window.location.pathname.includes("/public") || window.location.pathname === "/");
   const canUsePublicEditor = false;
 const pagesAsset = (name: string) => `${PAGES_BASE}${name}`;
 const dataAsset = (name: string) => `${PAGES_BASE}data/${name}`;
 
 const DATA = {
-  projectLogo: pagesAsset("atlas-tourism-project_c75dcab1.png"),
-  ministryLogo: pagesAsset("ministry-tourism_feb6f439.png"),
-  centerLogo: pagesAsset("tourism-documentation-center_0d098924.png"),
+  projectLogo: pagesAsset("assets/atlas-project-logo.png"),
+  ministryLogo: pagesAsset("assets/ministry-logo.png"),
+  centerLogo: pagesAsset("assets/tidc-logo.png"),
   hero: pagesAsset("libya-atlas-hero_ebb8b2b9.jpg"),
   desert: pagesAsset("libya-atlas-desert_8d3e876d.jpg"),
   heritage: pagesAsset("libya-atlas-heritage_baefbb7e.jpg"),
   cover: pagesAsset("libya-atlas-cover-gis-landscape_22a918d0.png"),
-  intro: pagesAsset("IMG_6898_91929b39.PNG"),
+  intro: pagesAsset("assets/atlas-intro-cover.webp"),
 };
 
 const INITIAL_CENTER: [number, number] = [27.2, 17.2];
@@ -237,7 +237,7 @@ export default function Home() {
   const markers = useRef<Record<string, L.Layer[]>>({});
   const routeLine = useRef<L.Polyline | null>(null);
   const publishedPoints = trpc.atlas.published.useQuery({});
-  const pendingTop150 = trpc.atlas.top150PendingMarkers.useQuery();
+  const pendingTop150 = trpc.atlas.top150PendingMarkers.useQuery(undefined, { enabled: !isPublicRoute && Boolean(isAuthenticated && user?.role === "admin") });
   const adminPoints = trpc.atlas.mine.useQuery(undefined, { enabled: Boolean(isAuthenticated && user?.role === "admin") });
   const trpcUtils = trpc.useUtils();
   const handleMapReady = useCallback((instance: L.Map) => { setMap(instance); setMapReady(true); }, []);
