@@ -31,6 +31,7 @@ const assistantContext = z.object({
   viewport: z.object({ south: z.number(), west: z.number(), north: z.number(), east: z.number(), zoom: z.number().min(0).max(24) }).optional(),
   nearbyIds: z.array(z.string().max(120)).max(24).optional(),
   nearbyNames: z.array(z.string().min(1).max(255)).max(24).optional(),
+  language: z.enum(["ar", "en"]).default("ar"),
 });
 
 async function getVerifiedAssistantSites() {
@@ -81,8 +82,8 @@ export const appRouter = router({
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
-          { role: "system", content: "أنت مساعد بحث جغرافي لمشروع أطلس ليبيا السياحي. أجب بالعربية اعتمادًا حصريًا على سجلات المواقع المرفقة. لا تخترع مواقع أو أرقامًا أو مصادر. إذا لم تكفِ البيانات، صرّح بذلك بوضوح. أعد JSON فقط." },
-          { role: "user", content: `نمط المستخدم: ${input.mode}\n${viewportText}\nالسؤال: ${input.question}\n${nearbyIdSet.size ? "هذه السجلات هي الأقرب للنطاق الحالي؛ أعطها الأولوية ولا تقترح سجلاً خارجها إلا إذا لم تكفِ البيانات:" : "سجلات الأطلس المتاحة:"}\n${JSON.stringify(searchSites)}` },
+          { role: "system", content: `أنت مساعد بحث جغرافي لمشروع أطلس ليبيا السياحي. اعتمد حصريًا على سجلات المواقع المرفقة، ولا تخترع مواقع أو أرقامًا أو مصادر. إذا لم تكفِ البيانات، صرّح بذلك بوضوح. أعد JSON فقط. لغة الإخراج الإلزامية لحقول answer وsources وlimitation: ${input.language === "en" ? "English" : "العربية"}. أبقِ أسماء المواقع الرسمية كما هي عند الحاجة.` },
+          { role: "user", content: `لغة المستخدم: ${input.language === "en" ? "English" : "العربية"}\nنمط المستخدم: ${input.mode}\n${viewportText}\nالسؤال: ${input.question}\n${nearbyIdSet.size ? "هذه السجلات هي الأقرب للنطاق الحالي؛ أعطها الأولوية ولا تقترح سجلاً خارجها إلا إذا لم تكفِ البيانات:" : "سجلات الأطلس المتاحة:"}\n${JSON.stringify(searchSites)}` },
         ],
         reasoning: { effort: "low" },
         response_format: { type: "json_schema", json_schema: { name: "atlas_search", strict: true, schema: { type: "object", properties: { answer: { type: "string" }, matchedIds: { type: "array", items: { type: "string" } }, sources: { type: "array", items: { type: "string" } }, confidence: { type: "string", enum: ["high", "medium", "low"] }, limitation: { type: "string" } }, required: ["answer", "matchedIds", "sources", "confidence", "limitation"], additionalProperties: false } } },
@@ -95,14 +96,14 @@ export const appRouter = router({
       const validSources = new Set(searchSites.flatMap((site) => [site.name, site.source].filter(Boolean) as string[]));
       return { ...parsed, matchedIds: parsed.matchedIds.filter((id) => validIds.has(id)), sources: parsed.sources.filter((source) => validSources.has(source)) };
     }),
-    routePlan: publicProcedure.input(z.object({ mode: z.enum(["researcher", "tourist", "visitor"]), startName: z.string().max(255).optional(), durationHours: z.number().min(1).max(120), interests: z.array(z.string().max(120)).max(8) })).mutation(async ({ input }) => {
+    routePlan: publicProcedure.input(z.object({ mode: z.enum(["researcher", "tourist", "visitor"]), startName: z.string().max(255).optional(), durationHours: z.number().min(1).max(120), interests: z.array(z.string().max(120)).max(8), language: z.enum(["ar", "en"]).default("ar") })).mutation(async ({ input }) => {
       const sites = (await getVerifiedAssistantSites()).slice(0, 80);
       if (sites.length < 2) throw new TRPCError({ code: "BAD_REQUEST", message: "يحتاج المسار إلى سجلين منشورين على الأقل." });
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
-          { role: "system", content: "أنت مخطط مسارات جغرافية لمشروع أطلس ليبيا السياحي. استخدم المواقع المرفقة فقط، ولا تضف أي موقع غير موجود. رتّب محطات منطقية حسب نمط المستخدم والاهتمامات والوقت، واذكر أن الترتيب تقريبي ما لم تتوفر شبكة طرق. أعد JSON فقط." },
-          { role: "user", content: `النمط: ${input.mode}\nنقطة البداية: ${input.startName || "غير محددة"}\nالمدة بالساعات: ${input.durationHours}\nالاهتمامات: ${input.interests.join(", ") || "استكشاف عام"}\nالمواقع الموثقة:\n${JSON.stringify(sites)}` },
+          { role: "system", content: `أنت مخطط مسارات جغرافية لمشروع أطلس ليبيا السياحي. استخدم المواقع المرفقة فقط، ولا تضف أي موقع غير موجود. رتّب محطات منطقية حسب نمط المستخدم والاهتمامات والوقت، واذكر أن الترتيب تقريبي ما لم تتوفر شبكة طرق. أعد JSON فقط. لغة title وrationale وwarnings الإلزامية: ${input.language === "en" ? "English" : "العربية"}.` },
+          { role: "user", content: `لغة المستخدم: ${input.language === "en" ? "English" : "العربية"}\nالنمط: ${input.mode}\nنقطة البداية: ${input.startName || "غير محددة"}\nالمدة بالساعات: ${input.durationHours}\nالاهتمامات: ${input.interests.join(", ") || "استكشاف عام"}\nالمواقع الموثقة:\n${JSON.stringify(sites)}` },
         ],
         reasoning: { effort: "low" },
         response_format: { type: "json_schema", json_schema: { name: "atlas_route", strict: true, schema: { type: "object", properties: { title: { type: "string" }, orderedIds: { type: "array", items: { type: "string" } }, rationale: { type: "string" }, warnings: { type: "array", items: { type: "string" } } }, required: ["title", "orderedIds", "rationale", "warnings"], additionalProperties: false } } },
