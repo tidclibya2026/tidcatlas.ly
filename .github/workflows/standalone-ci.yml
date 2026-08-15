@@ -1,16 +1,10 @@
 name: Standalone CI
 
-
-
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main, repair/full-stack-clean]
-
-
-
 
 jobs:
   verify:
@@ -46,9 +40,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm db:push
       - run: pnpm check
       - run: pnpm test
       - run: pnpm build
-
-
-
