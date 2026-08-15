@@ -27,7 +27,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import {
-  Activity, ArrowLeft, Building2, ChevronDown, Database, ExternalLink, Eye, EyeOff, Flag, Hotel,   ImagePlus, ImageOff, Landmark, Layers3, MessageSquarePlus,
+  Activity, ArrowLeft, Building2, ChevronDown, Database, ExternalLink, Eye, EyeOff, Flag, Hotel, ImagePlus, ImageOff, Landmark, Languages, Layers3, MessageSquarePlus,
   MapPinned, MapPinPlus, Menu, Moon, Mountain, Route, Search, ShieldCheck, SlidersHorizontal, Sparkles, Star, Sun, Trees, TrendingUp, Utensils, Waves, X, ZoomIn
 } from "lucide-react";
 
@@ -226,6 +226,10 @@ export default function Home() {
   const { theme, toggleTheme } = useTheme();
 
   const [hasEnteredAtlas, setHasEnteredAtlas] = useState(false);
+  const [language, setLanguage] = useState<"ar" | "en">(() => (typeof window !== "undefined" && window.localStorage.getItem("atlas-language") === "en" ? "en" : "ar"));
+  const [headerSearch, setHeaderSearch] = useState("");
+  const [headerSearchOpen, setHeaderSearchOpen] = useState(false);
+  const [headerCompact, setHeaderCompact] = useState(false);
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const persistedDocumentationLayers = trpc.atlas.layers.useQuery();
   const customDocumentationLayers = persistedDocumentationLayers.data ?? [];
@@ -243,6 +247,18 @@ export default function Home() {
   const managedLayerIds = useMemo(() => new Set(customLayerConfigs.map((layer) => layer.id)), [customLayerConfigs]);
   const [loaded, setLoaded] = useState<Record<string, Site[]>>({});
   const [query, setQuery] = useState("");
+  useEffect(() => {
+    const onScroll = () => setHeaderCompact(window.scrollY > 34);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem("atlas-language", language);
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  }, [language]);
+  const selectedLanguageLabels = language === "ar" ? { project: "أطلس ليبيا", tourism: "السياحي", eyebrow: "مشروع وطني للتوثيق والاستكشاف", slogan: "ليبيا ... مهد الحضارات وموطن السحر والجمال", official1: "وزارة السياحة والصناعات التقليدية", official2: "مركز المعلومات والتوثيق السياحي", supervised: "الجهة المشرفة", implemented: "الجهة المنفذة", search: "ابحث عن معلم أو مدينة ليبية…", edition: "نسخة العرض المؤسسية · 2026", gis: "خريطة وطنية" } : { project: "Libya Tourism", tourism: "Atlas", eyebrow: "National documentation and discovery project", slogan: "Libya ... cradle of civilizations and home of magic and beauty", official1: "Ministry of Tourism and Traditional Industries", official2: "Tourism Information and Documentation Center", supervised: "Supervising authority", implemented: "Implementing authority", search: "Search a landmark or Libyan city…", edition: "Institutional edition · 2026", gis: "National map" };
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedMunicipality, setSelectedMunicipality] = useState("all");
   const [selectedLayer, setSelectedLayer] = useState("all");
@@ -320,6 +336,11 @@ export default function Home() {
   const pointFeed = user?.role === "admin" ? adminPoints.data : publishedPoints.data;
   const managedSites = useMemo<Site[]>(() => (pointFeed || []).map((point) => ({ id: `managed-${point.id}`, name: point.name, description: point.description || "", lat: point.latitude, lng: point.longitude, imageUrl: point.imageUrl, properties: { municipality: point.municipality || "", category: point.category || "", source: point.source || "", ...parseMetadata(point.metadata) }, layerId: point.layerId })), [pointFeed]);
   const activeSites = useMemo(() => [...activeLayers.flatMap((id) => loaded[id] || []), ...managedSites.filter((site) => activeLayers.includes(site.layerId))], [activeLayers, loaded, managedSites]);
+  const headerSearchResults = useMemo(() => {
+    const needle = headerSearch.trim().toLocaleLowerCase();
+    if (!needle) return [];
+    return activeSites.filter((site) => `${site.name} ${Object.values(site.properties).join(" ")}`.toLocaleLowerCase().includes(needle)).slice(0, 6);
+  }, [activeSites, headerSearch]);
   const siteValue = (site: Site, keys: string[]) => keys.map((key) => site.properties[key] || site.properties[key.toLowerCase()]).find(Boolean) || "";
   const filterOptions = useMemo(() => {
     const categories = new Set<string>();
@@ -540,10 +561,11 @@ export default function Home() {
   }
 
   return (
-    <main dir="rtl" className="atlas-shell">
-      <header className="topbar" data-visual-language="national-institutional">
-        <div className="brand-lockup"><div className="project-mark"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /></div><div className="brand-title"><span className="eyebrow">مشروع وطني للتوثيق والاستكشاف</span><h1>أطلس ليبيا <em>السياحي</em></h1><small className="brand-slogan">ليبيا.. ملتقى الحضارات، ومهد الأصالة</small></div><div className="official-logos" aria-label="الجهات الرسمية المشرفة على المشروع"><div className="official-logo-cell"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><div><span className="official-kicker">الجهة المشرفة</span><strong>وزارة السياحة والصناعات التقليدية</strong></div></div><div className="official-logo-cell"><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /><div><span className="official-kicker">الجهة المنفذة</span><strong>مركز المعلومات والتوثيق السياحي</strong></div></div></div></div>
-        <div className="topbar-actions"><Button type="button" variant="ghost" size="icon" className="theme-toggle" onClick={() => toggleTheme?.()} aria-label={theme === "dark" ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي"} title={theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}>{theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}</Button><div className="header-gis-badge"><Layers3 size={14} /><span>GIS</span><small>خريطة وطنية</small></div><span className="edition"><span className="status-dot" /> نسخة العرض المؤسسية · 2026</span>{!isPublicRoute && <Button className="system-admin-topbar-button" variant="outline" size="sm" onClick={() => { if (isAuthenticated && user?.role === "admin") { window.location.href = `${import.meta.env.BASE_URL}management`; } else { startLogin(); } }}><ShieldCheck size={15} /> مسؤول النظام</Button>}<Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
+    <main dir={language === "ar" ? "rtl" : "ltr"} className="atlas-shell">
+      <header className={`topbar ${headerCompact ? "is-compact" : ""}`} data-visual-language="national-institutional">
+        <div className="brand-lockup"><div className="project-mark"><img className="project-logo" src={DATA.projectLogo} alt="شعار مشروع أطلس ليبيا السياحي" /></div><div className="brand-title"><span className="eyebrow">{selectedLanguageLabels.eyebrow}</span><h1>{selectedLanguageLabels.project} <em>{selectedLanguageLabels.tourism}</em></h1><small className="brand-slogan">{selectedLanguageLabels.slogan}</small></div><div className="official-logos" aria-label="الجهات الرسمية المشرفة على المشروع"><div className="official-logo-cell"><img src={DATA.ministryLogo} alt="شعار وزارة السياحة والصناعات التقليدية" /><div><span className="official-kicker">{selectedLanguageLabels.supervised}</span><strong>{selectedLanguageLabels.official1}</strong></div></div><div className="official-logo-cell"><img src={DATA.centerLogo} alt="شعار مركز المعلومات والتوثيق السياحي" /><div><span className="official-kicker">{selectedLanguageLabels.implemented}</span><strong>{selectedLanguageLabels.official2}</strong></div></div></div></div>
+        <div className="topbar-quick-search"><Search size={16} aria-hidden="true" /><input value={headerSearch} onFocus={() => setHeaderSearchOpen(true)} onChange={(event) => { setHeaderSearch(event.target.value); setHeaderSearchOpen(true); }} placeholder={selectedLanguageLabels.search} aria-label={selectedLanguageLabels.search} />{headerSearch && <button type="button" onClick={() => { setHeaderSearch(""); setHeaderSearchOpen(false); }} aria-label={language === "ar" ? "مسح البحث" : "Clear search"}><X size={14} /></button>}{headerSearchOpen && headerSearch.trim() && <div className="topbar-search-results">{headerSearchResults.length ? headerSearchResults.map((site) => <button type="button" key={site.id} onClick={() => { setQuery(site.name); setHeaderSearch(site.name); setHeaderSearchOpen(false); setSelected(site); focusSite(site, 12); }}>{site.name}<small>{siteValue(site, ["municipality", "city", "البلدية"]) || (language === "ar" ? "معلم موثق" : "Documented site")}</small></button>) : <span>{language === "ar" ? "لا توجد نتائج ضمن الطبقات النشطة" : "No results in active layers"}</span>}</div>}</div>
+        <div className="topbar-actions"><Button type="button" variant="ghost" size="sm" className="language-toggle" onClick={() => setLanguage((current) => current === "ar" ? "en" : "ar")} aria-label={language === "ar" ? "Switch to English" : "التبديل إلى العربية"}><Languages size={15} /><span>{language === "ar" ? "EN" : "عربي"}</span></Button><Button type="button" variant="ghost" size="icon" className="theme-toggle" onClick={() => toggleTheme?.()} aria-label={theme === "dark" ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي"} title={theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}>{theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}</Button><div className="header-gis-badge"><Layers3 size={14} /><span>GIS</span><small>{selectedLanguageLabels.gis}</small></div><span className="edition"><span className="status-dot" /> {selectedLanguageLabels.edition}</span>{!isPublicRoute && <Button className="system-admin-topbar-button" variant="outline" size="sm" onClick={() => { if (isAuthenticated && user?.role === "admin") { window.location.href = `${import.meta.env.BASE_URL}management`; } else { startLogin(); } }}><ShieldCheck size={15} /> مسؤول النظام</Button>}<Button variant="ghost" size="icon" className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="فتح قائمة الطبقات"><Menu /></Button></div>
       </header>
 
 
