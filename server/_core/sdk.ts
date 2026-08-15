@@ -83,11 +83,11 @@ const createOAuthHttpClient = (): AxiosInstance =>
 
 class SDKServer {
   private readonly client: AxiosInstance;
-  private readonly oauthService: OAuthService;
+  private readonly oauthService: OAuthService | null;
 
   constructor(client: AxiosInstance = createOAuthHttpClient()) {
     this.client = client;
-    this.oauthService = new OAuthService(this.client);
+    this.oauthService = ENV.authMode === "local" ? null : new OAuthService(this.client);
   }
 
   private deriveLoginMethod(
@@ -121,6 +121,7 @@ class SDKServer {
     code: string,
     state: string
   ): Promise<ExchangeTokenResponse> {
+    if (!this.oauthService) throw new Error("OAuth is disabled in local authentication mode");
     return this.oauthService.getTokenByCode(code, state);
   }
 
@@ -130,6 +131,7 @@ class SDKServer {
    * const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
    */
   async getUserInfo(accessToken: string): Promise<GetUserInfoResponse> {
+    if (!this.oauthService) throw new Error("OAuth is disabled in local authentication mode");
     const data = await this.oauthService.getUserInfoByToken({
       accessToken,
     } as ExchangeTokenResponse);

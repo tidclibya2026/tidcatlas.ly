@@ -1,0 +1,122 @@
+{
+  "project_info": {
+    "title": "معمارية إدارة الصور",
+    "created": 1786658563.34,
+    "last_updated": 1786658679.125,
+    "total_slides": 10
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "problem",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "architecture",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "flow",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "python_importer",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "metadata",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "display",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "storage_rights",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "implementation",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "success",
+      "state": "edited",
+      "pageNum": 10
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "معمارية إدارة الصور",
+      "summary": "أطلس ليبيا السياحي: من رابط KML إلى صورة موثقة قابلة للعرض، مع هوية مركز المعلومات والتوثيق السياحي.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "problem",
+      "title": "لماذا لا تكفي روابط KML؟",
+      "summary": "توضيح أسباب فشل الصور: CDATA وHTML والروابط النسبية والمصادر غير المستقرة وحقوق الاستخدام.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "architecture",
+      "title": "المعمارية المقترحة: ست طبقات",
+      "summary": "عرض طبقات الاستخراج والتطبيع والتخزين والبيانات الوصفية والعرض وحقوق الملكية.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "flow",
+      "title": "تدفق الصورة من المصدر إلى الواجهة",
+      "summary": "شرح مسار الصورة من KML أو GeoJSON إلى manifest ثم التخزين الدائم ثم نافذة التفاصيل.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "python_importer",
+      "title": "مستورد Python: الوضع الآمن أولًا",
+      "summary": "عرض وظيفة السكربت، parse-only، التنزيل الصريح، تقييد النطاقات، وmanifest.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "metadata",
+      "title": "نموذج بيانات الصورة",
+      "summary": "توضيح image_url وimage_source وimage_author وimage_license وimage_license_note.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "display",
+      "title": "استراتيجية العرض والاسترداد",
+      "summary": "شرح أولوية الصورة المخزنة، المصدر الأصلي، proxy، وplaceholder الآمن عند الفشل.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "storage_rights",
+      "title": "التخزين الدائم وحقوق الملكية",
+      "summary": "شرح storagePut وS3، حفظ المفتاح والبيانات الوصفية، وعدم نشر الأسرار أو صور بلا ترخيص.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "implementation",
+      "title": "خطة التنفيذ في المركز",
+      "summary": "خطوات اعتماد الملفات الرسمية، مراجعة manifest، اعتماد التراخيص، التخزين، والاختبار قبل النشر.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "success",
+      "title": "معيار النجاح",
+      "summary": "معايير قبول الحل: قابلية التتبع، الاستقرار، الحقوق الواضحة، وعدم استخدام صورة مضللة.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}
