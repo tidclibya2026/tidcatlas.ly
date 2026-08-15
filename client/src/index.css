@@ -542,3 +542,34 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 @media (max-width:1200px) { .brand-lockup { grid-template-columns:auto minmax(210px,1fr) minmax(360px,430px); } .official-logo-cell { padding-inline:6px; } .official-logo-cell strong { font-size:8px; } }
 @media (max-width:900px) { .brand-title { white-space:normal; } .brand-lockup h1 { font-size:20px; } .official-logos { background:rgba(255,253,246,.12); } }
 @media (max-width:560px) { .brand-lockup { grid-template-columns:auto minmax(0,1fr); } .brand-lockup h1 { white-space:nowrap; font-size:17px; } .brand-title .brand-slogan { white-space:nowrap; } .official-logos { display:flex; } .official-logo-cell { padding-inline:4px; } .official-logo-cell strong { font-size:7px; } .official-logo-cell img { width:28px; height:27px; padding:3px; } }
+
+/* 2026 atlas header: visual hierarchy is identity → institutions → tools */
+.atlas-header-2026 { display:grid; grid-template-columns:minmax(260px,1.05fr) minmax(350px,1fr) minmax(340px,1.2fr); align-items:center; gap:clamp(16px,2.4vw,38px); min-height:94px; padding:10px clamp(20px,4.5vw,72px); background:linear-gradient(112deg,#061d2b 0%,#0a3444 52%,#104d5d 100%); border-bottom:1px solid rgba(223,193,116,.72); box-shadow:0 10px 28px rgba(4,28,40,.22); }
+.atlas-header-2026::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.45; background:linear-gradient(90deg,rgba(220,190,111,.08),transparent 34%,rgba(255,255,255,.06) 68%,transparent); }
+.atlas-header-identity,.atlas-header-institutions,.atlas-header-tools { position:relative; z-index:1; min-width:0; }
+.atlas-header-identity { display:flex; align-items:center; gap:14px; direction:ltr; }
+.atlas-header-identity .project-mark { width:62px; height:62px; flex:none; border-radius:17px; border:1px solid #ead092; background:#f7f2e6; box-shadow:0 7px 20px rgba(0,0,0,.2); }
+.atlas-header-identity .brand-title { min-width:0; direction:rtl; text-align:right; }
+.atlas-header-identity .brand-title h1 { white-space:nowrap; margin:1px 0 3px; color:#fffdf5; font-family:'Noto Kufi Arabic',sans-serif; font-size:clamp(23px,2.25vw,34px); line-height:1.14; letter-spacing:-.06em; }
+.atlas-header-identity .brand-title h1 em { color:#e7c878; font-style:normal; }
+.atlas-header-identity .brand-slogan { display:block; max-width:430px; overflow:hidden; color:#d9e4e1; font-size:10px; line-height:1.4; text-overflow:ellipsis; white-space:nowrap; }
+.atlas-header-institutions { display:flex; align-items:center; justify-content:center; gap:clamp(8px,1vw,18px); padding:8px 12px; border:1px solid rgba(231,205,139,.36); border-radius:18px; background:linear-gradient(115deg,rgba(246,240,223,.13),rgba(246,240,223,.045)); box-shadow:inset 0 1px rgba(255,255,255,.12); backdrop-filter:blur(12px); }
+.institution-logo { display:flex; align-items:center; min-width:0; gap:8px; direction:rtl; }
+.institution-logo img { width:38px; height:38px; flex:none; padding:5px; border:1px solid rgba(231,205,139,.68); border-radius:12px; background:rgba(249,246,235,.9); object-fit:contain; }
+.institution-logo div { min-width:0; text-align:right; }
+.institution-logo span,.institution-logo strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.institution-logo span { color:#e1c985; font-size:7px; font-weight:700; }
+.institution-logo strong { color:#f9f1d8; font-size:9px; line-height:1.25; }
+.institution-rule { width:1px; height:34px; flex:none; background:linear-gradient(180deg,transparent,#e3c67e,transparent); }
+.atlas-header-tools { display:flex; align-items:center; justify-content:flex-end; gap:9px; min-width:0; }
+.atlas-header-tools .topbar-quick-search { flex:1 1 210px; width:auto; min-width:170px; max-width:330px; }
+.atlas-header-tools .topbar-actions { display:flex; align-items:center; flex:none; gap:6px; }
+.atlas-header-tools .edition { display:none; }
+.atlas-header-2026.is-compact { min-height:70px; padding-block:6px; }
+.atlas-header-2026.is-compact .atlas-header-identity .project-mark { width:50px; height:50px; border-radius:14px; }
+.atlas-header-2026.is-compact .atlas-header-identity .brand-title h1 { font-size:clamp(20px,2vw,29px); }
+.atlas-header-2026.is-compact .atlas-header-identity .brand-slogan,.atlas-header-2026.is-compact .atlas-header-identity .eyebrow { display:none; }
+.atlas-header-2026.is-compact .atlas-header-institutions { padding-block:4px; }
+@media (max-width:1150px) { .atlas-header-2026 { grid-template-columns:minmax(230px,1fr) minmax(310px,1fr); } .atlas-header-institutions { grid-column:1 / -1; grid-row:2; justify-self:center; width:min(640px,100%); } .atlas-header-tools { grid-column:2; grid-row:1; } }
+@media (max-width:720px) { .atlas-header-2026 { grid-template-columns:1fr auto; gap:8px 12px; padding-inline:14px; } .atlas-header-identity { grid-column:1 / -1; justify-content:center; } .atlas-header-tools { grid-column:1 / -1; grid-row:auto; justify-content:stretch; } .atlas-header-tools .topbar-quick-search { max-width:none; } .atlas-header-institutions { grid-column:1 / -1; grid-row:auto; } .atlas-header-2026.is-compact .atlas-header-institutions { display:none; } }
+@media (max-width:480px) { .atlas-header-identity .project-mark { width:48px; height:48px; border-radius:13px; } .atlas-header-identity .brand-title h1 { font-size:19px; } .atlas-header-identity .brand-slogan { max-width:250px; font-size:8px; } .institution-logo img { width:30px; height:30px; padding:4px; } .institution-logo strong { max-width:130px; font-size:7px; } .institution-logo span { font-size:6px; } .atlas-header-tools .language-toggle { min-width:35px; padding-inline:7px; } }
