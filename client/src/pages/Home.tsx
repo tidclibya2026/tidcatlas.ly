@@ -39,8 +39,8 @@ const pagesAsset = (name: string) => `${PAGES_BASE}${name}`;
 const dataAsset = (name: string) => `${PAGES_BASE}data/${name}`;
 
 const DATA = {
-  projectLogo: pagesAsset("assets/atlas-project-logo.png"),
-  ministryLogo: pagesAsset("assets/ministry-logo.png"),
+  projectLogo: pagesAsset("assets/atlas-project-logo-approved.png"),
+  ministryLogo: pagesAsset("assets/ministry-logo-approved.png"),
   centerLogo: pagesAsset("assets/tidc-logo.png"),
   hero: pagesAsset("libya-atlas-hero_ebb8b2b9.jpg"),
   desert: pagesAsset("libya-atlas-desert_8d3e876d.jpg"),
