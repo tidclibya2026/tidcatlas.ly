@@ -28,6 +28,8 @@ const assistantSiteInput = z.object({
 const assistantContext = z.object({
   question: z.string().min(2).max(1200),
   mode: z.enum(["researcher", "tourist", "visitor"]).default("visitor"),
+  viewport: z.object({ south: z.number(), west: z.number(), north: z.number(), east: z.number(), zoom: z.number().min(0).max(24) }).optional(),
+  nearbyIds: z.array(z.string().max(120)).max(24).optional(),
 });
 
 async function getVerifiedAssistantSites() {
@@ -70,11 +72,15 @@ export const appRouter = router({
     smartSearch: publicProcedure.input(assistantContext).mutation(async ({ input }) => {
       const sites = await getVerifiedAssistantSites();
       if (!sites.length) throw new TRPCError({ code: "BAD_REQUEST", message: "لا توجد سجلات منشورة كافية للبحث الذكي." });
+      const nearbyIdSet = new Set(input.nearbyIds ?? []);
+      const scopedSites = nearbyIdSet.size ? sites.filter((site) => nearbyIdSet.has(site.id)) : sites;
+      const searchSites = scopedSites.length ? scopedSites : sites;
+      const viewportText = input.viewport ? `النطاق الجغرافي الظاهر حاليًا: جنوب ${input.viewport.south.toFixed(4)}، غرب ${input.viewport.west.toFixed(4)}، شمال ${input.viewport.north.toFixed(4)}، شرق ${input.viewport.east.toFixed(4)}، مستوى التكبير ${input.viewport.zoom.toFixed(1)}.` : "لا يوجد نطاق خريطة محدد.";
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
           { role: "system", content: "أنت مساعد بحث جغرافي لمشروع أطلس ليبيا السياحي. أجب بالعربية اعتمادًا حصريًا على سجلات المواقع المرفقة. لا تخترع مواقع أو أرقامًا أو مصادر. إذا لم تكفِ البيانات، صرّح بذلك بوضوح. أعد JSON فقط." },
-          { role: "user", content: `نمط المستخدم: ${input.mode}\nالسؤال: ${input.question}\nسجلات الأطلس المتاحة:\n${JSON.stringify(sites)}` },
+          { role: "user", content: `نمط المستخدم: ${input.mode}\n${viewportText}\nالسؤال: ${input.question}\n${nearbyIdSet.size ? "هذه السجلات هي الأقرب للنطاق الحالي؛ أعطها الأولوية ولا تقترح سجلاً خارجها إلا إذا لم تكفِ البيانات:" : "سجلات الأطلس المتاحة:"}\n${JSON.stringify(searchSites)}` },
         ],
         reasoning: { effort: "low" },
         response_format: { type: "json_schema", json_schema: { name: "atlas_search", strict: true, schema: { type: "object", properties: { answer: { type: "string" }, matchedIds: { type: "array", items: { type: "string" } }, sources: { type: "array", items: { type: "string" } }, confidence: { type: "string", enum: ["high", "medium", "low"] }, limitation: { type: "string" } }, required: ["answer", "matchedIds", "sources", "confidence", "limitation"], additionalProperties: false } } },
@@ -83,8 +89,8 @@ export const appRouter = router({
       const content = response.choices[0]?.message.content;
       const raw = typeof content === "string" ? content : content?.map((part) => part.type === "text" ? part.text : "").join("") || "{}";
       const parsed = JSON.parse(raw) as { answer: string; matchedIds: string[]; sources: string[]; confidence: "high" | "medium" | "low"; limitation: string };
-      const validIds = new Set(sites.map((site) => site.id));
-      const validSources = new Set(sites.flatMap((site) => [site.name, site.source].filter(Boolean) as string[]));
+      const validIds = new Set(searchSites.map((site) => site.id));
+      const validSources = new Set(searchSites.flatMap((site) => [site.name, site.source].filter(Boolean) as string[]));
       return { ...parsed, matchedIds: parsed.matchedIds.filter((id) => validIds.has(id)), sources: parsed.sources.filter((source) => validSources.has(source)) };
     }),
     routePlan: publicProcedure.input(z.object({ mode: z.enum(["researcher", "tourist", "visitor"]), startName: z.string().max(255).optional(), durationHours: z.number().min(1).max(120), interests: z.array(z.string().max(120)).max(8) })).mutation(async ({ input }) => {
