@@ -16,7 +16,7 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
 
-  if (!isUnauthorized || isGithubPagesHost()) return;
+  if (!isUnauthorized || isGithubPagesHost() || !import.meta.env.VITE_OAUTH_PORTAL_URL) return;
 
   startLogin();
 };

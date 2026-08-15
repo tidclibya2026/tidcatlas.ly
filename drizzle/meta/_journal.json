@@ -71,6 +71,13 @@
       "when": 1786729450189,
       "tag": "0009_sad_madame_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1786797828369,
+      "tag": "0010_small_gideon",
+      "breakpoints": true
     }
   ]
 }
