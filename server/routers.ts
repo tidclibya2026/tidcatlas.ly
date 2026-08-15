@@ -30,6 +30,7 @@ const assistantContext = z.object({
   mode: z.enum(["researcher", "tourist", "visitor"]).default("visitor"),
   viewport: z.object({ south: z.number(), west: z.number(), north: z.number(), east: z.number(), zoom: z.number().min(0).max(24) }).optional(),
   nearbyIds: z.array(z.string().max(120)).max(24).optional(),
+  nearbyNames: z.array(z.string().min(1).max(255)).max(24).optional(),
 });
 
 async function getVerifiedAssistantSites() {
@@ -73,7 +74,8 @@ export const appRouter = router({
       const sites = await getVerifiedAssistantSites();
       if (!sites.length) throw new TRPCError({ code: "BAD_REQUEST", message: "لا توجد سجلات منشورة كافية للبحث الذكي." });
       const nearbyIdSet = new Set(input.nearbyIds ?? []);
-      const scopedSites = nearbyIdSet.size ? sites.filter((site) => nearbyIdSet.has(site.id)) : sites;
+      const nearbyNameSet = new Set((input.nearbyNames ?? []).map((name) => name.trim().toLocaleLowerCase("ar")));
+      const scopedSites = nearbyIdSet.size || nearbyNameSet.size ? sites.filter((site) => nearbyIdSet.has(site.id) || nearbyNameSet.has(site.name.trim().toLocaleLowerCase("ar"))) : sites;
       const searchSites = scopedSites.length ? scopedSites : sites;
       const viewportText = input.viewport ? `النطاق الجغرافي الظاهر حاليًا: جنوب ${input.viewport.south.toFixed(4)}، غرب ${input.viewport.west.toFixed(4)}، شمال ${input.viewport.north.toFixed(4)}، شرق ${input.viewport.east.toFixed(4)}، مستوى التكبير ${input.viewport.zoom.toFixed(1)}.` : "لا يوجد نطاق خريطة محدد.";
       const response = await invokeLLM({
