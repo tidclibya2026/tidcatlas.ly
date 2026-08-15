@@ -8,7 +8,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, atlasEditorProcedure, atlasImportProcedure, atlasReviewerProcedure, documentationProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating, listTop150ReviewDecisions, upsertTop150ReviewDecision } from "./db";
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listPublishedAtlasPointsWithImages, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating, listTop150ReviewDecisions, upsertTop150ReviewDecision } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -132,7 +132,7 @@ export const appRouter = router({
     }),
     published: publicProcedure
       .input(z.object({ layerId: z.string().max(80).optional() }).optional())
-      .query(({ input }) => listAtlasPoints(input?.layerId, "published")),
+      .query(({ input }) => listPublishedAtlasPointsWithImages(input?.layerId)),
     layers: publicProcedure.query(() => listAtlasLayers()),
     manageLayers: adminProcedure.query(() => listAtlasLayers(true)),
     createLayer: adminProcedure.input(z.object({ id: z.string().regex(/^[a-z0-9-]{2,80}$/), label: z.string().min(2).max(160), description: z.string().max(4000).optional(), color: z.string().regex(/^#[0-9a-fA-F]{6}$/), icon: z.string().min(1).max(80) })).mutation(async ({ input, ctx }) => { const layer = await createAtlasLayer({ ...input, createdBy: ctx.user.id, status: "active" }); await createAuditLog({ entityType: "atlas_layer", entityId: 0, action: "create", details: JSON.stringify(input), actorId: ctx.user.id }); return layer; }),
@@ -328,9 +328,9 @@ export const appRouter = router({
     }),
     imageReviewQueue: adminProcedure.query(() => listAtlasImageReviewQueue()),
     reassignImage: adminProcedure.input(z.object({ imageId: z.number().int().positive(), pointId: z.number().int().positive(), reason: z.string().min(3).max(1000) })).mutation(async ({ input, ctx }) => { const image = await reassignAtlasImage(input.imageId, input.pointId); await createAuditLog({ entityType: "atlas_image", entityId: input.imageId, action: "reassign", details: JSON.stringify({ pointId: input.pointId, reason: input.reason }), actorId: ctx.user.id }); return image; }),
-    reviewImage: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), reviewStatus: z.enum(["pending", "approved", "rejected"]), rightsNote: z.string().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
-      const image = await updateAtlasImage(input.id, { reviewStatus: input.reviewStatus, rightsNote: input.rightsNote, reviewedBy: ctx.user.id, reviewedAt: new Date() });
-      await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "review", details: JSON.stringify({ reviewStatus: input.reviewStatus }), actorId: ctx.user.id });
+    reviewImage: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), reviewStatus: z.enum(["pending", "approved", "rejected"]), rightsNote: z.string().min(3).max(4000).optional(), isPrimary: z.boolean().optional() })).mutation(async ({ input, ctx }) => {
+      const image = await updateAtlasImage(input.id, { reviewStatus: input.reviewStatus, rightsNote: input.rightsNote, isPrimary: input.reviewStatus === "approved" ? input.isPrimary : false, reviewedBy: ctx.user.id, reviewedAt: new Date() });
+      await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "review", details: JSON.stringify({ reviewStatus: input.reviewStatus, isPrimary: input.isPrimary ?? false }), actorId: ctx.user.id });
       return image;
     }),
     importJobs: atlasImportProcedure.query(({ ctx }) => listImportJobs(ctx.user.id)),

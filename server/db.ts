@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, like, lt, or } from "drizzle-orm";
+import { eq, desc, asc, and, or, like, sql, ne, gt, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   atlasAuditLogs,
@@ -125,6 +125,20 @@ export async function listAtlasPoints(layerId?: string, status?: "draft" | "publ
   return db.select().from(atlasPoints).where(filters.length ? and(...filters) : undefined).orderBy(desc(atlasPoints.createdAt));
 }
 
+export async function listPublishedAtlasPointsWithImages(layerId?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const points = await listAtlasPoints(layerId, "published");
+  if (!points.length) return points;
+  const approvedImages = await db.select().from(atlasImages).where(eq(atlasImages.reviewStatus, "approved")).orderBy(desc(atlasImages.isPrimary), desc(atlasImages.createdAt));
+  const primaryByPoint = new Map<number, (typeof approvedImages)[number]>();
+  for (const image of approvedImages) if (!primaryByPoint.has(image.pointId)) primaryByPoint.set(image.pointId, image);
+  return points.map((point) => {
+    const image = primaryByPoint.get(point.id);
+    return image ? { ...point, imageUrl: image.imageUrl, imageKey: image.storageKey || point.imageKey, imageSourceUrl: image.sourceUrl, imageAuthor: image.photographerName || image.ownerName, imageLicense: image.license, imageRightsNote: image.rightsNote } : point;
+  });
+}
+
 export async function listReviewQueue(recordStatus?: "draft" | "pending_review" | "approved" | "published" | "rejected" | "archived", filters?: { search?: string; layerId?: string; municipality?: string; category?: string; sort?: "newest" | "oldest" | "name" }) {
   const db = await getDb();
   if (!db) return [];
@@ -211,14 +225,21 @@ export async function listAtlasImages(pointId?: number) {
 export async function createAtlasImage(image: InsertAtlasImage) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
-  const result = await db.insert(atlasImages).values(image);
-  const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, Number(result[0].insertId))).limit(1);
+  await db.transaction(async (tx) => {
+    if (image.isPrimary) await tx.update(atlasImages).set({ isPrimary: false }).where(eq(atlasImages.pointId, image.pointId));
+    await tx.insert(atlasImages).values(image);
+  });
+  const rows = await db.select().from(atlasImages).where(and(eq(atlasImages.pointId, image.pointId), eq(atlasImages.imageUrl, image.imageUrl))).orderBy(desc(atlasImages.createdAt)).limit(1);
   return rows[0];
 }
 
 export async function updateAtlasImage(id: number, patch: Partial<InsertAtlasImage>) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  if (patch.isPrimary === true) {
+    const current = await db.select({ pointId: atlasImages.pointId }).from(atlasImages).where(eq(atlasImages.id, id)).limit(1);
+    if (current[0]) await db.update(atlasImages).set({ isPrimary: false }).where(and(eq(atlasImages.pointId, current[0].pointId), ne(atlasImages.id, id)));
+  }
   await db.update(atlasImages).set(patch).where(eq(atlasImages.id, id));
   const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, id)).limit(1);
   return rows[0];
