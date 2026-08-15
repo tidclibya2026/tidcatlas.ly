@@ -464,3 +464,33 @@ button, .layer-row, .search-result-list button { transition: background-color .1
 .dark .nearby-summary p { color:#c0cfca; }
 @media (prefers-reduced-motion:reduce) { .assistant-highlight-marker { animation:none; } }
 @media (max-width:560px) { .nearby-filters { grid-template-columns:1fr; } }
+
+/* Header 2026 — identity first, institutional attribution second */
+.topbar { position:relative; isolation:isolate; min-height:102px; height:auto; padding:14px clamp(18px,4vw,64px); background:linear-gradient(105deg,#061f2c 0%,#0a3445 54%,#0e4f63 100%); border-bottom:1px solid rgba(222,186,101,.65); box-shadow:0 12px 32px rgba(4,27,38,.22); }
+.topbar::after { content:""; position:absolute; inset:0; z-index:-1; opacity:.18; pointer-events:none; background:radial-gradient(circle at 18% 30%,rgba(241,223,176,.55) 0 1px,transparent 1.5px) 0 0/26px 26px,linear-gradient(90deg,transparent 0 72%,rgba(241,223,176,.22)); mask-image:linear-gradient(90deg,#000 0 76%,transparent 100%); }
+.brand-lockup { display:grid; grid-template-columns:auto minmax(250px,1fr) minmax(350px,430px); align-items:center; gap:18px; width:min(100%,1030px); }
+.project-mark { width:76px; height:76px; padding:8px; border-radius:21px; background:linear-gradient(145deg,#fffdf5,#e8d8ae); border:1px solid #e0b960; box-shadow:0 12px 26px rgba(0,0,0,.2),inset 0 0 0 4px rgba(255,255,255,.48); }
+.brand-lockup .project-logo { width:100%; height:100%; object-fit:contain; }
+.brand-title { min-width:0; padding-inline-end:4px; }
+.brand-title .eyebrow { display:block; margin-bottom:4px; color:#b9d7d2; font-size:9px; letter-spacing:.12em; }
+.brand-lockup h1 { margin:0; color:#fff; font-size:clamp(25px,2.7vw,38px); line-height:1.08; letter-spacing:-.06em; text-wrap:balance; }
+.brand-lockup h1 em { color:#f0d58f; font-style:normal; }
+.brand-title .brand-slogan { display:block; margin-top:8px; color:#f2dfad; font-size:11px; font-weight:700; letter-spacing:.01em; }
+.official-logos { display:grid; grid-template-columns:1fr 1fr; gap:0; min-width:0; margin:0; padding:8px 10px; border:1px solid rgba(226,194,121,.5); border-radius:16px; background:linear-gradient(145deg,rgba(255,253,246,.98),rgba(242,237,221,.95)); box-shadow:0 12px 24px rgba(0,0,0,.14); }
+.official-logo-cell { display:grid; grid-template-columns:42px minmax(0,1fr); align-items:center; gap:9px; min-width:0; padding:4px 10px; }
+.official-logo-cell + .official-logo-cell { border-inline-start:1px solid #dac99f; }
+.official-logo-cell img { width:42px; height:38px; padding:3px; object-fit:contain; border:0; border-radius:9px; background:transparent; }
+.official-logo-cell div { min-width:0; }
+.official-logo-cell strong { display:block; color:#123c52; font-size:10px; line-height:1.45; font-weight:900; }
+.official-logo-cell .official-kicker { display:block; margin-bottom:2px; color:#a17231; font-size:8px; font-weight:700; }
+.logo-divider { display:none; }
+.topbar-actions { align-self:center; gap:8px; margin-inline-start:auto; }
+.topbar-actions .edition { color:#c6ddd8; font-size:9px; white-space:nowrap; }
+.header-gis-badge { display:grid; grid-template-columns:auto auto; column-gap:5px; align-items:center; min-width:68px; padding:7px 9px; border:1px solid rgba(222,186,101,.6); border-radius:11px; background:rgba(3,25,35,.38); color:#f0d58f; }
+.header-gis-badge small { grid-column:1 / -1; color:#aecbc5; font-size:7px; }
+.mobile-menu { display:none; }
+@media (max-width:1100px) { .brand-lockup { grid-template-columns:auto minmax(210px,1fr) minmax(300px,380px); gap:12px; } .official-logo-cell { padding-inline:6px; } .official-logo-cell strong { font-size:9px; } .topbar-actions .edition { display:none; } }
+@media (max-width:780px) { .topbar { min-height:78px; padding:9px 12px; } .brand-lockup { grid-template-columns:auto minmax(0,1fr); gap:10px; } .project-mark { width:56px; height:56px; padding:6px; border-radius:15px; } .brand-lockup h1 { font-size:20px; } .brand-title .eyebrow { font-size:7px; } .brand-title .brand-slogan { margin-top:4px; font-size:8px; white-space:nowrap; } .official-logos { grid-column:1 / -1; grid-template-columns:1fr 1fr; width:100%; border-radius:12px; padding:5px; } .official-logo-cell { grid-template-columns:32px minmax(0,1fr); gap:6px; padding:3px 6px; } .official-logo-cell img { width:32px; height:29px; } .official-logo-cell .official-kicker { display:none; } .official-logo-cell strong { font-size:8px; line-height:1.35; } .topbar-actions { position:absolute; top:12px; left:10px; } .header-gis-badge { display:none; } .mobile-menu { display:inline-flex; } }
+@media (max-width:430px) { .topbar { padding:8px 9px; } .brand-lockup h1 { font-size:17px; } .brand-title .brand-slogan { max-width:170px; overflow:hidden; text-overflow:ellipsis; } .official-logo-cell strong { font-size:7px; } .official-logo-cell img { width:28px; height:26px; } .theme-toggle { width:30px; height:30px; } }
+.dark .official-logos { background:linear-gradient(145deg,#e8e0c4,#c9bd98); }
+.dark .official-logo-cell strong { color:#123c52; }
