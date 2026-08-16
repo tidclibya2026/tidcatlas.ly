@@ -17,6 +17,12 @@ describe("atlas import parsers", () => {
     expect(result.issues[0]?.message).toContain("إحداثيات");
   });
 
+  it("numbers multiple import issues sequentially from one", () => {
+    const result = parseKml(Buffer.from(`<kml><Placemark><name>بدون إحداثيات 1</name></Placemark><Placemark><name>بدون إحداثيات 2</name></Placemark><Placemark><name>صالح</name><Point><coordinates>14.2,25.1,0</coordinates></Point></Placemark><Placemark><name>بدون إحداثيات 3</name></Placemark></kml>`));
+    expect(result.issues.map((issue) => issue.issueNumber)).toEqual([1, 2, 3]);
+    expect(result.issues.map((issue) => issue.rowNumber)).toEqual([1, 2, 4]);
+  });
+
   it("maps Arabic and English XLSX headers", () => {
     const sheet = XLSX.utils.json_to_sheet([{ الاسم: "واحة", "خط العرض": 25.1, "خط الطول": 14.2, البلدية: "مرزق" }]);
     const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet, "Sites");

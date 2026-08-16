@@ -18,7 +18,7 @@ export type ImportRow = {
   fingerprint: string;
 };
 
-export type ImportIssue = { rowNumber: number; message: string };
+export type ImportIssue = { rowNumber: number; message: string; issueNumber?: number };
 export type ImportParseResult = { rows: ImportRow[]; issues: ImportIssue[]; totalRows: number };
 
 function decodeEntities(value: string) {
@@ -72,7 +72,7 @@ export function parseKml(buffer: Buffer, defaults?: { layerId?: string; source?:
     }
     rows.push(normalizedRow({ rowNumber: index + 1, layerId: metadata.layerId || defaults?.layerId || "imported", name, nameEn: metadata.nameEn, description, latitude, longitude, municipality: metadata.municipality, category: metadata.category, source: metadata.source || defaults?.source || "KML", sourceKind: "kml", sourceRecordId: metadata.id, metadata }));
   });
-  return { rows, issues, totalRows: placemarks.length };
+  return { rows, issues: issues.map((issue, issueIndex) => ({ ...issue, issueNumber: issueIndex + 1 })), totalRows: placemarks.length };
 }
 
 const aliases: Record<string, keyof ImportRow> = { layerid: "layerId", الطبقة: "layerId", name: "name", الاسم: "name", nameen: "nameEn", الاسمبالإنجليزية: "nameEn", description: "description", الوصف: "description", latitude: "latitude", lat: "latitude", خطالعرض: "latitude", longitude: "longitude", lon: "longitude", خطالطول: "longitude", municipality: "municipality", البلدية: "municipality", category: "category", التصنيف: "category", source: "source", المصدر: "source", id: "sourceRecordId", معرف: "sourceRecordId" };
@@ -81,7 +81,7 @@ function keyOf(header: string) { return aliases[header.toLowerCase().replace(/[\
 export function parseExcel(buffer: Buffer, defaults?: { layerId?: string; source?: string }): ImportParseResult {
   const workbook = XLSX.read(buffer, { type: "buffer", cellDates: false });
   const first = workbook.SheetNames[0];
-  if (!first) return { rows: [], issues: [{ rowNumber: 1, message: "ملف Excel لا يحتوي على ورقة عمل." }], totalRows: 0 };
+  if (!first) return { rows: [], issues: [{ rowNumber: 1, issueNumber: 1, message: "ملف Excel لا يحتوي على ورقة عمل." }], totalRows: 0 };
   const records = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[first], { defval: "" });
   const rows: ImportRow[] = []; const issues: ImportIssue[] = [];
   records.forEach((record, index) => {
@@ -92,5 +92,5 @@ export function parseExcel(buffer: Buffer, defaults?: { layerId?: string; source
     const metadata = Object.fromEntries(Object.entries(record).map(([key, value]) => [key, String(value ?? "").trim()]).filter(([, value]) => Boolean(value)));
     rows.push(normalizedRow({ rowNumber: index + 2, layerId: String(mapped.layerId || defaults?.layerId || "imported"), name, nameEn: mapped.nameEn ? String(mapped.nameEn) : undefined, description: mapped.description ? String(mapped.description) : undefined, latitude, longitude, municipality: mapped.municipality ? String(mapped.municipality) : undefined, category: mapped.category ? String(mapped.category) : undefined, source: String(mapped.source || defaults?.source || "Excel"), sourceKind: "excel", sourceRecordId: mapped.sourceRecordId ? String(mapped.sourceRecordId) : undefined, metadata }));
   });
-  return { rows, issues, totalRows: records.length };
+  return { rows, issues: issues.map((issue, issueIndex) => ({ ...issue, issueNumber: issueIndex + 1 })), totalRows: records.length };
 }
