@@ -23,6 +23,13 @@ describe("atlas import parsers", () => {
     expect(result.issues.map((issue) => issue.rowNumber)).toEqual([1, 2, 4]);
   });
 
+  it("numbers eleven import issues from one through eleven", () => {
+    const invalidPlacemarks = Array.from({ length: 11 }, (_, index) => `<Placemark><name>سجل غير صالح ${index + 1}</name></Placemark>`).join("");
+    const result = parseKml(Buffer.from(`<kml>${invalidPlacemarks}</kml>`));
+    expect(result.issues).toHaveLength(11);
+    expect(result.issues.map((issue) => issue.issueNumber)).toEqual(Array.from({ length: 11 }, (_, index) => index + 1));
+  });
+
   it("maps Arabic and English XLSX headers", () => {
     const sheet = XLSX.utils.json_to_sheet([{ الاسم: "واحة", "خط العرض": 25.1, "خط الطول": 14.2, البلدية: "مرزق" }]);
     const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet, "Sites");
