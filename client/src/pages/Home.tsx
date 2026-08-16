@@ -523,11 +523,16 @@ export default function Home() {
     const pendingIds = activeLayers.filter((id) => !managedLayerIds.has(id) && id !== "density" && id !== "favorites" && !loaded[id]);
     if (activeLayers.includes("density") && (!loaded.hotels || !loaded.resorts) && !loadingLayerRequests.current.has("density")) pendingIds.push("density");
     if (activeLayers.includes("favorites") && !loaded.favorites && !loadingLayerRequests.current.has("favorites")) pendingIds.push("favorites");
-    const nextPendingIds = Array.from(new Set(pendingIds));`r`n
-    const nextLoadingKey = nextPendingIds.join("|");`r`n
-    if (loadingStateKey.current !== nextLoadingKey) {`r`n
-      loadingStateKey.current = nextLoadingKey;`r`n
-      setLoadingLayers(nextPendingIds);`r`n
+    const nextPendingIds = Array.from(new Set(pendingIds));
+
+    const nextLoadingKey = nextPendingIds.join("|");
+
+    if (loadingStateKey.current !== nextLoadingKey) {
+
+      loadingStateKey.current = nextLoadingKey;
+
+      setLoadingLayers(nextPendingIds);
+
     }
     if (activeLayers.includes("density") && !markers.current.density?.length && !loadingLayerRequests.current.has("density")) {
       Promise.all(["hotels", "resorts"].map(async (id) => {
@@ -548,10 +553,12 @@ export default function Home() {
       })).then((groups) => setLoaded((current) => ({ ...current, favorites: buildFavoriteSites(groups.flat()) }))).catch(() => toast.error("تعذر تحميل المواقع المفضلة")).finally(() => loadingLayerRequests.current.delete("favorites"));
     }
     activeLayers.filter((id) => !managedLayerIds.has(id) && id !== "density").forEach(async (id) => {
-      if (loadingLayerRequests.current.has(id)) return;`r`n      const config = layers.find((item) => item.id === id);
+      if (loadingLayerRequests.current.has(id)) return;
+      const config = layers.find((item) => item.id === id);
       if (!config || loaded[id]) { if (config && loaded[id]) renderMarkers(config, loaded[id]); return; }
       try {
-        loadingLayerRequests.current.add(id);`r`n        const sites = await loadLayer(config);
+        loadingLayerRequests.current.add(id);
+        const sites = await loadLayer(config);
         setLoaded((current) => ({ ...current, [id]: sites }));
         renderMarkers(config, sites);
       } catch (error) {
@@ -676,6 +683,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 
