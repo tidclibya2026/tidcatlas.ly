@@ -1,9 +1,5 @@
 import { OAUTH_STATE_COOKIE, encodeOAuthState } from "@shared/const";
 
-export const PUBLISHED_MANAGEMENT_URL = "https://libyatlas-kgramdv2.manus.space/management";
-export const isGithubPagesHost = () => typeof window !== "undefined" && window.location.hostname.endsWith("github.io");
-export const getManagementUrl = () => isGithubPagesHost() ? PUBLISHED_MANAGEMENT_URL : `${window.location.origin}${import.meta.env.BASE_URL}management`;
-
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 // Start the Manus OAuth login. Call this from an event handler or effect at the
