@@ -1,4 +1,3 @@
-/* Design reminder: National Memory Map — the map must feel like a living atlas, with quiet basemap, readable layers, and no visual competition with the data. */
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -7,11 +6,22 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { cn } from "@/lib/utils";
 
-interface MapViewProps { className?: string; initialCenter?: [number, number]; initialZoom?: number; onMapReady?: (map: L.Map) => void; onClusterReady?: (cluster: L.MarkerClusterGroup) => void; }
+interface MapViewProps {
+  className?: string;
+  initialCenter?: [number, number];
+  initialZoom?: number;
+  onMapReady?: (map: L.Map) => void;
+  onClusterReady?: (cluster: L.MarkerClusterGroup) => void;
+}
 
 export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom = 5, onMapReady, onClusterReady }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const onMapReadyRef = useRef(onMapReady);
+  const onClusterReadyRef = useRef(onClusterReady);
+  onMapReadyRef.current = onMapReady;
+  onClusterReadyRef.current = onClusterReady;
+
   useEffect(() => {
     if (!container.current || mapRef.current) return;
     const libyaBounds = L.latLngBounds([18.8, 8.2], [34.2, 25.6]);
@@ -31,24 +41,34 @@ export function MapView({ className, initialCenter = [27.2, 17.2], initialZoom =
       },
     });
     cluster.addTo(map);
-    onClusterReady?.(cluster);
+    onClusterReadyRef.current?.(cluster);
     zoomControl.getContainer()?.setAttribute("aria-label", "أدوات تكبير وتصغير الخريطة");
-    const primaryTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "© OpenStreetMap © CARTO" }).addTo(map);
+    const primaryTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "© OpenStreetMap © CARTO" } ).addTo(map);
     let fallbackTiles: L.TileLayer | null = null;
     let switchedToFallback = false;
     const useFallbackTiles = () => {
       if (switchedToFallback) return;
       switchedToFallback = true;
       primaryTiles.removeFrom(map);
-      fallbackTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" }).addTo(map);
+      fallbackTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" } ).addTo(map);
     };
     primaryTiles.once("tileerror", useFallbackTiles);
     mapRef.current = map;
-    onMapReady?.(map);
+    onMapReadyRef.current?.(map);
     const resize = () => map.invalidateSize();
     window.addEventListener("resize", resize);
     const timer = window.setTimeout(resize, 180);
-    return () => { window.clearTimeout(timer); window.removeEventListener("resize", resize); primaryTiles.off("tileerror", useFallbackTiles); fallbackTiles?.removeFrom(map); cluster.clearLayers(); cluster.removeFrom(map); map.remove(); mapRef.current = null; };
-  }, [initialCenter, initialZoom, onMapReady, onClusterReady]);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", resize);
+      primaryTiles.off("tileerror", useFallbackTiles);
+      fallbackTiles?.removeFrom(map);
+      cluster.clearLayers();
+      cluster.removeFrom(map);
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [initialCenter, initialZoom]);
+
   return <div ref={container} className={cn("w-full h-[500px]", className)} aria-label="الخريطة التفاعلية لأطلس ليبيا السياحي" />;
 }
