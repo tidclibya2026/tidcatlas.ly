@@ -529,7 +529,7 @@ export default function Home() {
         const sites = await loadLayer(source);
         setLoaded((current) => ({ ...current, [id]: sites }));
         return sites;
-      })).then((groups) => renderDensity(groups.flat())).catch(() => toast.error("تعذر حساب كثافة التجمعات السياحية"));
+      })).then((groups) => renderDensity(groups.flat())).catch(() => toast.error("تعذر حساب كثافة التجمعات السياحية")).finally(() => loadingLayerRequests.current.delete("density"));
     }
     if (activeLayers.includes("favorites") && !loaded.favorites) {
       const sourceIds = ["heritage", "natural", "akakus", "old-tripoli"];
@@ -537,7 +537,7 @@ export default function Home() {
         if (loaded[id]) return loaded[id];
         const source = layers.find((item) => item.id === id);
         return source ? loadLayer(source) : [];
-      })).then((groups) => setLoaded((current) => ({ ...current, favorites: buildFavoriteSites(groups.flat()) }))).catch(() => toast.error("تعذر تحميل المواقع المفضلة"));
+      })).then((groups) => setLoaded((current) => ({ ...current, favorites: buildFavoriteSites(groups.flat()) }))).catch(() => toast.error("تعذر تحميل المواقع المفضلة")).finally(() => loadingLayerRequests.current.delete("favorites"));
     }
     activeLayers.filter((id) => !managedLayerIds.has(id) && id !== "density").forEach(async (id) => {
       const config = layers.find((item) => item.id === id);
@@ -668,3 +668,4 @@ export default function Home() {
     </main>
   );
 }
+
