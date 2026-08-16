@@ -2,10 +2,6 @@ export function extractKmlImageUrls(description: string, properties: Record<stri
   const decodedDescription = decodeKmlHtml(description);
   const propertyEntries = Object.entries(properties).map(([key, value]) => [key.toLowerCase().replace(/[^a-z0-9]/g, ""), value] as const);
   const propertyMap = new Map(propertyEntries);
-<<<<<<< HEAD
-  const fromProperties = ["imageurl", "image", "imagehref", "photourl", "photo", "pictureurl", "picture", "thumbnailurl", "mediaurl"]
-    .map((key) => propertyMap.get(key)).filter(Boolean).map((value) => decodeKmlUrl(value!));
-=======
   const fromProperties = ["imageurl", "image", "imagehref", "photourl", "photo", "pictureurl", "picture", "thumbnailurl", "mediaurl", "medialinks", "gxmedialinks", "imageurls"]
     .flatMap((key) => {
       const value = propertyMap.get(key);
@@ -13,7 +9,6 @@ export function extractKmlImageUrls(description: string, properties: Record<stri
       const urls = Array.from(value.matchAll(/https?:\/\/[^\s"'<>\]]+/gi), (match) => decodeKmlUrl(match[0]));
       return urls.length ? urls : [decodeKmlUrl(value)];
     });
->>>>>>> origin/repair/latest-atlas-2026
 
   const candidates = [
     ...fromProperties,
@@ -37,11 +32,7 @@ function decodeKmlHtml(value: string) {
 }
 
 function decodeKmlUrl(value: string) {
-<<<<<<< HEAD
-  return value.replace(/&amp;/g, "&").replace(/\\u0026/g, "&").trim();
-=======
   return value.replace(/<!\[CDATA\[|\]\]>/g, "").replace(/&amp;/g, "&").replace(/\\u0026/g, "&").trim();
->>>>>>> origin/repair/latest-atlas-2026
 }
 
 export function normalizeKmlImageRights(properties: Record<string, string>) {

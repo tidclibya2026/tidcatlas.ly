@@ -8,8 +8,6 @@
       "when": 1786626489338,
       "tag": "0000_marvelous_rictor",
       "breakpoints": true
-<<<<<<< HEAD
-=======
     },
     {
       "idx": 1,
@@ -80,7 +78,6 @@
       "when": 1786797828369,
       "tag": "0010_small_gideon",
       "breakpoints": true
->>>>>>> origin/repair/latest-atlas-2026
     }
   ]
 }

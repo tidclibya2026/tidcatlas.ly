@@ -7,8 +7,6 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
-<<<<<<< HEAD
-=======
   appBaseUrl: process.env.APP_BASE_URL ?? "http://localhost:3000",
   authMode: process.env.AUTH_MODE ?? "local",
   storageDriver: process.env.STORAGE_DRIVER ?? "local",
@@ -28,5 +26,4 @@ export const ENV = {
   mapsApiKey: process.env.MAPS_API_KEY ?? "",
   transcriptionApiUrl: process.env.TRANSCRIPTION_API_URL ?? "",
   transcriptionApiKey: process.env.TRANSCRIPTION_API_KEY ?? "",
->>>>>>> origin/repair/latest-atlas-2026
 };

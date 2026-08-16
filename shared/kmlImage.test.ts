@@ -34,14 +34,11 @@ describe("extractKmlImageUrl", () => {
 });
 
 
-<<<<<<< HEAD
-=======
 it("extracts hotel photos from gx_media_links values", () => {
   const urls = extractKmlImageUrls("", { gx_media_links: "<![CDATA[https://lh3.googleusercontent.com/hotel-photo-a https://lh3.googleusercontent.com/hotel-photo-b]]>" });
   expect(urls).toEqual(["https://lh3.googleusercontent.com/hotel-photo-a", "https://lh3.googleusercontent.com/hotel-photo-b"]);
 });
 
->>>>>>> origin/repair/latest-atlas-2026
 it("supports alternate image fields and keeps the original source", () => {
   expect(extractKmlImageUrl("", { image_href: "https://example.com/site.webp" })).toBe("https://example.com/site.webp");
   expect(extractKmlImageUrl("", { thumbnail_url: "https://example.com/thumb.jpg" })).toBe("https://example.com/thumb.jpg");

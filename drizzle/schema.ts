@@ -6,11 +6,8 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-<<<<<<< HEAD
-=======
   passwordHash: text("passwordHash"),
   isActive: boolean("isActive").default(true).notNull(),
->>>>>>> origin/repair/latest-atlas-2026
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

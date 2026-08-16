@@ -19,21 +19,12 @@ type MapsConfig = {
 };
 
 function getMapsConfig(): MapsConfig {
-<<<<<<< HEAD
-  const baseUrl = ENV.forgeApiUrl;
-  const apiKey = ENV.forgeApiKey;
-
-  if (!baseUrl || !apiKey) {
-    throw new Error(
-      "Google Maps proxy credentials missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY"
-=======
   const baseUrl = ENV.mapsApiUrl || ENV.forgeApiUrl;
   const apiKey = ENV.mapsApiKey || ENV.forgeApiKey;
 
   if (!baseUrl || !apiKey) {
     throw new Error(
       "Maps provider is not configured: set MAPS_API_URL and MAPS_API_KEY"
->>>>>>> origin/repair/latest-atlas-2026
     );
   }
 
