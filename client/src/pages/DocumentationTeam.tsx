@@ -40,7 +40,7 @@ export default function DocumentationTeam() {
   const { user, loading, error: authError, refresh: refreshAuth } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const teamAccess = trpc.atlas.myTeamAccess.useQuery(undefined, { enabled: Boolean(user) });
-  const [status, setStatus] = useState<"draft" | "pending_review" | "approved" | "published" | "rejected" | "archived">("draft");
+  const [status, setStatus] = useState<"draft" | "pending_review" | "approved" | "published" | "rejected" | "archived">("pending_review");
   const [search, setSearch] = useState("");
   const [layerFilter, setLayerFilter] = useState("");
   const [municipalityFilter, setMunicipalityFilter] = useState("");
