@@ -316,6 +316,9 @@ export default function Home() {
   const [clusterGroup, setClusterGroup] = useState<L.MarkerClusterGroup | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [loadingLayers, setLoadingLayers] = useState<string[]>([]);
+  const loadingLayerRequests = useRef(new Set<string>());
+  const loadingStateKey = useRef("");
+  const searchLayerRequests = useRef(new Set<string>());
   const [editorOpen, setEditorOpen] = useState(false);
   const [pickMode, setPickMode] = useState(false);
   const [draftPoint, setDraftPoint] = useState({ layerId: "heritage", name: "", description: "", municipality: "", category: "", source: "", latitude: "", longitude: "", metadata: "", imageDataUrl: "", imageFileName: "", imageContentType: "" });
@@ -668,4 +671,5 @@ export default function Home() {
     </main>
   );
 }
+
 
