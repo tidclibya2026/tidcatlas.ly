@@ -19,12 +19,12 @@ type MapsConfig = {
 };
 
 function getMapsConfig(): MapsConfig {
-  const baseUrl = ENV.forgeApiUrl;
-  const apiKey = ENV.forgeApiKey;
+  const baseUrl = ENV.mapsApiUrl || ENV.forgeApiUrl;
+  const apiKey = ENV.mapsApiKey || ENV.forgeApiKey;
 
   if (!baseUrl || !apiKey) {
     throw new Error(
-      "Google Maps proxy credentials missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY"
+      "Maps provider is not configured: set MAPS_API_URL and MAPS_API_KEY"
     );
   }
 

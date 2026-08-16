@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Noto+Kufi+Arabic:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f0f4f8}.slide-container{width:1280px;min-height:720px;padding:62px 76px 0;background:#f0f4f8;color:#102a43;font-family:'IBM Plex Sans Arabic',sans-serif;position:relative;overflow:hidden}.slide-container:after{content:'';position:absolute;left:-90px;bottom:-170px;width:560px;min-height:360px;border:1px solid #2f6f7e33;border-radius:50%;transform:rotate(-18deg)}.kicker{color:#d97706;font-size:13px;font-weight:700}.title{margin-top:12px;font:800 34px/1.4 'Noto Kufi Arabic',sans-serif}.sub{margin-top:12px;color:#526b7d;font-size:15px;line-height:1.8;max-width:760px}.path{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:82px;border-top:1px solid #9fb3bf;border-bottom:1px solid #9fb3bf}.stage{min-height:215px;padding:28px 22px 0;border-left:1px solid #9fb3bf;position:relative}.stage:first-child{border-left:0}.stage:after{content:'›';position:absolute;left:-12px;top:67px;color:#d97706;font-size:28px;font-weight:700}.stage:first-child:after{display:none}.index{color:#8aa0ad;font-size:12px;font-weight:700}.stage h3{margin:14px 0 9px;font-size:19px}.stage p{margin:0;color:#526b7d;font-size:13px;line-height:1.9}.stage.primary{background:#e3eee9}.stage.primary h3{color:#287a70}.stage.fallback{background:#f7eadb}.stage.fallback h3{color:#b65f08}.rule{position:absolute;right:76px;bottom:54px;width:850px;padding-top:17px;border-top:2px solid #d97706;color:#526b7d;font-size:13px}.rule strong{color:#102a43;font-weight:700}.note{position:absolute;left:76px;bottom:54px;color:#687f8e;font-size:12px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+<div class="kicker">07 · تجربة العرض</div>
+<div class="title">استراتيجية العرض والاسترداد</div>
+<div class="sub">الصورة لا تُستبدل بصورة عامة عند الفشل؛ بل تنتقل عبر مسار استرداد مضبوط يحافظ على هوية الموقع ومصدر الصورة.</div>
+<div class="path">
+<div class="stage primary"><div class="index">01 / الأولوية</div><h3>الصورة المخزنة</h3><p>نسخة مستقرة في S3 أو تخزين المشروع، مع key وhash وبيانات حقوق جاهزة للعرض.</p></div>
+<div class="stage"><div class="index">02 / التحقق</div><h3>المصدر الأصلي</h3><p>تجربة الرابط الأصلي عند الحاجة، مع حفظه كرابط مصدر لا كبديل مجهول.</p></div>
+<div class="stage"><div class="index">03 / العرض</div><h3>Proxy مضبوط</h3><p>استخدام proxy للعرض فقط عند تعذر الوصول المباشر، دون تغيير مصدر الملكية.</p></div>
+<div class="stage fallback"><div class="index">04 / الأمان</div><h3>Placeholder واضح</h3><p>عند عدم وجود صورة موثقة تظهر رسالة صريحة بدل صورة موقع آخر أو محتوى مضلل.</p></div>
+</div>
+<div class="rule"><strong>قاعدة القرار:</strong> لا نعرض صورة إلا إذا كان ارتباطها بالموقع ومصدرها وحقوقها قابلًا للتتبع.</div>
+<div class="note">منع الالتباس أهم من ملء المساحة بصورة غير موثقة</div>
+</div>
+</body>
+</html>

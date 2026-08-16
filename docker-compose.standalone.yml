@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: libya_tourism_atlas
+      MARIADB_USER: atlas_user
+      MARIADB_PASSWORD: change-me
+      MARIADB_ROOT_PASSWORD: change-root-password
+    volumes:
+      - atlas-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.standalone
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: mysql://atlas_user:change-me@db:3306/libya_tourism_atlas
+      JWT_SECRET: replace-with-a-long-random-secret
+      APP_BASE_URL: http://localhost:3000
+      AUTH_MODE: local
+      STORAGE_DRIVER: local
+      STORAGE_DIR: /app/storage/uploads
+      PUBLIC_STORAGE_URL: /uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - atlas-uploads:/app/storage/uploads
+
+volumes:
+  atlas-db:
+  atlas-uploads:

@@ -70,6 +70,28 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+  return result[0];
+}
+
+export async function createLocalUser(input: { email: string; name: string; passwordHash: string; role?: "user" | "admin" }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const openId = `local_${crypto.randomUUID()}`;
+  await db.insert(users).values({ openId, email: normalizedEmail, name: input.name.trim(), passwordHash: input.passwordHash, loginMethod: "local", role: input.role ?? "user", isActive: true });
+  return getUserByOpenId(openId);
+}
+
+export async function updateUserPasswordHash(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
+}
+
 export async function listAtlasLayers(includeArchived = false) {
   const db = await getDb();
   if (!db) return [];
