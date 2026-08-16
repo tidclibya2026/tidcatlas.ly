@@ -233,6 +233,14 @@ export async function createAtlasImage(image: InsertAtlasImage) {
   return rows[0];
 }
 
+export async function createAtlasImagesBatch(images: InsertAtlasImage[]) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  if (!images.length) return { inserted: 0 };
+  await db.insert(atlasImages).values(images);
+  return { inserted: images.length };
+}
+
 export async function updateAtlasImage(id: number, patch: Partial<InsertAtlasImage>) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");

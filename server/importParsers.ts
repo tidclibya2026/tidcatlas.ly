@@ -37,6 +37,23 @@ function makeFingerprint(name: string, latitude: number, longitude: number) { re
 
 function normalizedRow(input: Omit<ImportRow, "fingerprint">): ImportRow { return { ...input, fingerprint: makeFingerprint(input.name, input.latitude, input.longitude) }; }
 
+export function extractKmlImageUrls(row: Pick<ImportRow, "metadata" | "description">) {
+  const urls: string[] = [];
+  for (const key of ["images_json", "source_media_url", "gx_media_links", "image_urls", "image_url", "imageUrl"]) {
+    const raw = row.metadata[key];
+    if (!raw) continue;
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) urls.push(...parsed.filter((value): value is string => typeof value === "string"));
+      else if (typeof parsed === "string") urls.push(parsed);
+    } catch {
+      urls.push(...raw.match(/https?:\/\/[^\s"'<>\]]+/gi) ?? []);
+    }
+  }
+  urls.push(...(row.description?.match(/https?:\/\/[^\s"'<>\]]+/gi) ?? []));
+  return Array.from(new Set(urls.map((url) => url.trim().replace(/[),.;]+$/, "")).filter((url) => /^https?:\/\//i.test(url)))).slice(0, 20);
+}
+
 export function parseKml(buffer: Buffer, defaults?: { layerId?: string; source?: string }): ImportParseResult {
   const xml = buffer.toString("utf8");
   const placemarks = Array.from(xml.matchAll(/<Placemark(?:\s[^>]*)?>([\s\S]*?)<\/Placemark>/gi));
