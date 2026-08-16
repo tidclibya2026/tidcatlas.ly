@@ -39,6 +39,36 @@ if ($LASTEXITCODE -eq 0 -and $allConflicts) {
   exit 2
 }
 
-Write-Host "تم إصلاح Home.tsx بنجاح." -ForegroundColor Green
-Write-Host "تم حفظ نسخة احتياطية في: $backup"
-Write-Host "شغّل الآن: pnpm check; pnpm test; pnpm dev"
+# Remove the invalid local Umami placeholder script that returns HTML/400.
+$indexPath = Join-Path $projectRoot "client\index.html"
+if (Test-Path $indexPath) {
+  $indexBackup = "$indexPath.backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+  Copy-Item $indexPath $indexBackup
+  $indexContent = Get-Content -Raw -Encoding UTF8 $indexPath
+  $indexContent = [regex]::Replace($indexContent, '(?m)^\s*<script defer src="%VITE_ANALYTICS_ENDPOINT%/umami"[^>]*></script>\s*\r?\n?', '')
+  Set-Content -Path $indexPath -Value $indexContent -Encoding UTF8
+  Write-Host "تم تنظيف index.html من Umami غير الصالح." -ForegroundColor Green
+}
+
+# Ensure Home's management helper exists in the local const module.
+$constPath = Join-Path $projectRoot "client\src\const.ts"
+if (Test-Path $constPath) {
+  $constContent = Get-Content -Raw -Encoding UTF8 $constPath
+  if ($constContent -notmatch 'export const getManagementUrl') {
+    $helper = @'
+
+export const PUBLISHED_MANAGEMENT_URL = "https://libyatlas-kgramdv2.manus.space/management";
+export const isGithubPagesHost = () => typeof window !== "undefined" && window.location.hostname.endsWith("github.io");
+export const getManagementUrl = () => isGithubPagesHost() ? PUBLISHED_MANAGEMENT_URL : `${window.location.origin}${import.meta.env.BASE_URL}management`;
+'@
+    Add-Content -Path $constPath -Value $helper -Encoding UTF8
+    Write-Host "تمت إضافة getManagementUrl إلى const.ts." -ForegroundColor Green
+  }
+}
+
+$viteCache = Join-Path $projectRoot "node_modules\.vite"
+if (Test-Path $viteCache) { Remove-Item $viteCache -Recurse -Force }
+
+Write-Host "تم إصلاح Home.tsx وتهيئة ملفات التشغيل المحلية بنجاح." -ForegroundColor Green
+Write-Host "تم حفظ نسخة Home الاحتياطية في: $backup"
+Write-Host "شغّل الآن: pnpm check; pnpm test; pnpm build; pnpm dev"
