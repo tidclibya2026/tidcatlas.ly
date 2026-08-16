@@ -212,6 +212,7 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
+<<<<<<< HEAD
 const resolveApiUrl = () =>
   ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
     ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
@@ -221,6 +222,18 @@ const assertApiKey = () => {
   if (!ENV.forgeApiKey) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
+=======
+const resolveApiUrl = () => {
+  const base = ENV.aiApiUrl || ENV.forgeApiUrl;
+  if (!base) throw new Error("AI_API_URL is not configured");
+  return `${base.replace(/\/$/, "")}/v1/chat/completions`;
+};
+
+const resolveApiKey = () => ENV.aiApiKey || ENV.forgeApiKey;
+
+const assertApiKey = () => {
+  if (!resolveApiKey()) throw new Error("AI_API_KEY is not configured");
+>>>>>>> origin/repair/latest-atlas-2026
 };
 
 const normalizeResponseFormat = ({
@@ -405,7 +418,11 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     method: "POST",
     headers: {
       "content-type": "application/json",
+<<<<<<< HEAD
       authorization: `Bearer ${ENV.forgeApiKey}`,
+=======
+      authorization: `Bearer ${resolveApiKey()}`,
+>>>>>>> origin/repair/latest-atlas-2026
     },
     body: JSON.stringify(payload),
   });
@@ -435,12 +452,21 @@ export type ModelsResponse = {
 export async function listLLMModels(): Promise<ModelsResponse> {
   assertApiKey();
 
+<<<<<<< HEAD
   const url = ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
     ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/models`
     : "https://forge.manus.im/v1/models";
 
   const response = await fetchWithBackoff(url, {
     headers: { authorization: `Bearer ${ENV.forgeApiKey}` },
+=======
+  const base = ENV.aiApiUrl || ENV.forgeApiUrl;
+  if (!base) throw new Error("AI_API_URL is not configured");
+  const url = `${base.replace(/\/$/, "")}/v1/models`;
+
+  const response = await fetchWithBackoff(url, {
+    headers: { authorization: `Bearer ${resolveApiKey()}` },
+>>>>>>> origin/repair/latest-atlas-2026
   });
 
   if (!response.ok) {

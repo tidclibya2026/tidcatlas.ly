@@ -8,6 +8,11 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+<<<<<<< HEAD
+=======
+import { ENV } from "./env";
+import { registerLocalAuthRoutes } from "./localAuth";
+>>>>>>> origin/repair/latest-atlas-2026
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -34,8 +39,17 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+<<<<<<< HEAD
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+=======
+  if (ENV.storageDriver === "local") {
+    app.use(ENV.publicStorageUrl, express.static(ENV.storageDir, { fallthrough: false }));
+  }
+  if (process.env.ENABLE_LEGACY_MANUS === "true") registerStorageProxy(app);
+  if (ENV.authMode === "local") registerLocalAuthRoutes(app);
+  if (ENV.authMode === "oidc" || process.env.ENABLE_LEGACY_MANUS === "true") registerOAuthRoutes(app);
+>>>>>>> origin/repair/latest-atlas-2026
   // tRPC API
   app.use(
     "/api/trpc",

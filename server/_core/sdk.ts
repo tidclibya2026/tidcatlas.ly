@@ -83,11 +83,19 @@ const createOAuthHttpClient = (): AxiosInstance =>
 
 class SDKServer {
   private readonly client: AxiosInstance;
+<<<<<<< HEAD
   private readonly oauthService: OAuthService;
 
   constructor(client: AxiosInstance = createOAuthHttpClient()) {
     this.client = client;
     this.oauthService = new OAuthService(this.client);
+=======
+  private readonly oauthService: OAuthService | null;
+
+  constructor(client: AxiosInstance = createOAuthHttpClient()) {
+    this.client = client;
+    this.oauthService = ENV.authMode === "local" ? null : new OAuthService(this.client);
+>>>>>>> origin/repair/latest-atlas-2026
   }
 
   private deriveLoginMethod(
@@ -121,6 +129,10 @@ class SDKServer {
     code: string,
     state: string
   ): Promise<ExchangeTokenResponse> {
+<<<<<<< HEAD
+=======
+    if (!this.oauthService) throw new Error("OAuth is disabled in local authentication mode");
+>>>>>>> origin/repair/latest-atlas-2026
     return this.oauthService.getTokenByCode(code, state);
   }
 
@@ -130,6 +142,10 @@ class SDKServer {
    * const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
    */
   async getUserInfo(accessToken: string): Promise<GetUserInfoResponse> {
+<<<<<<< HEAD
+=======
+    if (!this.oauthService) throw new Error("OAuth is disabled in local authentication mode");
+>>>>>>> origin/repair/latest-atlas-2026
     const data = await this.oauthService.getUserInfoByToken({
       accessToken,
     } as ExchangeTokenResponse);

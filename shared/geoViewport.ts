@@ -13,13 +13,18 @@ export function distanceKm(from: [number, number], to: [number, number]) {
 }
 
 export function isPointInViewport(point: GeoPoint, viewport: GeoViewport) {
+<<<<<<< HEAD
   const inLongitude = viewport.west <= viewport.east
     ? point.lng >= viewport.west && point.lng <= viewport.east
     : point.lng >= viewport.west || point.lng <= viewport.east;
+=======
+  const inLongitude = viewport.west <= viewport.east ? point.lng >= viewport.west && point.lng <= viewport.east : point.lng >= viewport.west || point.lng <= viewport.east;
+>>>>>>> origin/repair/latest-atlas-2026
   return point.lat >= viewport.south && point.lat <= viewport.north && inLongitude;
 }
 
 export function nearbyPoints<T extends GeoPoint>(points: T[], viewport: GeoViewport, limit = 12) {
+<<<<<<< HEAD
   const center: [number, number] = [
     (viewport.south + viewport.north) / 2,
     (viewport.west + viewport.east) / 2,
@@ -33,4 +38,8 @@ export function nearbyPoints<T extends GeoPoint>(points: T[], viewport: GeoViewp
     }))
     .sort((a, b) => a.distanceKm - b.distanceKm)
     .slice(0, limit);
+=======
+  const center: [number, number] = [(viewport.south + viewport.north) / 2, (viewport.west + viewport.east) / 2];
+  return points.filter((point) => isPointInViewport(point, viewport)).map((point) => ({ ...point, distanceKm: distanceKm(center, [point.lat, point.lng]) })).sort((a, b) => a.distanceKm - b.distanceKm).slice(0, limit);
+>>>>>>> origin/repair/latest-atlas-2026
 }

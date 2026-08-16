@@ -18,6 +18,13 @@ function value(site: FilterableAtlasSite, keys: string[]) {
   return keys.map((key) => site.properties[key] ?? site.properties[key.toLowerCase()]).find(Boolean)?.toString() ?? "";
 }
 
+<<<<<<< HEAD
+=======
+export function normalizeAtlasSearch(value: string) {
+  return value.normalize("NFKC").replace(/[ًٌٍَُِّْـ]/g, "").replace(/[إأآا]/g, "ا").replace(/ى/g, "ي").trim().toLocaleLowerCase();
+}
+
+>>>>>>> origin/repair/latest-atlas-2026
 const CATEGORY_FAMILIES = [
   { label: "تاريخية", terms: ["تاريخ", "histor", "old city", "مدينة قديمة", "قلعة", "قصر"] },
   { label: "طبيعية", terms: ["طبي", "natural", "nature", "واحة", "بحيرة", "وادي", "شلال", "جبل", "صحراء", "محمية"] },
@@ -37,13 +44,22 @@ export function atlasCategoryFamilies() {
 }
 
 export function filterAtlasSites<T extends FilterableAtlasSite>(sites: T[], filters: AtlasSiteFilters): T[] {
+<<<<<<< HEAD
   const query = (filters.query ?? "").trim().toLocaleLowerCase();
+=======
+  const query = normalizeAtlasSearch(filters.query ?? "");
+>>>>>>> origin/repair/latest-atlas-2026
   return sites.filter((site) => {
     const category = value(site, ["category", "type", "classification", "التصنيف"]);
     const categoryFamily = inferAtlasCategory(site);
     const municipality = value(site, ["municipality", "municipality_name", "بلدية", "البلدية", "city"]);
     const status = value(site, ["status", "حالة السجل", "الحالة"]) || "منشور";
+<<<<<<< HEAD
     const matchesQuery = !query || `${site.name} ${site.description} ${category} ${municipality}`.toLocaleLowerCase().includes(query);
+=======
+    const searchableText = [site.name, site.description, category, municipality, site.layerId, ...Object.values(site.properties)].filter(Boolean).join(" ");
+    const matchesQuery = !query || normalizeAtlasSearch(searchableText).includes(query);
+>>>>>>> origin/repair/latest-atlas-2026
     return matchesQuery
       && (!filters.category || filters.category === "all" || category === filters.category || categoryFamily === filters.category)
       && (!filters.municipality || filters.municipality === "all" || municipality === filters.municipality)

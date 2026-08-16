@@ -75,6 +75,7 @@ export async function transcribeAudio(
 ): Promise<TranscriptionResponse | TranscriptionError> {
   try {
     // Step 1: Validate environment configuration
+<<<<<<< HEAD
     if (!ENV.forgeApiUrl) {
       return {
         error: "Voice transcription service is not configured",
@@ -87,6 +88,20 @@ export async function transcribeAudio(
         error: "Voice transcription service authentication is missing",
         code: "SERVICE_ERROR",
         details: "BUILT_IN_FORGE_API_KEY is not set"
+=======
+    if (!ENV.transcriptionApiUrl) {
+      return {
+        error: "Voice transcription service is not configured",
+        code: "SERVICE_ERROR",
+        details: "TRANSCRIPTION_API_URL is not set"
+      };
+    }
+    if (!ENV.transcriptionApiKey) {
+      return {
+        error: "Voice transcription service authentication is missing",
+        code: "SERVICE_ERROR",
+        details: "TRANSCRIPTION_API_KEY is not set"
+>>>>>>> origin/repair/latest-atlas-2026
       };
     }
 
@@ -143,9 +158,15 @@ export async function transcribeAudio(
     formData.append("prompt", prompt);
 
     // Step 4: Call the transcription service
+<<<<<<< HEAD
     const baseUrl = ENV.forgeApiUrl.endsWith("/")
       ? ENV.forgeApiUrl
       : `${ENV.forgeApiUrl}/`;
+=======
+    const baseUrl = ENV.transcriptionApiUrl.endsWith("/")
+      ? ENV.transcriptionApiUrl
+      : `${ENV.transcriptionApiUrl}/`;
+>>>>>>> origin/repair/latest-atlas-2026
     
     const fullUrl = new URL(
       "v1/audio/transcriptions",
@@ -155,7 +176,11 @@ export async function transcribeAudio(
     const response = await fetch(fullUrl, {
       method: "POST",
       headers: {
+<<<<<<< HEAD
         authorization: `Bearer ${ENV.forgeApiKey}`,
+=======
+        authorization: `Bearer ${ENV.transcriptionApiKey}`,
+>>>>>>> origin/repair/latest-atlas-2026
         "Accept-Encoding": "identity",
       },
       body: formData,

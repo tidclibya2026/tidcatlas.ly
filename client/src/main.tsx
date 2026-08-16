@@ -5,7 +5,11 @@ import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
+<<<<<<< HEAD
 import { startLogin } from "./const";
+=======
+import { isGithubPagesHost, startLogin } from "./const";
+>>>>>>> origin/repair/latest-atlas-2026
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -16,7 +20,11 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
 
+<<<<<<< HEAD
   if (!isUnauthorized) return;
+=======
+  if (!isUnauthorized || isGithubPagesHost() || !import.meta.env.VITE_OAUTH_PORTAL_URL) return;
+>>>>>>> origin/repair/latest-atlas-2026
 
   startLogin();
 };

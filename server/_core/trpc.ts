@@ -16,6 +16,20 @@ const requireUser = t.middleware(async ({ ctx, next }) => {
 
 export const protectedProcedure = t.procedure.use(requireUser);
 
+<<<<<<< HEAD
+=======
+async function getSafeActiveTeamMember(user: NonNullable<TrpcContext["user"]>) {
+  try {
+    return await getActiveTeamMemberForUser(user);
+  } catch (error) {
+    // Authorization must fail closed when the membership store is unavailable.
+    // Do not expose a database error as an internal server error to callers.
+    console.error("[AuthZ] Unable to resolve documentation team membership", error);
+    return undefined;
+  }
+}
+
+>>>>>>> origin/repair/latest-atlas-2026
 export const adminProcedure = t.procedure.use(
   t.middleware(async ({ ctx, next }) => {
     if (!ctx.user || ctx.user.role !== "admin") {
@@ -28,7 +42,11 @@ export const adminProcedure = t.procedure.use(
 const documentationAccess = t.middleware(async ({ ctx, next }) => {
   if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
   if (ctx.user.role === "admin") return next({ ctx: { ...ctx, user: ctx.user, teamMember: null } });
+<<<<<<< HEAD
   const teamMember = await getActiveTeamMemberForUser(ctx.user);
+=======
+  const teamMember = await getSafeActiveTeamMember(ctx.user);
+>>>>>>> origin/repair/latest-atlas-2026
   if (!teamMember) throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك عضوية نشطة في فريق التوثيق" });
   return next({ ctx: { ...ctx, user: ctx.user, teamMember } });
 });
@@ -39,7 +57,11 @@ const roleProcedure = (allowed: Array<"reviewer" | "editor" | "import_manager">)
   t.middleware(async ({ ctx, next }) => {
     if (ctx.user?.role === "admin") return next();
     if (ctx.user) {
+<<<<<<< HEAD
       const teamMember = await getActiveTeamMemberForUser(ctx.user);
+=======
+      const teamMember = await getSafeActiveTeamMember(ctx.user);
+>>>>>>> origin/repair/latest-atlas-2026
       if (teamMember && allowed.includes(teamMember.teamRole)) return next();
     }
     throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك الصلاحية المطلوبة لهذه العملية" });

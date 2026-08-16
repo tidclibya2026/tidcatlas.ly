@@ -1,0 +1,45 @@
+name: Standalone CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_DATABASE: libya_tourism_atlas_test
+          MARIADB_USER: atlas_test
+          MARIADB_PASSWORD: atlas_test_password
+          MARIADB_ROOT_PASSWORD: root_test_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: mysql://atlas_test:atlas_test_password@127.0.0.1:3306/libya_tourism_atlas_test
+      JWT_SECRET: ci-only-random-secret-change-me
+      AUTH_MODE: local
+      STORAGE_DRIVER: local
+      STORAGE_DIR: /tmp/libya-tourism-atlas-uploads
+      PUBLIC_STORAGE_URL: /uploads
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test
+      - run: pnpm build

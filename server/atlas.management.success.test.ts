@@ -80,8 +80,13 @@ describe("atlas documentation success flows", () => {
     const caller = appRouter.createCaller(ctx());
     const image = await caller.atlas.addImage({ pointId: 4, imageUrl: "https://example.com/site.jpg", sourceUrl: "https://example.com/source", sourceKind: "web_page", ownerName: "TIDC", license: "Permission pending", rightsNote: "يجب مراجعة إذن الاستخدام قبل النشر.", rightsWarning: true, isPrimary: true });
     expect(image).toMatchObject({ pointId: 4, sourceKind: "web_page", rightsWarning: true });
+<<<<<<< HEAD
     const reviewed = await caller.atlas.reviewImage({ id: 21, reviewStatus: "approved", rightsNote: "تم توثيق المصدر." });
     expect(reviewed).toMatchObject({ id: 21, reviewStatus: "approved" });
+=======
+    const reviewed = await caller.atlas.reviewImage({ id: 21, reviewStatus: "approved", isPrimary: true, rightsNote: "تم توثيق المصدر." });
+    expect(reviewed).toMatchObject({ id: 21, reviewStatus: "approved", isPrimary: true, rightsNote: "تم توثيق المصدر." });
+>>>>>>> origin/repair/latest-atlas-2026
     expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_image", action: "create" }));
     expect(auditLog).toHaveBeenCalledWith(expect.objectContaining({ entityType: "atlas_image", action: "review" }));
   });

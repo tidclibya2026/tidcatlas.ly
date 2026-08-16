@@ -12,6 +12,16 @@ describe("filterAtlasSites", () => {
     expect(filterAtlasSites(sites, { status: "مسودة" }).map((site) => site.id)).toEqual(["b"]);
   });
 
+<<<<<<< HEAD
+=======
+  it("searches Arabic and English names stored in site properties", () => {
+    const multilingualSites = [{ id: "heritage-1", name: "مسرح لبدة", description: "", layerId: "heritage", properties: { name_en: "Leptis Magna Theatre", landmark_en: "Septimius Severus" } }];
+    expect(filterAtlasSites(multilingualSites, { query: "مسرح لبدة" })).toHaveLength(1);
+    expect(filterAtlasSites(multilingualSites, { query: "Leptis Magna" })).toHaveLength(1);
+    expect(filterAtlasSites(multilingualSites, { query: "Septimius" })).toHaveLength(1);
+  });
+
+>>>>>>> origin/repair/latest-atlas-2026
   it("returns an empty result when no verified record matches", () => {
     expect(filterAtlasSites(sites, { query: "سرت", status: "منشور" })).toHaveLength(0);
   });

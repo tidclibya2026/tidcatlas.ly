@@ -8,10 +8,18 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, atlasEditorProcedure, atlasImportProcedure, atlasReviewerProcedure, documentationProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
+<<<<<<< HEAD
 import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating, listTop150ReviewDecisions, upsertTop150ReviewDecision } from "./db";
 import { parseExcel, parseKml, type ImportRow } from "./importParsers";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
+=======
+import { archiveAtlasImage, archiveAtlasPoint, createAtlasImage, createAtlasLayer, createAtlasPoint, createAtlasPointsBatch, createAuditLog, createImportJob, findPotentialDuplicatePoints, getActiveTeamMemberForUser, getAtlasPoint, getImportJob, listAtlasImages, listAtlasImageReviewQueue, reassignAtlasImage, getAtlasDataSnapshot, listAtlasSuggestions, createAtlasSuggestion, updateAtlasSuggestion, listAtlasLayers, listAtlasPoints, listPublishedAtlasPointsWithImages, createAtlasImagesBatch, listBackups, listImportJobs, listReviewQueue, listTeamMembers, mergeAtlasPoints, createBackupRecord, createTeamMember, updateBackupRecord, updateTeamMember, updateAtlasImage, updateAtlasLayer, updateAtlasPoint, updateImportJob, listAtlasComments, createAtlasComment, updateAtlasComment, getAtlasComment, getAtlasRatingSummary, upsertAtlasRating, listTop150ReviewDecisions, upsertTop150ReviewDecision } from "./db";
+import { extractKmlImageUrls, parseExcel, parseKml, type ImportRow } from "./importParsers";
+import { storageGetSignedUrl, storagePut } from "./storage";
+import { invokeLLM } from "./_core/llm";
+import { transcribeAudio } from "./_core/voiceTranscription";
+>>>>>>> origin/repair/latest-atlas-2026
 
 const assistantSiteInput = z.object({
   id: z.string().max(160),
@@ -28,6 +36,13 @@ const assistantSiteInput = z.object({
 const assistantContext = z.object({
   question: z.string().min(2).max(1200),
   mode: z.enum(["researcher", "tourist", "visitor"]).default("visitor"),
+<<<<<<< HEAD
+=======
+  viewport: z.object({ south: z.number(), west: z.number(), north: z.number(), east: z.number(), zoom: z.number().min(0).max(24) }).optional(),
+  nearbyIds: z.array(z.string().max(120)).max(24).optional(),
+  nearbyNames: z.array(z.string().min(1).max(255)).max(24).optional(),
+  language: z.enum(["ar", "en"]).default("ar"),
+>>>>>>> origin/repair/latest-atlas-2026
 });
 
 async function getVerifiedAssistantSites() {
@@ -58,6 +73,23 @@ const pointInput = z.object({
 
 export const appRouter = router({
   system: systemRouter,
+<<<<<<< HEAD
+=======
+  voice: router({
+    transcribe: publicProcedure.input(z.object({ audioDataUrl: z.string().regex(/^data:audio\/[a-z0-9.+-]+;base64,/i).max(24_000_000), language: z.enum(["ar", "en"]).default("ar") })).mutation(async ({ input }) => {
+      const match = input.audioDataUrl.match(/^data:(audio\/[a-z0-9.+-]+);base64,(.+)$/i);
+      if (!match) throw new TRPCError({ code: "BAD_REQUEST", message: input.language === "en" ? "Invalid audio recording." : "التسجيل الصوتي غير صالح." });
+      const [, contentType, encoded] = match;
+      const buffer = Buffer.from(encoded, "base64");
+      if (!buffer.length || buffer.length > 16 * 1024 * 1024) throw new TRPCError({ code: "PAYLOAD_TOO_LARGE", message: input.language === "en" ? "Audio must be smaller than 16 MB." : "يجب أن يكون التسجيل الصوتي أصغر من 16 ميغابايت." });
+      const extension = contentType.split("/")[1]?.split(";")[0] || "webm";
+      const uploaded = await storagePut(`voice/atlas-question.${extension}`, buffer, contentType);
+      const result = await transcribeAudio({ audioUrl: uploaded.url, language: input.language, prompt: input.language === "en" ? "Transcribe a tourism and geography question in English." : "حوّل سؤالًا عن السياحة والجغرافيا في ليبيا إلى نص عربي واضح." });
+      if ("error" in result) throw new TRPCError({ code: "BAD_REQUEST", message: result.error, cause: result });
+      return { text: result.text, language: result.language || input.language };
+    }),
+  }),
+>>>>>>> origin/repair/latest-atlas-2026
   auth: router({
     me: publicProcedure.query(({ ctx }) => ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -70,11 +102,24 @@ export const appRouter = router({
     smartSearch: publicProcedure.input(assistantContext).mutation(async ({ input }) => {
       const sites = await getVerifiedAssistantSites();
       if (!sites.length) throw new TRPCError({ code: "BAD_REQUEST", message: "لا توجد سجلات منشورة كافية للبحث الذكي." });
+<<<<<<< HEAD
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
           { role: "system", content: "أنت مساعد بحث جغرافي لمشروع أطلس ليبيا السياحي. أجب بالعربية اعتمادًا حصريًا على سجلات المواقع المرفقة. لا تخترع مواقع أو أرقامًا أو مصادر. إذا لم تكفِ البيانات، صرّح بذلك بوضوح. أعد JSON فقط." },
           { role: "user", content: `نمط المستخدم: ${input.mode}\nالسؤال: ${input.question}\nسجلات الأطلس المتاحة:\n${JSON.stringify(sites)}` },
+=======
+      const nearbyIdSet = new Set(input.nearbyIds ?? []);
+      const nearbyNameSet = new Set((input.nearbyNames ?? []).map((name) => name.trim().toLocaleLowerCase("ar")));
+      const scopedSites = nearbyIdSet.size || nearbyNameSet.size ? sites.filter((site) => nearbyIdSet.has(site.id) || nearbyNameSet.has(site.name.trim().toLocaleLowerCase("ar"))) : sites;
+      const searchSites = scopedSites.length ? scopedSites : sites;
+      const viewportText = input.viewport ? `النطاق الجغرافي الظاهر حاليًا: جنوب ${input.viewport.south.toFixed(4)}، غرب ${input.viewport.west.toFixed(4)}، شمال ${input.viewport.north.toFixed(4)}، شرق ${input.viewport.east.toFixed(4)}، مستوى التكبير ${input.viewport.zoom.toFixed(1)}.` : "لا يوجد نطاق خريطة محدد.";
+      const response = await invokeLLM({
+        model: "gpt-5-mini",
+        messages: [
+          { role: "system", content: `أنت مساعد بحث جغرافي لمشروع أطلس ليبيا السياحي. اعتمد حصريًا على سجلات المواقع المرفقة، ولا تخترع مواقع أو أرقامًا أو مصادر. إذا لم تكفِ البيانات، صرّح بذلك بوضوح. أعد JSON فقط. لغة الإخراج الإلزامية لحقول answer وsources وlimitation: ${input.language === "en" ? "English" : "العربية"}. أبقِ أسماء المواقع الرسمية كما هي عند الحاجة.` },
+          { role: "user", content: `لغة المستخدم: ${input.language === "en" ? "English" : "العربية"}\nنمط المستخدم: ${input.mode}\n${viewportText}\nالسؤال: ${input.question}\n${nearbyIdSet.size ? "هذه السجلات هي الأقرب للنطاق الحالي؛ أعطها الأولوية ولا تقترح سجلاً خارجها إلا إذا لم تكفِ البيانات:" : "سجلات الأطلس المتاحة:"}\n${JSON.stringify(searchSites)}` },
+>>>>>>> origin/repair/latest-atlas-2026
         ],
         reasoning: { effort: "low" },
         response_format: { type: "json_schema", json_schema: { name: "atlas_search", strict: true, schema: { type: "object", properties: { answer: { type: "string" }, matchedIds: { type: "array", items: { type: "string" } }, sources: { type: "array", items: { type: "string" } }, confidence: { type: "string", enum: ["high", "medium", "low"] }, limitation: { type: "string" } }, required: ["answer", "matchedIds", "sources", "confidence", "limitation"], additionalProperties: false } } },
@@ -83,18 +128,31 @@ export const appRouter = router({
       const content = response.choices[0]?.message.content;
       const raw = typeof content === "string" ? content : content?.map((part) => part.type === "text" ? part.text : "").join("") || "{}";
       const parsed = JSON.parse(raw) as { answer: string; matchedIds: string[]; sources: string[]; confidence: "high" | "medium" | "low"; limitation: string };
+<<<<<<< HEAD
       const validIds = new Set(sites.map((site) => site.id));
       const validSources = new Set(sites.flatMap((site) => [site.name, site.source].filter(Boolean) as string[]));
       return { ...parsed, matchedIds: parsed.matchedIds.filter((id) => validIds.has(id)), sources: parsed.sources.filter((source) => validSources.has(source)) };
     }),
     routePlan: publicProcedure.input(z.object({ mode: z.enum(["researcher", "tourist", "visitor"]), startName: z.string().max(255).optional(), durationHours: z.number().min(1).max(120), interests: z.array(z.string().max(120)).max(8) })).mutation(async ({ input }) => {
+=======
+      const validIds = new Set(searchSites.map((site) => site.id));
+      const validSources = new Set(searchSites.flatMap((site) => [site.name, site.source].filter(Boolean) as string[]));
+      return { ...parsed, matchedIds: parsed.matchedIds.filter((id) => validIds.has(id)), sources: parsed.sources.filter((source) => validSources.has(source)) };
+    }),
+    routePlan: publicProcedure.input(z.object({ mode: z.enum(["researcher", "tourist", "visitor"]), startName: z.string().max(255).optional(), durationHours: z.number().min(1).max(120), interests: z.array(z.string().max(120)).max(8), language: z.enum(["ar", "en"]).default("ar") })).mutation(async ({ input }) => {
+>>>>>>> origin/repair/latest-atlas-2026
       const sites = (await getVerifiedAssistantSites()).slice(0, 80);
       if (sites.length < 2) throw new TRPCError({ code: "BAD_REQUEST", message: "يحتاج المسار إلى سجلين منشورين على الأقل." });
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
+<<<<<<< HEAD
           { role: "system", content: "أنت مخطط مسارات جغرافية لمشروع أطلس ليبيا السياحي. استخدم المواقع المرفقة فقط، ولا تضف أي موقع غير موجود. رتّب محطات منطقية حسب نمط المستخدم والاهتمامات والوقت، واذكر أن الترتيب تقريبي ما لم تتوفر شبكة طرق. أعد JSON فقط." },
           { role: "user", content: `النمط: ${input.mode}\nنقطة البداية: ${input.startName || "غير محددة"}\nالمدة بالساعات: ${input.durationHours}\nالاهتمامات: ${input.interests.join(", ") || "استكشاف عام"}\nالمواقع الموثقة:\n${JSON.stringify(sites)}` },
+=======
+          { role: "system", content: `أنت مخطط مسارات جغرافية لمشروع أطلس ليبيا السياحي. استخدم المواقع المرفقة فقط، ولا تضف أي موقع غير موجود. رتّب محطات منطقية حسب نمط المستخدم والاهتمامات والوقت، واذكر أن الترتيب تقريبي ما لم تتوفر شبكة طرق. أعد JSON فقط. لغة title وrationale وwarnings الإلزامية: ${input.language === "en" ? "English" : "العربية"}.` },
+          { role: "user", content: `لغة المستخدم: ${input.language === "en" ? "English" : "العربية"}\nالنمط: ${input.mode}\nنقطة البداية: ${input.startName || "غير محددة"}\nالمدة بالساعات: ${input.durationHours}\nالاهتمامات: ${input.interests.join(", ") || "استكشاف عام"}\nالمواقع الموثقة:\n${JSON.stringify(sites)}` },
+>>>>>>> origin/repair/latest-atlas-2026
         ],
         reasoning: { effort: "low" },
         response_format: { type: "json_schema", json_schema: { name: "atlas_route", strict: true, schema: { type: "object", properties: { title: { type: "string" }, orderedIds: { type: "array", items: { type: "string" } }, rationale: { type: "string" }, warnings: { type: "array", items: { type: "string" } } }, required: ["title", "orderedIds", "rationale", "warnings"], additionalProperties: false } } },
@@ -108,7 +166,11 @@ export const appRouter = router({
     }),
     published: publicProcedure
       .input(z.object({ layerId: z.string().max(80).optional() }).optional())
+<<<<<<< HEAD
       .query(({ input }) => listAtlasPoints(input?.layerId, "published")),
+=======
+      .query(({ input }) => listPublishedAtlasPointsWithImages(input?.layerId)),
+>>>>>>> origin/repair/latest-atlas-2026
     layers: publicProcedure.query(() => listAtlasLayers()),
     manageLayers: adminProcedure.query(() => listAtlasLayers(true)),
     createLayer: adminProcedure.input(z.object({ id: z.string().regex(/^[a-z0-9-]{2,80}$/), label: z.string().min(2).max(160), description: z.string().max(4000).optional(), color: z.string().regex(/^#[0-9a-fA-F]{6}$/), icon: z.string().min(1).max(80) })).mutation(async ({ input, ctx }) => { const layer = await createAtlasLayer({ ...input, createdBy: ctx.user.id, status: "active" }); await createAuditLog({ entityType: "atlas_layer", entityId: 0, action: "create", details: JSON.stringify(input), actorId: ctx.user.id }); return layer; }),
@@ -304,9 +366,15 @@ export const appRouter = router({
     }),
     imageReviewQueue: adminProcedure.query(() => listAtlasImageReviewQueue()),
     reassignImage: adminProcedure.input(z.object({ imageId: z.number().int().positive(), pointId: z.number().int().positive(), reason: z.string().min(3).max(1000) })).mutation(async ({ input, ctx }) => { const image = await reassignAtlasImage(input.imageId, input.pointId); await createAuditLog({ entityType: "atlas_image", entityId: input.imageId, action: "reassign", details: JSON.stringify({ pointId: input.pointId, reason: input.reason }), actorId: ctx.user.id }); return image; }),
+<<<<<<< HEAD
     reviewImage: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), reviewStatus: z.enum(["pending", "approved", "rejected"]), rightsNote: z.string().min(3).max(4000).optional() })).mutation(async ({ input, ctx }) => {
       const image = await updateAtlasImage(input.id, { reviewStatus: input.reviewStatus, rightsNote: input.rightsNote, reviewedBy: ctx.user.id, reviewedAt: new Date() });
       await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "review", details: JSON.stringify({ reviewStatus: input.reviewStatus }), actorId: ctx.user.id });
+=======
+    reviewImage: atlasReviewerProcedure.input(z.object({ id: z.number().int().positive(), reviewStatus: z.enum(["pending", "approved", "rejected"]), rightsNote: z.string().min(3).max(4000).optional(), isPrimary: z.boolean().optional() })).mutation(async ({ input, ctx }) => {
+      const image = await updateAtlasImage(input.id, { reviewStatus: input.reviewStatus, rightsNote: input.rightsNote, isPrimary: input.reviewStatus === "approved" ? input.isPrimary : false, reviewedBy: ctx.user.id, reviewedAt: new Date() });
+      await createAuditLog({ entityType: "atlas_image", entityId: input.id, action: "review", details: JSON.stringify({ reviewStatus: input.reviewStatus, isPrimary: input.isPrimary ?? false }), actorId: ctx.user.id });
+>>>>>>> origin/repair/latest-atlas-2026
       return image;
     }),
     importJobs: atlasImportProcedure.query(({ ctx }) => listImportJobs(ctx.user.id)),
@@ -360,9 +428,23 @@ export const appRouter = router({
         const unique = parsed.rows.filter((row) => { if (known.has(row.fingerprint)) return false; known.add(row.fingerprint); return true; });
         const points = unique.map((row: ImportRow) => ({ layerId: row.layerId, name: row.name, nameEn: row.nameEn, description: row.description, latitude: row.latitude, longitude: row.longitude, municipality: row.municipality, category: row.category, source: row.source, sourceKind: row.sourceKind, sourceRecordId: row.sourceRecordId, metadata: JSON.stringify(row.metadata), status: "draft" as const, recordStatus: "pending_review" as const, fingerprint: row.fingerprint, createdBy: ctx.user.id }));
         await createAtlasPointsBatch(points);
+<<<<<<< HEAD
         await updateImportJob(input.jobId, { status: parsed.issues.length ? "needs_review" : "completed", totalRows: parsed.totalRows, importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length, errorSummary: parsed.issues.length ? JSON.stringify(parsed.issues.slice(0, 100)) : null });
         await createAuditLog({ entityType: "atlas_import_job", entityId: input.jobId, action: "commit", details: JSON.stringify({ importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length }), actorId: ctx.user.id });
         return { jobId: input.jobId, status: parsed.issues.length ? "needs_review" : "completed", totalRows: parsed.totalRows, importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length, issues: parsed.issues.slice(0, 100) };
+=======
+        const insertedPoints = await listAtlasPoints();
+        const pointByFingerprint = new Map(insertedPoints.filter((point) => unique.some((row) => row.fingerprint === point.fingerprint)).map((point) => [point.fingerprint, point]));
+        const importedImages = unique.flatMap((row) => {
+          const point = pointByFingerprint.get(row.fingerprint);
+          if (!point || input.sourceKind !== "kml") return [];
+          return extractKmlImageUrls(row).map((imageUrl, index) => ({ pointId: point.id, imageUrl, sourceUrl: imageUrl, sourceKind: "kml" as const, sourceRecordId: row.sourceRecordId, sourceFileName: input.fileName, importJobId: input.jobId, rightsNote: "رابط صورة مستورد من ملف KML؛ يجب على فريق التوثيق مراجعة المصدر وحقوق الاستخدام قبل الاعتماد.", rightsWarning: true, isPrimary: index === 0, reviewStatus: "pending" as const, createdBy: ctx.user.id }));
+        });
+        await createAtlasImagesBatch(importedImages);
+        await updateImportJob(input.jobId, { status: parsed.issues.length ? "needs_review" : "completed", totalRows: parsed.totalRows, importedRows: points.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length, errorSummary: parsed.issues.length ? JSON.stringify(parsed.issues.slice(0, 100)) : null });
+        await createAuditLog({ entityType: "atlas_import_job", entityId: input.jobId, action: "commit", details: JSON.stringify({ importedRows: points.length, importedImages: importedImages.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length }), actorId: ctx.user.id });
+        return { jobId: input.jobId, status: parsed.issues.length ? "needs_review" : "completed", totalRows: parsed.totalRows, importedRows: points.length, importedImages: importedImages.length, duplicateRows: parsed.rows.length - unique.length, rejectedRows: parsed.issues.length, issues: parsed.issues.slice(0, 100) };
+>>>>>>> origin/repair/latest-atlas-2026
       } catch (error) {
         await updateImportJob(input.jobId, { status: "failed", errorSummary: error instanceof Error ? error.message : "فشل غير معروف" });
         throw error;

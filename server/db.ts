@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { and, desc, eq, gt, like, lt, or } from "drizzle-orm";
+=======
+import { eq, desc, asc, and, or, like, sql, ne, gt, lt } from "drizzle-orm";
+>>>>>>> origin/repair/latest-atlas-2026
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   atlasAuditLogs,
@@ -70,6 +74,31 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+<<<<<<< HEAD
+=======
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+  return result[0];
+}
+
+export async function createLocalUser(input: { email: string; name: string; passwordHash: string; role?: "user" | "admin" }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const openId = `local_${crypto.randomUUID()}`;
+  await db.insert(users).values({ openId, email: normalizedEmail, name: input.name.trim(), passwordHash: input.passwordHash, loginMethod: "local", role: input.role ?? "user", isActive: true });
+  return getUserByOpenId(openId);
+}
+
+export async function updateUserPasswordHash(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
+}
+
+>>>>>>> origin/repair/latest-atlas-2026
 export async function listAtlasLayers(includeArchived = false) {
   const db = await getDb();
   if (!db) return [];
@@ -103,6 +132,23 @@ export async function listAtlasPoints(layerId?: string, status?: "draft" | "publ
   return db.select().from(atlasPoints).where(filters.length ? and(...filters) : undefined).orderBy(desc(atlasPoints.createdAt));
 }
 
+<<<<<<< HEAD
+=======
+export async function listPublishedAtlasPointsWithImages(layerId?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const points = await listAtlasPoints(layerId, "published");
+  if (!points.length) return points;
+  const approvedImages = await db.select().from(atlasImages).where(eq(atlasImages.reviewStatus, "approved")).orderBy(desc(atlasImages.isPrimary), desc(atlasImages.createdAt));
+  const primaryByPoint = new Map<number, (typeof approvedImages)[number]>();
+  for (const image of approvedImages) if (!primaryByPoint.has(image.pointId)) primaryByPoint.set(image.pointId, image);
+  return points.map((point) => {
+    const image = primaryByPoint.get(point.id);
+    return image ? { ...point, imageUrl: image.imageUrl, imageKey: image.storageKey || point.imageKey, imageSourceUrl: image.sourceUrl, imageAuthor: image.photographerName || image.ownerName, imageLicense: image.license, imageRightsNote: image.rightsNote } : point;
+  });
+}
+
+>>>>>>> origin/repair/latest-atlas-2026
 export async function listReviewQueue(recordStatus?: "draft" | "pending_review" | "approved" | "published" | "rejected" | "archived", filters?: { search?: string; layerId?: string; municipality?: string; category?: string; sort?: "newest" | "oldest" | "name" }) {
   const db = await getDb();
   if (!db) return [];
@@ -189,6 +235,7 @@ export async function listAtlasImages(pointId?: number) {
 export async function createAtlasImage(image: InsertAtlasImage) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
+<<<<<<< HEAD
   const result = await db.insert(atlasImages).values(image);
   const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, Number(result[0].insertId))).limit(1);
   return rows[0];
@@ -197,6 +244,31 @@ export async function createAtlasImage(image: InsertAtlasImage) {
 export async function updateAtlasImage(id: number, patch: Partial<InsertAtlasImage>) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة");
+=======
+  await db.transaction(async (tx) => {
+    if (image.isPrimary) await tx.update(atlasImages).set({ isPrimary: false }).where(eq(atlasImages.pointId, image.pointId));
+    await tx.insert(atlasImages).values(image);
+  });
+  const rows = await db.select().from(atlasImages).where(and(eq(atlasImages.pointId, image.pointId), eq(atlasImages.imageUrl, image.imageUrl))).orderBy(desc(atlasImages.createdAt)).limit(1);
+  return rows[0];
+}
+
+export async function createAtlasImagesBatch(images: InsertAtlasImage[]) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  if (!images.length) return { inserted: 0 };
+  await db.insert(atlasImages).values(images);
+  return { inserted: images.length };
+}
+
+export async function updateAtlasImage(id: number, patch: Partial<InsertAtlasImage>) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة");
+  if (patch.isPrimary === true) {
+    const current = await db.select({ pointId: atlasImages.pointId }).from(atlasImages).where(eq(atlasImages.id, id)).limit(1);
+    if (current[0]) await db.update(atlasImages).set({ isPrimary: false }).where(and(eq(atlasImages.pointId, current[0].pointId), ne(atlasImages.id, id)));
+  }
+>>>>>>> origin/repair/latest-atlas-2026
   await db.update(atlasImages).set(patch).where(eq(atlasImages.id, id));
   const rows = await db.select().from(atlasImages).where(eq(atlasImages.id, id)).limit(1);
   return rows[0];

@@ -23,6 +23,14 @@ describe("atlas points", () => {
     await expect(caller.atlas.mine()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
   });
 
+<<<<<<< HEAD
+=======
+  it("rejects malformed voice input before upload", async () => {
+    const caller = appRouter.createCaller(context(null));
+    await expect(caller.voice.transcribe({ audioDataUrl: "not-a-data-url", language: "ar" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+>>>>>>> origin/repair/latest-atlas-2026
   it("requires at least one verified record for smart search", async () => {
     const caller = appRouter.createCaller(context(null));
     await expect(caller.atlas.smartSearch({ question: "ما المواقع؟", mode: "visitor", sites: [] })).rejects.toMatchObject({ code: "BAD_REQUEST" });
