@@ -1,0 +1,47 @@
+name: Verify Static Web GIS (preview only)
+on:
+  push:
+    branches:
+      - feat/static-webgis-pages
+    paths:
+      - 'static-atlas/**'
+      - 'client/public/**'
+      - '.github/workflows/static-webgis-verify.yml'
+  pull_request:
+    paths:
+      - 'static-atlas/**'
+      - 'client/public/**'
+      - '.github/workflows/static-webgis-verify.yml'
+permissions:
+  contents: read
+jobs:
+  verify-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble preview without backend
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp -a client/public/. _site/
+          cp static-atlas/index.html _site/index.html
+          touch _site/.nojekyll
+          test -s _site/index.html
+          for file in \
+            world-heritage_ae1639b4.kml \
+            natural-atlas-with-media_5ccb1fb0.geojson \
+            akakus_60c47b41.kml \
+            old-tripoli_5c62867b.kml \
+            hotels_b9547235.kml \
+            resorts_e4a8f065.kml \
+            investment_de22d4a0.kml \
+            restaurants_0642e048.kml; do
+            test -s "_site/data/$file" || { echo "Missing: $file"; exit 1; }
+          done
+          ! grep -Eq '/api/trpc|trpc\.' _site/index.html
+          echo 'Static preview assembled successfully'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-webgis-preview
+          path: _site
+          retention-days: 7
